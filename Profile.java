@@ -1,11 +1,10 @@
-package EECS3311_Project.profile;
+package EECS3311_Project.App;
 import java.util.*;
-
 import javax.naming.directory.InvalidAttributesException;
 
 public class Profile {
    //Data
-   private char sex;
+   private boolean sex; //true = male, false = female
    private Date birth;
    private double height; //In centimeters
    private double weight;
@@ -14,14 +13,14 @@ public class Profile {
 
    //Settings
    private boolean isMetric; //True = Metric, False = Imperial
-   private int bmrSetting;   //1 = Miffin St Jeor, 2 = Revised Harris-Benedict, 3 = Katch McArdle
+   private int bmrSetting;   //0 = Miffin St Jeor, 1 = Revised Harris-Benedict, 2 = Katch McArdle
 
    //Basic constructors
    public Profile() {
-      this(' ', new Date(), 0.0, 0.0);
+      this(true, new Date(), 0.0, 0.0);
    }
 
-   public Profile(char sex, Date birth, double height, double weight) {
+   public Profile(boolean sex, Date birth, double height, double weight) {
       //Data
       this.sex = sex;
       this.birth = birth;
@@ -35,11 +34,11 @@ public class Profile {
 
       //Settings
       isMetric = false; //Default in Imperial
-      bmrSetting = 1;
+      bmrSetting = 0;
    }
 
    //Setters
-   public void setSex(char sex) {
+   public void setSex(boolean sex) {
       //Not sure to use boolean instead :P
       this.sex = sex;
    }
@@ -47,7 +46,7 @@ public class Profile {
    //Two options: Use whatever more convenient (or just ask for a specific one)
    public void setBirth(Date birth) {this.birth = birth;}
    public void setBirth(int year, int month, int day) {
-      this.birth = new Date(year, month, day);
+      this.birth = new Date(year, month, day); //TODO: Deprecated object, possible need for different implementation
    }
 
    public void setHeight(double height) {
@@ -78,7 +77,7 @@ public class Profile {
 
    public void setBMR(int bmrSetting) {
       try {
-         if (bmrSetting < 1 || bmrSetting > 3) throw new InvalidAttributesException("Invalid bmrSetting value, value must be between 1 to 3.");
+         if (bmrSetting < 0 || bmrSetting > 2) throw new InvalidAttributesException("Invalid bmrSetting value, value must be between 1 to 3.");
       } catch (Exception e) {
          e.printStackTrace();
       }
@@ -91,7 +90,7 @@ public class Profile {
    // }
 
    //Getters
-   public char getSex() {return sex;}
+   public boolean getSex() {return sex;}
    public Date getBirth() {return birth;}
    public double getHeight() {
       if (isMetric)
@@ -114,32 +113,3 @@ public class Profile {
    //Not sure if calc method should just return the name or the value
    public int getCalcMethod() {return bmrSetting;}
 }
-
-class Log {
-   private Date loggedDate;
-   private double loggedHeight;
-   private double loggedWeight;
-
-   //Constructors
-   public Log() {
-      this(0.0, 0.0, null);
-   }
-
-   public Log(double height, double weight, Date logDate) {
-      loggedHeight = height;
-      loggedWeight = weight;
-      loggedDate = logDate;
-   }
-
-   //Getters
-   public double getLoggedHeight() {return this.loggedHeight;}
-   public double getLoggedWeight() {return this.loggedWeight;}
-
-   //toString format: YY/MM/DD - Data
-   @Override
-   public String toString() {
-      return String.format("%2d/%2d/%2d - Height: %.2f, Weight: %.2f", 
-         loggedDate.getYear(), loggedDate.getMonth(), loggedDate.getDay(), loggedHeight, loggedWeight);
-   }
-}
-
