@@ -203,6 +203,7 @@ public class CEGraph extends JFrame implements ActionListener {
 	}// end actionPerformed
 
 	class User {
+		// basic user for testing
 		ArrayList<String> dates = new ArrayList<String>();
 		ArrayList<Double> totalCalories = new ArrayList<Double>();
 		ArrayList<Double> totalExercises = new ArrayList<Double>();
