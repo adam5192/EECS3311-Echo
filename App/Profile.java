@@ -2,11 +2,17 @@ package EECS3311_Project.App;
 import java.util.*;
 import javax.naming.directory.InvalidAttributesException;
 
+@SuppressWarnings("deprecation")
+//Date values of:
+//Year as (year - 1900) (automatically corrected aside from default )
+//Month from 0-11 (corrected in log.toString() but be mindful of month in)
+//Date is as normal.
+
 public class Profile {
    private static int nextId = 0;
 
    //Data
-   private int userId;  //Keeps track of user's log history
+   private int userId;  //Keeps track of which profile is being opened
    private boolean sex; //true = male, false = female
    private Date birth;
    private double height; //In centimeters
@@ -33,7 +39,7 @@ public class Profile {
       //Log Update
       Date logDate = new Date();
       logDate.setYear(logDate.getYear()+1900);
-      logDate.setMonth(logDate.getMonth()+1);
+      logDate.setMonth(logDate.getMonth());
       history = new ArrayList<Log>();
       history.add(new DataLog(this.height, this.weight, logDate, this.userId));
 
@@ -60,7 +66,7 @@ public class Profile {
       Date logDate = new Date();
       //Adjustments to date values for the correct display
       logDate.setYear(logDate.getYear()+1900);
-      logDate.setMonth(logDate.getMonth()+1);
+      logDate.setMonth(logDate.getMonth());
       if (isMetric) 
          this.height = height;
       else
@@ -73,7 +79,7 @@ public class Profile {
       //TODO: Implement get current date & handling 'x ft y in' as input
       Date logDate = new Date();
       logDate.setYear(logDate.getYear()+1900);
-      logDate.setMonth(logDate.getMonth()+1);
+      logDate.setMonth(logDate.getMonth());
       if (isMetric)
          this.weight = weight;
       else 
@@ -208,8 +214,8 @@ public class Profile {
       if (user1.getHeight() == 123.0 * 3.281 / 100) System.out.println("Correct setHeight().");
       if (user1.getWeight() == 75.0 * 2.2046) System.out.println("Correct setWeight().");
 
-      //Add logs
-      Date today = new Date(2023, 10, 17);
+      //Add, remove logs
+      Date today = new Date(2023, 11, 17);
       user1.addLog(170.0, 120.0, today);
       user1.addLog(1200, "Lunch", today);
       user1.addLog(200, 20.0, today);
