@@ -1,7 +1,6 @@
 package EECS3311_Project.App;
 import java.util.*;
 import javax.management.InvalidAttributeValueException;
-import javax.xml.crypto.Data;
 
 //For logging height and weight changes.
 class DataLog extends Log {
@@ -112,6 +111,7 @@ class MealLog extends Log {
       }
    }
 
+   //Imported from mealLog.java for atomic main method test
    //Add intake into the log with matching date
    public static void setCaloIn(Date logDate, int caloIn, int userId) {
       //TODO: Implement find specified log in database using logDate.
