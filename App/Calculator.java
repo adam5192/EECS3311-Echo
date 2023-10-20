@@ -1,4 +1,4 @@
-public class BMRCalculator {
+public class Calculator {
 
     public static double calculateBMR(boolean gender, int age, double weight, double height, int bmrSetting, double bodyFat) {
       double bmr = 0;
