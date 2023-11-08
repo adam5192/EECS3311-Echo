@@ -49,6 +49,14 @@ class Meal {
         return "Meal{" + "date='" + date + '\'' + ", meal type='" + mealType + '\'' + ", ingredients=" + ingredients + "}";
     }
 
+    public String getMealType() {
+        return this.mealType;
+    }
+
+    public String getDate() {
+        return this.date;
+    }
+
     //will likely have additional variables
 }
 
@@ -60,6 +68,7 @@ class Ingredient {
     private int fat;
     private int protein;
     private int carbs;
+    private int grams;
     //likely will be more variables
 
     //Default constructor
@@ -72,12 +81,9 @@ class Ingredient {
     }
 
     //Constructor with all parameters
-    public Ingredient(String name, int calories, int fat, int protein, int carbs) {
+    public Ingredient(String name, int grams) {
         this.name = name;
-        this.calories = calories;
-        this.fat = fat;
-        this.protein = protein;
-        this.carbs = carbs;
+        this.grams = grams;
     }
 
     //getters and setters below
@@ -153,31 +159,31 @@ class MealLogger {
 // TODO: Implement database helper
 
 //temporary test cases for running without database
-public class mealLog {
-    public static void main(String[] args) {
-        // examples
-        Ingredient tomato = new Ingredient("Tomato", 20, 0, 1, 6);
-        Ingredient bread = new Ingredient("Bread", 255, 3, 8, 51);
-        Ingredient egg = new Ingredient("Egg", 145, 11, 14, 2);
-
-        // create Meal object
-        Meal breakfast = new Meal();
-        breakfast.setType("Breakfast");
-        breakfast.setDate("10/14/2023");
-        breakfast.addIngredient(tomato);
-        breakfast.addIngredient(bread);
-        breakfast.addIngredient(egg);
-
-        System.out.println("Total calories: " + breakfast.calculateCalories());
-        System.out.println("Total protein: " + breakfast.calculateProtein());
-        System.out.println("Total fat: " + breakfast.calculateFat());
-        System.out.println("Total carbs: " + breakfast.calculateCarbs());
-
-        // create meal logger object and add breakfast to it
-        MealLogger myMealLogger = new MealLogger();
-        myMealLogger.logMeal(breakfast);
-
-        // display all meals logged in the MealLogger
-        System.out.println("All logged meals: " + myMealLogger.getMeals());
-    }
-}
+//public class mealLog {
+//    public static void main(String[] args) {
+//        // examples
+//        Ingredient tomato = new Ingredient("Tomato", 20, 0, 1, 6, 100);
+//        Ingredient bread = new Ingredient("Bread", 255, 3, 8, 51, 100);
+//        Ingredient egg = new Ingredient("Egg", 145, 11, 14, 2, 100);
+//
+//        // create Meal object
+//        Meal breakfast = new Meal();
+//        breakfast.setType("Breakfast");
+//        breakfast.setDate("10/14/2023");
+//        breakfast.addIngredient(tomato);
+//        breakfast.addIngredient(bread);
+//        breakfast.addIngredient(egg);
+//
+//        System.out.println("Total calories: " + breakfast.calculateCalories());
+//        System.out.println("Total protein: " + breakfast.calculateProtein());
+//        System.out.println("Total fat: " + breakfast.calculateFat());
+//        System.out.println("Total carbs: " + breakfast.calculateCarbs());
+//
+//        // create meal logger object and add breakfast to it
+//        MealLogger myMealLogger = new MealLogger();
+//        myMealLogger.logMeal(breakfast);
+//
+//        // display all meals logged in the MealLogger
+//        System.out.println("All logged meals: " + myMealLogger.getMeals());
+//    }
+//}
