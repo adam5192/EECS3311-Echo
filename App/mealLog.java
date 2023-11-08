@@ -11,7 +11,7 @@ class Meal {
 
     public Meal() {
         this.ingredients = new ArrayList<>();
-    }   
+    }
 
     public int calculateCalories() {
         return ingredients.stream().mapToInt(Ingredient::getCalories).sum(); //converts ingredients list to stream and gets calories of each ingredient
@@ -24,7 +24,7 @@ class Meal {
     public int calculateFat() {
         return ingredients.stream().mapToInt(Ingredient::getFat).sum();
     }
-    
+
     public int calculateCarbs() {
         return ingredients.stream().mapToInt(Ingredient::getCarbs).sum();
     }
@@ -61,7 +61,7 @@ class Ingredient {
     private int protein;
     private int carbs;
     //likely will be more variables
-    
+
     //Default constructor
     public Ingredient() {
         this.name = "";
