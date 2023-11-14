@@ -53,28 +53,23 @@ class DataLog extends Log {
 
 //For logging individual meals
 class MealLog extends Log {
-   private int caloIn;   //Calorie intake
    private String mealType; //Valid values: "Breakfast", "Lunch", "Dinner", "Snack"
    private List<Ingredient> ingredients;
 
    //Constructors
    public MealLog(int userId) {
       super(userId);
-      caloIn = 0;
       mealType = "Breakfast";
       ingredients = new ArrayList<Ingredient>();
       super.setLogType(2);
    }
 
-   public MealLog(int caloIn, String mealType, Date logDate, int userId) {
+   public MealLog(String mealType, Date logDate, int userId) {
       super(logDate, userId);
       try {
-         if (caloIn < 0) 
-            throw new InvalidAttributeValueException("Value of calorie intake cannot be negative.");
-         else if (!(mealType.equals("Breakfast") || mealType.equals("Lunch") || mealType.equals("Dinner") || mealType.equals("Snack")))
+         if (!(mealType.equals("Breakfast") || mealType.equals("Lunch") || mealType.equals("Dinner") || mealType.equals("Snack")))
             throw new InvalidAttributeValueException("Invalid mealType value.");
 
-         this.caloIn = caloIn;
          this.mealType = mealType;
          ingredients = new ArrayList<Ingredient>();
          super.setLogType(2);
@@ -84,7 +79,6 @@ class MealLog extends Log {
    }
 
    //Getters
-   public int getCaloIn() {return this.caloIn;}
    /**
     * Getter method for mealType.
     * @return the meal type associated with the log, null if the value of mealType is invalid.
@@ -102,19 +96,9 @@ class MealLog extends Log {
       }
    }
 
-   public void setCaloIn(int newIn) {
-      try {
-         if (newIn < 0) throw new InvalidAttributeValueException("Calorie intake cannot be negative.");
-         caloIn = newIn;
-      } catch (Exception e) {
-         e.printStackTrace();
-      }
-   }
-
    //Add ingredients to the meal
    public void addIngredient(Ingredient in) {
-      ingredients.add(in);
-      caloIn += in.getCalories(); //Update calorie intake of the log
+      ingredients.add(in); //Update calorie intake of the log
    }
 
    //Calculate the calorie, protein, fat and carb content of the meal
@@ -137,7 +121,7 @@ class MealLog extends Log {
    //toString format: YY/MM/DD - Meal Type - Calorie Intake
    @Override
    public String toString() {
-      return super.toString() + String.format(" - %s - Calorie Intake: %d", mealType, caloIn);
+      return super.toString() + String.format(" - %s - Calorie Intake: %d", mealType, calculateCalories());
    }
 
    public String getIngredientString() {
@@ -277,6 +261,9 @@ public class Log {
       System.out.println(exercise.toString());
 
       exercise = new ExerciseLog(600, 120, new Date(2023, 9, 19), dummyID);
+      System.out.println(exercise.toString()+"\n");
+   }
+}
       System.out.println(exercise.toString()+"\n");
    }
 }
