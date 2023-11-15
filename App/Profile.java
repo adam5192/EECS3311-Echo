@@ -1,4 +1,4 @@
-package EECS3311_Project.App;
+package App;
 import java.util.*;
 import javax.naming.directory.InvalidAttributesException;
 
@@ -49,6 +49,27 @@ public class Profile {
       bmrSetting = 0;
    }
 
+   // Recreating profile saved in the database
+   public Profile(boolean sex, Date birth, double height, double weight, int userID) {
+      //Settings
+      this.userId = userID;
+      isMetric = true; //Default in Metric
+      bmrSetting = 0;
+
+      //Data
+      this.sex = sex;
+      this.birth = birth;
+      this.setHeight(height);
+      this.setWeight(weight);
+
+      //Log Update
+      Date logDate = new Date();
+      logDate.setYear(logDate.getYear()+1900);
+      logDate.setMonth(logDate.getMonth());
+      history = new ArrayList<Log>();
+      history.add(new DataLog(this.height, this.weight, logDate, this.userId));
+   }
+
    //Setters
    public void setSex(boolean sex) {
       //Not sure to use boolean instead :P
@@ -61,30 +82,41 @@ public class Profile {
       this.birth = new Date(year, month, day); //TODO: Deprecated object, possible need for different implementation
    }
 
+   //Conversion rate: 1m = 3.281ft
    public void setHeight(double height) {
+      try {
       //TODO: Implement get current date & handling 'x ft y in' as input
       Date logDate = new Date();
       //Adjustments to date values for the correct display
       logDate.setYear(logDate.getYear()+1900);
       logDate.setMonth(logDate.getMonth());
-      if (isMetric) 
+      
+      if (isMetric)
          this.height = height;
-      else
-         this.height = height * 100 / 3.281;
-
+      else {
+         this.height = (height / 3.281) / 100.0; //Convert feet to centimeters
+      }
       history.add(new DataLog(this.height, this.weight, logDate, this.userId));
+      } catch (Exception e) {
+         e.printStackTrace();
+      }
    }
 
+   //Conversion rate: 1kg = 2.204bs
    public void setWeight(double weight) {
-      //TODO: Implement get current date & handling 'x ft y in' as input
+      try {
       Date logDate = new Date();
+      //Adjustments to date values for the correct display
       logDate.setYear(logDate.getYear()+1900);
       logDate.setMonth(logDate.getMonth());
       if (isMetric)
          this.weight = weight;
-      else 
-         this.weight = weight / 2.2046;
+      else
+         this.weight = weight / 2.204; // Convert pounds input to centimeters
       history.add(new DataLog(this.height, this.weight, logDate, this.userId));
+      } catch (Exception e) {
+         e.printStackTrace();
+      }
    }
 
    public void setFatLvl(double fatLvl) {
@@ -117,16 +149,10 @@ public class Profile {
    public boolean getSex() {return sex;}
    public Date getBirth() {return birth;}
    public double getHeight() {
-      if (isMetric)
          return height;
-      else
-         return (height / 100.0) * 3.281; //Handle conversion: 1m = 3.281ft (= ~3ft 2in)
    }
    public double getWeight() {
-      if (isMetric)
          return weight;
-      else
-         return weight * 2.2046; //Conversion rate: 1kg = 2.2046lbs
 
    }
 
@@ -151,8 +177,8 @@ public class Profile {
    public void addLog(double height, double weight, Date logDate) {
       this.history.add(new DataLog(height, weight, logDate, this.userId));
    }
-   public void addLog(int caloIn, String mealType, Date logDate) {
-      this.history.add(new MealLog(caloIn, mealType, logDate, this.userId));
+   public void addLog(String[] ingredients, String mealType, Date logDate) {
+      this.history.add(new MealLog(mealType, logDate, this.userId));
    }
    public void addLog(int caloBurnt, double time, Date logDate) {
       this.history.add(new ExerciseLog(caloBurnt, time, logDate, this.userId));
@@ -217,7 +243,9 @@ public class Profile {
       //Add, remove logs
       Date today = new Date(2023, 11, 17);
       user1.addLog(170.0, 120.0, today);
-      user1.addLog(1200, "Lunch", today);
+      String[] list = new String[5];
+      list[0] = "milk";
+      user1.addLog(list, "Lunch", today);
       user1.addLog(200, 20.0, today);
       System.out.println(user1.getHistory());
 
