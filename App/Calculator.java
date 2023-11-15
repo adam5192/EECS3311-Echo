@@ -1,30 +1,32 @@
 public class Calculator {
 
-    public static double calculateBMR(boolean gender, int age, double weight, double height, int bmrSetting, double bodyFat) {
-      double bmr = 0;
-  
-      // Miffin St Jeor BMR calculation
-      if (bmrSetting == 0) { 
-        if (gender) {
-          bmr = (10 * weight + (6.25 * height) - (5 * age) + 5);
-        } else {
-          bmr = (10 * weight + (6.25 * height) - (5 * age) - 161);
+    public static double calculateBMR( Profile user) 
+    {
+        double bmr = 0;
+        int age = ( LocalDate.now().getYear() )- ( user.getBirth().getYear() );
+        
+        // Miffin St Jeor BMR calculation
+        if (user.getCalcMethod() == 0) { 
+          if (user.getSex()) {
+            bmr = (10 * user.getWeight() + (6.25 * user.getHeight()) - (5 * age) + 5);
+          } else {
+            bmr = (10 * user.getWeight() + (6.25 * user.getHeight()) - (5 * age) - 161);
+          }
+        } 
+        // Revised Harris-Benedict BMR calculation 
+        else if (user.getCalcMethod() == 1) {
+          if (user.getSex()) {
+            bmr = (13.397 * user.getWeight() + (4.799 * user.getHeight()) - (5.677 * age) + 88.362);
+          } else {
+            bmr = (9.247 * user.getWeight() + (3.098 * user.getHeight()) - (4.330 * age) + 447.593);
+          }
+        } 
+        //Katch McArdle BMR calculation
+        else if (user.getCalcMethod() == 2) {
+          bmr = (370 + 21.6 * (1 - (user.getFatLvl() / 100)) * user.getWeight());
         }
-      } 
-      // Revised Harris-Benedict BMR calculation 
-      else if (bmrSetting == 1) {
-        if (gender) {
-          bmr = (13.397 * weight + (4.799 * height) - (5.677 * age) + 88.362);
-        } else {
-          bmr = (9.247 * weight + (3.098 * height) - (4.330 * age) + 447.593);
-        }
-      } 
-      //Katch McArdle BMR calculation
-      else if (bmrSetting == 2) {
-        bmr = (370 + 21.6 * (1 - (bodyFat / 100)) * weight);
-      } else {}
-  
-      return bmr;
+        
+    	return (Math.round(bmr));
     }
     public static double calculateCaloriesBurned(double duration, double bmr, double intensity) {
       double CaloriesBurned = 0;
