@@ -1,4 +1,4 @@
-package EECS3311_Project.App;
+package App;
 import java.util.*;
 import javax.management.InvalidAttributeValueException;
 
@@ -76,6 +76,12 @@ class MealLog extends Log {
       } catch (Exception e) {
          e.printStackTrace();
       }
+   }
+
+   public MealLog(String[] foodName, String mealType, Date logDate, int userId) {
+      this(mealType, logDate, userId);
+
+      
    }
 
    //Getters
@@ -261,9 +267,6 @@ public class Log {
       System.out.println(exercise.toString());
 
       exercise = new ExerciseLog(600, 120, new Date(2023, 9, 19), dummyID);
-      System.out.println(exercise.toString()+"\n");
-   }
-}
       System.out.println(exercise.toString()+"\n");
    }
 }
