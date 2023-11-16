@@ -4,7 +4,7 @@ import java.util.Date;
 import java.util.*;
 public class DBQuery {
    /**
-    * Retrieve the nutrient value of a food from the database.
+    * Retrieve the nutrient value of a food from the database. The unit is kCal/Cal for calories and gram for all other nutrient.
     * Valid nutrient values per design choice: KCAL, PROT, FAT, CARB, OTHERS
     * Assumption: foodDesc input is one-to-one to the names in the value, otherwise, return 0.
     * @param foodDesc the name of an ingredient
@@ -32,7 +32,7 @@ public class DBQuery {
             PreparedStatement statement = query.prepareStatement(
                "select * from FoodName natural join NutrientAmount natural join NutrientName where FoodDescription = ? " + 
                "and NutrientSymbol <> ? and NutrientSymbol <> ? and NutrientSymbol <> ? and NutrientSymbol <> ? and NutrientSymbol <> ?"
-            ); // Get all other nutrients (will be changed)
+            );
             statement.setString(1, foodDesc);
             statement.setString(2, "KCAL");
             statement.setString(3, "KJ");
@@ -42,8 +42,15 @@ public class DBQuery {
 
             try (ResultSet rs = statement.executeQuery()) {
                int result = 0;
-               while (rs.next())
-                  result += rs.getInt("NutrientValue");
+               while (rs.next()) {
+                  // If unit is gram, add to sum as is
+                  if (rs.getString("NutrientUnit").equals("g")) 
+                     result += rs.getInt("NutrientValue");
+                  // If unit is miligram, convert to gram before adding
+                  else if (rs.getString("NutrientUnit").equals("mg")) 
+                     result += rs.getDouble("NutrientValue") / 100;
+                  // Else (microgram, etc.) ignore
+               }
                return result;
             }
          }
