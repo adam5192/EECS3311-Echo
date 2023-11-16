@@ -1,3 +1,5 @@
+package App;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -81,9 +83,12 @@ class Ingredient {
     }
 
     //Constructor with all parameters
-    public Ingredient(String name, int grams) {
+    public Ingredient(String name, int calories, int fat, int protein, int carbs) {
         this.name = name;
-        this.grams = grams;
+        this.calories = calories;
+        this.fat = fat;
+        this.protein = protein;
+        this.carbs = carbs;
     }
 
     //getters and setters below

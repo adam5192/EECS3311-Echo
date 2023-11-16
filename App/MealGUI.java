@@ -1,3 +1,5 @@
+package App;
+
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -46,7 +48,7 @@ public class MealGUI extends JFrame {
                 try {
                     String name = ingredientField.getText();
                     int grams = Integer.parseInt(gramsField.getText());
-                    Ingredient ingredient = new Ingredient(name, grams);
+                    Ingredient ingredient = new Ingredient(name, 0, 0, 0, 0);
                     ingredientList.add(ingredient);
                     ingredientField.setText("");
                     gramsField.setText("");
