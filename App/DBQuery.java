@@ -4,7 +4,7 @@ import java.util.Date;
 import java.util.*;
 public class DBQuery {
    /**
-    * Retrieve the nutrient value of a food from the database. The unit is kCal/Cal for calories and gram for all other nutrient.
+    * Retrieve the nutrient value of a food from the database. The unit is kCal for calories and gram for all other nutrient.
     * Valid nutrient values per design choice: KCAL, PROT, FAT, CARB, OTHERS
     * Assumption: foodDesc input is one-to-one to the names in the value, otherwise, return 0.
     * @param foodDesc the name of an ingredient
@@ -61,6 +61,32 @@ public class DBQuery {
    }
 
    /**
+    * Retrieve all the ingredient descriptions in the database.
+    * @return Array of Strings that contain of all food's descriptions in the database
+    * @throws SQLException
+    */
+   public static String[] getIngredientNames() throws SQLException {
+      try (Connection query = DriverManager.getConnection("jdbc:mysql://localhost:3306", "root", "EECS3311_Project")) {
+         PreparedStatement statement = query.prepareStatement("select * from FoodName");
+         ResultSet rs = statement.executeQuery();
+         
+         // Set size of String array
+         rs.last();
+         String[] output = new String[rs.getRow()];
+         rs.beforeFirst();
+
+         for (int i = 0; rs.next(); i++) {
+            output[i] = rs.getString("FoodDescription");
+         }
+
+         return output;
+      } catch (SQLException e) {
+         e.printStackTrace();
+         return null;
+      }
+   }
+
+   /**
     * Fetch the stored data of a previously created user
     * @param userID the userID assigned at creation of Profile
     * @return a new Profile object that represents the user's profile including settings and logs.
@@ -79,6 +105,9 @@ public class DBQuery {
          // a.setHistory
 
          return userProfile;
+      } catch (SQLException e) {
+         e.printStackTrace();
+         return null;
       }
    }
 
