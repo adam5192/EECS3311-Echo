@@ -81,10 +81,10 @@ class MealLog extends Log {
       }
    }
 
-   public MealLog(String[] foodName, String mealType, Date logDate, int userId) {
+   public MealLog(Ingredient[] ingredients, String mealType, Date logDate, int userId) {
       this(mealType, logDate, userId);
-
-      
+      for (Ingredient i : ingredients)
+         this.ingredients.add(i);
    }
 
    //Getters
@@ -164,15 +164,17 @@ class Ingredient {
         this.fat = 0;
         this.protein = 0;
         this.carbs = 0;
+        this.others = 0;
     }
 
     //Constructor with all parameters
-    public Ingredient(String name, int calories, int fat, int protein, int carbs) {
+    public Ingredient(String name, int calories, int fat, int protein, int carbs, int others) {
         this.name = name;
         this.calories = calories;
         this.fat = fat;
         this.protein = protein;
         this.carbs = carbs;
+        this.others = others;
     }
 
     //getters and setters below
@@ -336,9 +338,9 @@ public class Log {
 
       //MealLog
       // examples
-      Ingredient tomato = new Ingredient("Tomato", 20, 0, 1, 6);
-      Ingredient bread = new Ingredient("Bread", 255, 3, 8, 51);
-      Ingredient egg = new Ingredient("Egg", 145, 11, 14, 2);
+      Ingredient tomato = new Ingredient("Tomato", 20, 0, 1, 6, 0);
+      Ingredient bread = new Ingredient("Bread", 255, 3, 8, 51, 0);
+      Ingredient egg = new Ingredient("Egg", 145, 11, 14, 2, 0);
 
       // create Meal object
       MealLog breakfast = new MealLog(dummyID);
