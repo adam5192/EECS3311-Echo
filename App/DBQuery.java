@@ -126,7 +126,7 @@ public class DBQuery {
                      "where ProfileLog.UserID = ? and ProfileLog.LogDate = ?"
                   );
                   log = stmt.executeQuery();
-                  while(log.next()) { // In case there is multiple log with the same date of the same type
+                  while(log.next()) { // In case there is multiple logs with the same date of the same type from the same user
                      history.add(new DataLog(log.getDouble("Height"), log.getDouble("Weight"),
                                  log.getDate("LogDate"), log.getInt("UserID")));
                   }
@@ -135,11 +135,27 @@ public class DBQuery {
                   stmt = query.prepareStatement(
                      "select * from ProfileLog inner join MealLog " + 
                      "on ProfileLog.LogDate = MealLog.LogDate and ProfileLog.LogType = MealLog.LogType " +
-                     "where ProfileLog.UserID = ? and ProfileLog.LogDate = ?"
+                     "where ProfileLog.UserID = ? and ProfileLog.LogDate = ?" +
+                     "group by MealLog.MealID"
                   );
                   log = stmt.executeQuery();
-                  while(log.next()) { // In case there is multiple log with the same date of the same type
-                     
+                  Ingredient[] list = new Ingredient[100]; // Assumption: No meal has more than 100 ingredients
+                  String lastIn = null;
+                  for(int i = 0; log.next() && i < 100;) { // In case there is multiple logs with the same date of the same type
+                     if (lastIn.equals(null) || lastIn.equals(log.getString("IngredientName"))) {// If first iteration or current ingredient and previous is part of the same meal, add to list as normal
+                        list[i++] = new Ingredient(log.getString("IngredientName"), log.getInt("CaloVal"), log.getInt("FatVal"),
+                                                log.getInt("ProtVal"), log.getInt("CarbVal"), log.getInt("Others"));
+                        lastIn = log.getString("IngredientName");
+                     }
+                     else { // Current ingredient is for a different meal
+                        log.previous(); // info required is from the previous index
+                        history.add(new MealLog(list, log.getString("MealType"), log.getDate("LogDate"), log.getInt("UserID")));
+
+                        // Restart the process for the next meal
+                        list = new Ingredient[100];
+                        lastIn = null;
+                        i = 0;
+                     }
                   }
                   break;
                case 3:
@@ -149,7 +165,7 @@ public class DBQuery {
                      "where ProfileLog.UserID = ? and ProfileLog.LogDate = ?"
                   );
                   log = stmt.executeQuery();
-                  while(log.next()) { // In case there is multiple log with the same date of the same type
+                  while(log.next()) { // In case there is multiple logs with the same date of the same type from the same user
                      history.add(new DataLog(log.getInt("CaloBurnt"), log.getDouble("ExerciseTime"),
                                  log.getDate("LogDate"), log.getInt("UserID")));
                   }
@@ -163,12 +179,5 @@ public class DBQuery {
          e.printStackTrace();
          return null;
       }
-   }
-
-   /**
-    * Restore the values of the logs to the correct values
-    */
-   private static void getLog(ResultSet rs, int userID) {
-      
    }
 }
