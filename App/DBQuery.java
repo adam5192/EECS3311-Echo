@@ -13,9 +13,11 @@ public class DBQuery {
     */
    public static int getNutrientVal(String foodDesc, String nutrient) throws SQLException{
       try (Connection query = DriverManager.getConnection("jdbc:mysql://localhost:3306", "root", "EECS3311_Project")) {
-         if (nutrient != "OTHERS") {
+         if (!nutrient.equals("OTHERS")) {
             PreparedStatement statement = query.prepareStatement(
-               "select * from FoodName natural join NutrientAmount natural join NutrientName where FoodDescription = ? and NutrientSymbol = ?"
+               "select * from FoodName inner join NutrientAmount inner join NutrientName " +
+               "on FoodName.FoodID = NutrientAmount.FoodID and NutrientAmount.NutrientNameID = NutrientName.NutrientNameID " +
+               "where FoodDescription = ? and NutrientSymbol = ?"
             );
             statement.setString(1, foodDesc);
             statement.setString(2, nutrient);
@@ -30,8 +32,9 @@ public class DBQuery {
          }
          else {
             PreparedStatement statement = query.prepareStatement(
-               "select * from FoodName natural join NutrientAmount natural join NutrientName where FoodDescription = ? " + 
-               "and NutrientSymbol <> ? and NutrientSymbol <> ? and NutrientSymbol <> ? and NutrientSymbol <> ? and NutrientSymbol <> ?"
+               "select * from FoodName inner join NutrientAmount inner join NutrientName " + 
+               "on FoodName.FoodID = NutrientAmount.FoodID and NutrientAmount.NutrientNameID = NutrientName.NutrientNameID " + 
+               "where FoodDescription = ? and NutrientSymbol <> ? and NutrientSymbol <> ? and NutrientSymbol <> ? and NutrientSymbol <> ? and NutrientSymbol <> ?"
             );
             statement.setString(1, foodDesc);
             statement.setString(2, "KCAL");
@@ -93,17 +96,68 @@ public class DBQuery {
     */
    public static Profile getProfile(int userID) throws SQLException{
       try (Connection query = DriverManager.getConnection("jdbc:mysql://localhost:3306", "root", "EECS3311_Project")) {
-         PreparedStatement statement = query.prepareStatement("select * from ? where UserID = ?");
-         statement.setString(1, "UserProfile");
+         PreparedStatement statement = query.prepareStatement(
+            "select * from UserProfile inner join ProfileLog " + 
+            "on UserProfile.UserID = ProfileLog.UserID" +
+            "where UserID = ? order by ProfileLog.LogDate"
+            );
          statement.setInt(2, userID);
-         ResultSet rs = statement.executeQuery();
+         ResultSet rs = statement.executeQuery(); // A set of rows representing logs of the profile being recovered.
 
-         Profile userProfile = new Profile(rs.getBoolean("Sex"), rs.getDate("Birth"), rs.getDouble("Height"), rs.getDouble("Weight"), userID);
-         statement.setString(1, "ProfileLog");
-         rs = statement.executeQuery();
+         // Profile object generation
+         rs.first();
+         Profile userProfile = new Profile(rs.getBoolean("Sex"), rs.getDate("Birth"), 
+                                 rs.getDouble("CurrHeight"), rs.getDouble("CurrWeight"), userID);
+         userProfile.setBMR(rs.getInt("BMR"));
+         userProfile.setUnit(rs.getBoolean("IsMetric"));
+         userProfile.setFatLvl(rs.getInt("FatLvl"));
 
-         // a.setHistory
+         // Log history regeneration
+         List<Log> history = new LinkedList<Log>(); // Better for add and deletion operations
+         rs.beforeFirst();
+         while (rs.next()) {
+            PreparedStatement stmt;
+            ResultSet log;
+            switch (rs.getInt("LogType")) {
+               case 1:
+                  stmt = query.prepareStatement(
+                     "select * from ProfileLog inner join DataLog " + 
+                     "on ProfileLog.LogDate = DataLog.LogDate and ProfileLog.LogType = DataLog.LogType " +
+                     "where ProfileLog.UserID = ? and ProfileLog.LogDate = ?"
+                  );
+                  log = stmt.executeQuery();
+                  while(log.next()) { // In case there is multiple log with the same date of the same type
+                     history.add(new DataLog(log.getDouble("Height"), log.getDouble("Weight"),
+                                 log.getDate("LogDate"), log.getInt("UserID")));
+                  }
+                  break;
+               case 2:// TODO - Implement MealLog adding
+                  stmt = query.prepareStatement(
+                     "select * from ProfileLog inner join MealLog " + 
+                     "on ProfileLog.LogDate = MealLog.LogDate and ProfileLog.LogType = MealLog.LogType " +
+                     "where ProfileLog.UserID = ? and ProfileLog.LogDate = ?"
+                  );
+                  log = stmt.executeQuery();
+                  while(log.next()) { // In case there is multiple log with the same date of the same type
+                     
+                  }
+                  break;
+               case 3:
+                  stmt = query.prepareStatement(
+                     "select * from ProfileLog inner join ExerciseLog " + 
+                     "on ProfileLog.LogDate = ExerciseLog.LogDate and ProfileLog.LogType = ExerciseLog.LogType " +
+                     "where ProfileLog.UserID = ? and ProfileLog.LogDate = ?"
+                  );
+                  log = stmt.executeQuery();
+                  while(log.next()) { // In case there is multiple log with the same date of the same type
+                     history.add(new DataLog(log.getInt("CaloBurnt"), log.getDouble("ExerciseTime"),
+                                 log.getDate("LogDate"), log.getInt("UserID")));
+                  }
+                  break;
+            }
+         }
 
+         userProfile.setHistory(history);
          return userProfile;
       } catch (SQLException e) {
          e.printStackTrace();
@@ -114,7 +168,7 @@ public class DBQuery {
    /**
     * Restore the values of the logs to the correct values
     */
-   private static void getLog(Date logDate, int logType) {
-
+   private static void getLog(ResultSet rs, int userID) {
+      
    }
 }
