@@ -67,7 +67,10 @@ class MealLog extends Log {
    public MealLog(String mealType, Date logDate, int userId) {
       super(logDate, userId);
       try {
-         if (!(mealType.equals("Breakfast") || mealType.equals("Lunch") || mealType.equals("Dinner") || mealType.equals("Snack")))
+         if (!(mealType.equals("Breakfast") 
+            || mealType.equals("Lunch") 
+            || mealType.equals("Dinner") 
+            || mealType.equals("Snack")))
             throw new InvalidAttributeValueException("Invalid mealType value.");
 
          this.mealType = mealType;
@@ -104,7 +107,7 @@ class MealLog extends Log {
 
    //Add ingredients to the meal
    public void addIngredient(Ingredient in) {
-      ingredients.add(in); //Update calorie intake of the log
+      ingredients.add(in);
    }
 
    //Calculate the calorie, protein, fat and carb content of the meal
@@ -124,6 +127,10 @@ class MealLog extends Log {
       return ingredients.stream().mapToInt(Ingredient::getCarbs).sum();
    }
 
+   public int calculateOthers() {
+      return ingredients.stream().mapToInt(Ingredient::getOthers).sum();
+   }
+
    //toString format: YY/MM/DD - Meal Type - Calorie Intake
    @Override
    public String toString() {
@@ -137,6 +144,92 @@ class MealLog extends Log {
       }
       return out;
    }
+}
+
+//This class represents a single ingredient, and includes all of the macros in it (calories, fat, protein, etc...)
+class Ingredient {
+    //declare all vairables of an ingredient
+    private String name;
+    private int calories;
+    private int fat;
+    private int protein;
+    private int carbs;
+    private int others;
+    //likely will be more variables
+    
+    //Default constructor
+    public Ingredient() {
+        this.name = "";
+        this.calories = 0;
+        this.fat = 0;
+        this.protein = 0;
+        this.carbs = 0;
+    }
+
+    //Constructor with all parameters
+    public Ingredient(String name, int calories, int fat, int protein, int carbs) {
+        this.name = name;
+        this.calories = calories;
+        this.fat = fat;
+        this.protein = protein;
+        this.carbs = carbs;
+    }
+
+    //getters and setters below
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public int getCalories() {
+        return calories;
+    }
+
+    public void setCalories(int calories) {
+        this.calories = calories;
+    }
+
+    public void setFat(int fat) {
+        this.fat = fat;
+    }
+
+    public int getFat() {
+        return fat;
+    }
+
+    public void setProtein(int protein) {
+        this.protein = protein;
+    }
+
+    public int getProtein() {
+        return protein;
+    }
+
+    public void setCarbs(int carbs) {
+        this.carbs = carbs;
+    }
+
+    public int getCarbs() {
+        return carbs;
+    }
+
+    public void setOthers(int others) {
+        this.others = others;
+    }
+    public int getOthers() {
+        return others;
+    }
+    //will likely have additional variables
+
+    @Override
+    public String toString() {
+        return "Ingredient{" + "name= " + name + '\'' + ", calories = " + calories + ", fat = " + fat + ", protein = " + protein + ", carbs = " + carbs + '}';
+    }
+
 }
 
 class ExerciseLog extends Log {
