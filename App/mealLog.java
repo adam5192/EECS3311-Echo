@@ -71,6 +71,7 @@ class Ingredient {
     private int protein;
     private int carbs;
     private int grams;
+    private int serving;
     //likely will be more variables
 
     //Default constructor
@@ -80,6 +81,7 @@ class Ingredient {
         this.fat = 0;
         this.protein = 0;
         this.carbs = 0;
+        this.grams = 0;
     }
 
     //Constructor with all parameters
@@ -133,6 +135,14 @@ class Ingredient {
         return carbs;
     }
 
+    public void setGrams(int grams) {
+        this.grams = grams;
+    }
+
+    public int getGrams() {
+        return grams;
+    }
+
     //will likely have additional variables
 
     @Override
@@ -140,6 +150,13 @@ class Ingredient {
         return "Ingredient{" + "name= " + name + '\'' + ", calories = " + calories + ", fat = " + fat + ", protein = " + protein + ", carbs = " + carbs + '}';
     }
 
+    public void setServing(int serving) {
+        this.serving = serving;
+    }
+
+    public int getServing(){
+        return serving;
+    }
 }
 
 //This class keeps track of multiple meals
