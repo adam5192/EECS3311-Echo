@@ -174,8 +174,10 @@ public class Profile {
    }
    public void addLog(Ingredient[] ingredients, String mealType, Date logDate) {
       MealLog meal = new MealLog(mealType, logDate, this.userId);
-      for (Ingredient i : ingredients)
-         meal.addIngredient(i);
+      for (Ingredient i : ingredients) {
+         if (i != null)
+            meal.addIngredient(i);
+      }
       history.add(meal);
    }
    public void addLog(int caloBurnt, double time, Date logDate) {
