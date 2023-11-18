@@ -35,17 +35,18 @@ public class Profile {
       this.birth = birth;
       this.height = height;
       this.weight = weight;
+      this.fatLvl = 0;
 
       //Log Update
       Date logDate = new Date();
       logDate.setYear(logDate.getYear()+1900);
       logDate.setMonth(logDate.getMonth());
-      history = new ArrayList<Log>();
+      history = new LinkedList<Log>();
       history.add(new DataLog(this.height, this.weight, logDate, this.userId));
 
       //Settings
       userId = nextId++;
-      isMetric = false; //Default in Imperial
+      isMetric = true; //Default in Metric
       bmrSetting = 0;
    }
 
@@ -61,13 +62,6 @@ public class Profile {
       this.birth = birth;
       this.setHeight(height);
       this.setWeight(weight);
-
-      //Log Update
-      Date logDate = new Date();
-      logDate.setYear(logDate.getYear()+1900);
-      logDate.setMonth(logDate.getMonth());
-      history = new ArrayList<Log>();
-      history.add(new DataLog(this.height, this.weight, logDate, this.userId));
    }
 
    //Setters
@@ -141,9 +135,10 @@ public class Profile {
       this.bmrSetting = bmrSetting;
    }
 
-   // public void setHistory(Map<Date, Log> history) {
-   //    this.history = history;
-   // }
+   // Sets the history log of a profile to a pre-generated history
+   public void setHistory(List<Log> history) {
+      this.history = history;
+   }
 
    //Getters
    public boolean getSex() {return sex;}
@@ -175,13 +170,16 @@ public class Profile {
     * Overloaded method for adding a new log to the profile.
     */
    public void addLog(double height, double weight, Date logDate) {
-      this.history.add(new DataLog(height, weight, logDate, this.userId));
+      history.add(new DataLog(height, weight, logDate, this.userId));
    }
-   public void addLog(String[] ingredients, String mealType, Date logDate) {
-      this.history.add(new MealLog(mealType, logDate, this.userId));
+   public void addLog(Ingredient[] ingredients, String mealType, Date logDate) {
+      MealLog meal = new MealLog(mealType, logDate, this.userId);
+      for (Ingredient i : ingredients)
+         meal.addIngredient(i);
+      history.add(meal);
    }
    public void addLog(int caloBurnt, double time, Date logDate) {
-      this.history.add(new ExerciseLog(caloBurnt, time, logDate, this.userId));
+      history.add(new ExerciseLog(caloBurnt, time, logDate, this.userId));
    }
 
    /**
@@ -245,7 +243,6 @@ public class Profile {
       user1.addLog(170.0, 120.0, today);
       String[] list = new String[5];
       list[0] = "milk";
-      user1.addLog(list, "Lunch", today);
       user1.addLog(200, 20.0, today);
       System.out.println(user1.getHistory());
 
