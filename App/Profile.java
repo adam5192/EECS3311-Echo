@@ -83,7 +83,6 @@ public class Profile {
       Date logDate = new Date();
       //Adjustments to date values for the correct display
       logDate.setYear(logDate.getYear()+1900);
-      logDate.setMonth(logDate.getMonth());
       
       if (isMetric)
          this.height = height;
@@ -102,7 +101,7 @@ public class Profile {
       Date logDate = new Date();
       //Adjustments to date values for the correct display
       logDate.setYear(logDate.getYear()+1900);
-      logDate.setMonth(logDate.getMonth());
+
       if (isMetric)
          this.weight = weight;
       else
@@ -141,15 +140,11 @@ public class Profile {
    }
 
    //Getters
+   public int getUserID() {return userId;}
    public boolean getSex() {return sex;}
    public Date getBirth() {return birth;}
-   public double getHeight() {
-         return height;
-   }
-   public double getWeight() {
-         return weight;
-
-   }
+   public double getHeight() {return height;}
+   public double getWeight() {return weight;}
 
    public double getFatLvl() {return fatLvl;}
 
@@ -158,7 +153,8 @@ public class Profile {
    //Not sure if calc method should just return the name or the value
    public int getCalcMethod() {return bmrSetting;}
 
-   public String getHistory() {
+   public List<Log> getHistory() {return history;}
+   public String getHistoryString() {
       String out = "";
       for (int i = 0; i < history.size(); i++)
          out += history.get(i).toString()+"\n";
@@ -172,8 +168,8 @@ public class Profile {
    public void addLog(double height, double weight, Date logDate) {
       history.add(new DataLog(height, weight, logDate, this.userId));
    }
-   public void addLog(Ingredient[] ingredients, String mealType, Date logDate) {
-      MealLog meal = new MealLog(mealType, logDate, this.userId);
+   public void addLog(String mealName, Ingredient[] ingredients, String mealType, Date logDate) {
+      MealLog meal = new MealLog(mealName, mealType, logDate, this.userId);
       for (Ingredient i : ingredients) {
          if (i != null)
             meal.addIngredient(i);
