@@ -1,4 +1,3 @@
-package App;
 import java.util.*;
 import javax.management.InvalidAttributeValueException;
 
@@ -67,10 +66,10 @@ class MealLog extends Log {
    public MealLog(String mealType, Date logDate, int userId) {
       super(logDate, userId);
       try {
-         if (!(mealType.equals("Breakfast") 
-            || mealType.equals("Lunch") 
-            || mealType.equals("Dinner") 
-            || mealType.equals("Snack")))
+         if (!(mealType.equals("Breakfast")
+                 || mealType.equals("Lunch")
+                 || mealType.equals("Dinner")
+                 || mealType.equals("Snack")))
             throw new InvalidAttributeValueException("Invalid mealType value.");
 
          this.mealType = mealType;
@@ -97,7 +96,7 @@ class MealLog extends Log {
    //Setters
    public void setType(String mealType) {
       try {
-         if (!(mealType.equals("Breakfast") || mealType.equals("Lunch") || mealType.equals("Dinner") || mealType.equals("Snack"))) 
+         if (!(mealType.equals("Breakfast") || mealType.equals("Lunch") || mealType.equals("Dinner") || mealType.equals("Snack")))
             throw new InvalidAttributeValueException("Invalid mealType value.");
          this.mealType = mealType;
       } catch (Exception e) {
@@ -122,7 +121,7 @@ class MealLog extends Log {
    public int calculateFat() {
       return ingredients.stream().mapToInt(Ingredient::getFat).sum();
    }
-   
+
    public int calculateCarbs() {
       return ingredients.stream().mapToInt(Ingredient::getCarbs).sum();
    }
@@ -148,89 +147,100 @@ class MealLog extends Log {
 
 //This class represents a single ingredient, and includes all of the macros in it (calories, fat, protein, etc...)
 class Ingredient {
-    //declare all vairables of an ingredient
-    private String name;
-    private int calories;
-    private int fat;
-    private int protein;
-    private int carbs;
-    private int others;
-    //likely will be more variables
-    
-    //Default constructor
-    public Ingredient() {
-        this.name = "";
-        this.calories = 0;
-        this.fat = 0;
-        this.protein = 0;
-        this.carbs = 0;
-        this.others = 0;
+   //declare all vairables of an ingredient
+   private String name;
+   private int calories;
+   private int fat;
+   private int protein;
+   private int carbs;
+   private int others;
+   private int serving;
+   //likely will be more variables
+
+   //Default constructor
+   public Ingredient() {
+      this.name = "";
+      this.calories = 0;
+      this.fat = 0;
+      this.protein = 0;
+      this.carbs = 0;
+      this.others = 0;
+      this.serving = 0;
+   }
+
+   //Constructor with all parameters
+   public Ingredient(String name, int calories, int fat, int protein, int carbs, int others, int serving) {
+      this.name = name;
+      this.calories = calories;
+      this.fat = fat;
+      this.protein = protein;
+      this.carbs = carbs;
+      this.others = others;
+      this.serving = serving;
+   }
+
+   //getters and setters below
+
+   public String getName() {
+      return name;
+   }
+
+   public void setName(String name) {
+      this.name = name;
+   }
+
+   public int getCalories() {
+      return calories;
+   }
+
+   public void setCalories(int calories) {
+      this.calories = calories;
+   }
+
+   public void setFat(int fat) {
+      this.fat = fat;
+   }
+
+   public int getFat() {
+      return fat;
+   }
+
+   public void setProtein(int protein) {
+      this.protein = protein;
+   }
+
+   public int getProtein() {
+      return protein;
+   }
+
+   public void setCarbs(int carbs) {
+      this.carbs = carbs;
+   }
+
+   public int getCarbs() {
+      return carbs;
+   }
+
+   public void setOthers(int others) {
+      this.others = others;
+   }
+   public int getOthers() {
+      return others;
+   }
+
+   public void setServing(int serving) {
+        this.serving = serving;
     }
 
-    //Constructor with all parameters
-    public Ingredient(String name, int calories, int fat, int protein, int carbs, int others) {
-        this.name = name;
-        this.calories = calories;
-        this.fat = fat;
-        this.protein = protein;
-        this.carbs = carbs;
-        this.others = others;
+    public int getServing(){
+        return serving;
     }
+   //will likely have additional variables
 
-    //getters and setters below
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public int getCalories() {
-        return calories;
-    }
-
-    public void setCalories(int calories) {
-        this.calories = calories;
-    }
-
-    public void setFat(int fat) {
-        this.fat = fat;
-    }
-
-    public int getFat() {
-        return fat;
-    }
-
-    public void setProtein(int protein) {
-        this.protein = protein;
-    }
-
-    public int getProtein() {
-        return protein;
-    }
-
-    public void setCarbs(int carbs) {
-        this.carbs = carbs;
-    }
-
-    public int getCarbs() {
-        return carbs;
-    }
-
-    public void setOthers(int others) {
-        this.others = others;
-    }
-    public int getOthers() {
-        return others;
-    }
-    //will likely have additional variables
-
-    @Override
-    public String toString() {
-        return "Ingredient{" + "name= " + name + '\'' + ", calories = " + calories + ", fat = " + fat + ", protein = " + protein + ", carbs = " + carbs + '}';
-    }
+   @Override
+   public String toString() {
+      return "Ingredient{" + "name= " + name + '\'' + ", calories = " + calories + ", fat = " + fat + ", protein = " + protein + ", carbs = " + carbs + '}';
+   }
 
 }
 
@@ -292,7 +302,7 @@ public class Log {
    //Constructors
    public Log(int userId) {
       this(new Date(), userId);
-      loggedDate.setYear(loggedDate.getYear()+1900);
+      loggedDate.setYear(loggedDate.getYear() + 1900);
    }
 
    public Log(Date logDate, int userId) {
@@ -315,53 +325,55 @@ public class Log {
       return loggedDate;
    }
 
-   public int getLogType() {return logType;}
+   public int getLogType() {
+      return logType;
+   }
 
    //toString format: YY/MM/DD 
    @Override
    public String toString() {
-      return String.format("%d/%2d/%2d", loggedDate.getYear(), loggedDate.getMonth()+1, loggedDate.getDate()); 
-   }
-
-   //TODO: Implement database queries and calorie/exercise intake logging
-   public static void main(String[] args) {
-      //DataLog
-      int dummyID = 0;
-      DataLog data = new DataLog(dummyID);
-      System.out.println(data.toString());
-      data.setLogHeight(170);
-      data.setLogWeight(80);
-      System.out.println(data.toString());
-
-      data = new DataLog(180, 70, new Date(2023, 9, 15), dummyID);
-      System.out.println(data.toString()+"\n");
-
-      //MealLog
-      // examples
-      Ingredient tomato = new Ingredient("Tomato", 20, 0, 1, 6, 0);
-      Ingredient bread = new Ingredient("Bread", 255, 3, 8, 51, 0);
-      Ingredient egg = new Ingredient("Egg", 145, 11, 14, 2, 0);
-
-      // create Meal object
-      MealLog breakfast = new MealLog(dummyID);
-      breakfast.setType("Breakfast");
-      breakfast.setDate(new Date(2023, 9, 14));
-      breakfast.addIngredient(tomato);
-      breakfast.addIngredient(bread);
-      breakfast.addIngredient(egg);
-
-      // display all meals logged in the MealLogger
-      System.out.println(breakfast.toString());
-      System.out.println(breakfast.getIngredientString());
-
-      //ExerciseLog
-      ExerciseLog exercise = new ExerciseLog(dummyID);
-      System.out.println(exercise.toString());
-      exercise.setCaloBurnt(420);
-      exercise.setTime(30);
-      System.out.println(exercise.toString());
-
-      exercise = new ExerciseLog(600, 120, new Date(2023, 9, 19), dummyID);
-      System.out.println(exercise.toString()+"\n");
+      return String.format("%d/%2d/%2d", loggedDate.getYear(), loggedDate.getMonth() + 1, loggedDate.getDate());
    }
 }
+//   //TODO: Implement database queries and calorie/exercise intake logging
+//   public static void main(String[] args) {
+//      //DataLog
+//      int dummyID = 0;
+//      DataLog data = new DataLog(dummyID);
+//      System.out.println(data.toString());
+//      data.setLogHeight(170);
+//      data.setLogWeight(80);
+//      System.out.println(data.toString());
+//
+//      data = new DataLog(180, 70, new Date(2023, 9, 15), dummyID);
+//      System.out.println(data.toString()+"\n");
+//
+//      //MealLog
+//      // examples
+//      Ingredient tomato = new Ingredient("Tomato", 20, 0, 1, 6, 0);
+//      Ingredient bread = new Ingredient("Bread", 255, 3, 8, 51, 0);
+//      Ingredient egg = new Ingredient("Egg", 145, 11, 14, 2, 0);
+//
+//      // create Meal object
+//      MealLog breakfast = new MealLog(dummyID);
+//      breakfast.setType("Breakfast");
+//      breakfast.setDate(new Date(2023, 9, 14));
+//      breakfast.addIngredient(tomato);
+//      breakfast.addIngredient(bread);
+//      breakfast.addIngredient(egg);
+//
+//      // display all meals logged in the MealLogger
+//      System.out.println(breakfast.toString());
+//      System.out.println(breakfast.getIngredientString());
+//
+//      //ExerciseLog
+//      ExerciseLog exercise = new ExerciseLog(dummyID);
+//      System.out.println(exercise.toString());
+//      exercise.setCaloBurnt(420);
+//      exercise.setTime(30);
+//      System.out.println(exercise.toString());
+//
+//      exercise = new ExerciseLog(600, 120, new Date(2023, 9, 19), dummyID);
+//      System.out.println(exercise.toString()+"\n");
+//   }
+//}
