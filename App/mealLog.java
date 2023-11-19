@@ -135,14 +135,6 @@ class Ingredient {
         return carbs;
     }
 
-    public void setGrams(int grams) {
-        this.grams = grams;
-    }
-
-    public int getGrams() {
-        return grams;
-    }
-
     //will likely have additional variables
 
     @Override

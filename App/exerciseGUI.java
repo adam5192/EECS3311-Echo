@@ -21,7 +21,8 @@ public class exerciseGUI extends JFrame {
     private JLabel timeLabel;
     private ExerciseLogger exerciseLogger = new ExerciseLogger();
 
-    public exerciseGUI() {
+    public exerciseGUI(Profile user) {
+        double userBMR = Calculator.calculateBMR(user);
         setContentPane(MainPanel);
         setTitle("Exercise Log");
         setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -127,7 +128,7 @@ public class exerciseGUI extends JFrame {
                 StringBuilder exerciseLogInfo = new StringBuilder();
                 int totalCaloriesBurned = 0;
                 for (Exercise exercise : exerciseLogger.getExercises()){
-                    int caloriesBurned = exercise.calculateCaloriesBurnt(1200);
+                    int caloriesBurned = exercise.calculateCaloriesBurnt(userBMR);
 
                     totalCaloriesBurned += caloriesBurned;
 
@@ -159,7 +160,8 @@ public class exerciseGUI extends JFrame {
     }
 
     public static void main(String[] args) {
-        new exerciseGUI();
+        Profile user = new Profile();
+        new exerciseGUI(user);
     }
 
     private void createUIComponents() {
