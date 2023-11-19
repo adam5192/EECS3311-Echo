@@ -1,6 +1,7 @@
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.SQLException;
 
 import javax.swing.JButton;
 //This class represents the main front-end interface of the application and implements the ActionListener interface.
@@ -57,10 +58,15 @@ public class Front implements ActionListener {
      if (e.getSource() == Meal) {
          // Open a new window for Meal log GUI.
     	 main.dispose();
-    	 MealGui mealgui = new MealGui;
+         try {
+             MealGUI mealgui = new MealGUI();
+         } catch (SQLException ex) {
+             ex.printStackTrace();
+         }
      } else if (e.getSource() == Exercise) {
          // Open a new window for Exercise log GUI.
     	 main.dispose();
+         exerciseGUI exGUI = new exerciseGUI();
     	 
      } else if (e.getSource() == Graphing) {
          // Open a new window for Graphing GUI.
