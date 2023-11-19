@@ -1,7 +1,10 @@
 package App;
 import java.sql.*;
-import java.util.Date;
 import java.util.*;
+@SuppressWarnings("deprecation")
+/**
+ * NOTE: Change Connection urls, user, and password according to the local database.
+ */
 public class DBQuery {
    /**
     * Retrieve the nutrient value of a food from the database. The unit is kCal for calories and gram for all other nutrient.
@@ -106,7 +109,7 @@ public class DBQuery {
 
          // Profile object generation
          rs.first();
-         Profile userProfile = new Profile(rs.getBoolean("Sex"), rs.getDate("Birth"), 
+         Profile userProfile = new Profile(rs.getBoolean("Sex"), new java.util.Date(rs.getDate("Birth").getTime()), 
                                  rs.getDouble("CurrHeight"), rs.getDouble("CurrWeight"), userID);
          userProfile.setBMR(rs.getInt("BMR"));
          userProfile.setUnit(rs.getBoolean("IsMetric"));
@@ -127,11 +130,13 @@ public class DBQuery {
                   );
                   log = stmt.executeQuery();
                   while(log.next()) { // In case there is multiple logs with the same date of the same type from the same user
+                     java.util.Date date = new java.util.Date(log.getDate("LogDate").getTime());
+                     date.setYear(date.getYear() + 1970);
                      history.add(new DataLog(log.getDouble("Height"), log.getDouble("Weight"),
-                                 log.getDate("LogDate"), log.getInt("UserID")));
+                                 date, log.getInt("UserID")));
                   }
                   break;
-               case 2:// TODO - Implement MealLog adding
+               case 2:// TODO - Test for errors
                   stmt = query.prepareStatement(
                      "select * from ProfileLog inner join MealLog " + 
                      "on ProfileLog.LogDate = MealLog.LogDate and ProfileLog.LogType = MealLog.LogType " +
@@ -144,12 +149,14 @@ public class DBQuery {
                   for(int i = 0; log.next() && i < 100;) { // In case there is multiple logs with the same date of the same type
                      if (lastIn.equals(null) || lastIn.equals(log.getString("IngredientName"))) {// If first iteration or current ingredient and previous is part of the same meal, add to list as normal
                         list[i++] = new Ingredient(log.getString("IngredientName"), log.getInt("CaloVal"), log.getInt("FatVal"),
-                                                log.getInt("ProtVal"), log.getInt("CarbVal"), log.getInt("Others"));
+                                                log.getInt("ProtVal"), log.getInt("CarbVal"), log.getInt("Others"), log.getInt("Serving"));
                         lastIn = log.getString("IngredientName");
                      }
                      else { // Current ingredient is for a different meal
                         log.previous(); // info required is from the previous index
-                        history.add(new MealLog(list, log.getString("MealType"), log.getDate("LogDate"), log.getInt("UserID")));
+                        java.util.Date date = new java.util.Date(log.getDate("LogDate").getTime());
+                        date.setYear(date.getYear() + 1970);
+                        history.add(new MealLog(log.getString("MealName"), list, log.getString("MealType"), date, log.getInt("UserID")));
 
                         // Restart the process for the next meal
                         list = new Ingredient[100];
@@ -166,8 +173,10 @@ public class DBQuery {
                   );
                   log = stmt.executeQuery();
                   while(log.next()) { // In case there is multiple logs with the same date of the same type from the same user
-                     history.add(new DataLog(log.getInt("CaloBurnt"), log.getDouble("ExerciseTime"),
-                                 log.getDate("LogDate"), log.getInt("UserID")));
+                     java.util.Date date = new java.util.Date(log.getDate("LogDate").getTime());
+                     date.setYear(date.getYear() + 1970);
+                     history.add(new ExerciseLog(log.getInt("CaloBurnt"), log.getDouble("ExerciseTime"),
+                                 date, log.getInt("UserID")));
                   }
                   break;
             }
@@ -180,4 +189,155 @@ public class DBQuery {
          return null;
       }
    }
+
+   /**
+    * Stores the Profile object into the database.
+    */
+   public static void storeProfile(Profile user) {
+      try (Connection query = DriverManager.getConnection("jdbc:mysql://localhost:3306", "root", "EECS3311_Project")) {
+         // Storing profile-specific values
+         PreparedStatement statement = query.prepareStatement(
+            "insert into UserProfile (UserID, Sex, Birth, CurrHeight, CurrWeight, FatLvl, IsMetric, BMRSetting)" +
+            "values (?, ?, ?, ?, ?, ?, ?, ?)" +
+            "on duplicate key update" +
+            "Sex = ?, Birth = ?, CurrHeight = ?, CurrWeight = ?, FatLvl = ?, IsMetric = ?, BMRSetting = ?"
+            );
+         // In values
+         statement.setInt(1, user.getUserID());
+         statement.setBoolean(2, user.getSex());
+         java.sql.Date date = new java.sql.Date(user.getBirth().getTime());
+         statement.setDate(3, date);
+         statement.setDouble(4, user.getHeight());
+         statement.setDouble(5, user.getWeight());
+         statement.setDouble(6, user.getFatLvl());
+         statement.setBoolean(7, user.isMetric);
+         statement.setInt(8, user.getCalcMethod());
+         // On duplicates, update
+         statement.setBoolean(9, user.getSex());
+         statement.setDate(10, date);
+         statement.setDouble(11, user.getHeight());
+         statement.setDouble(12, user.getWeight());
+         statement.setDouble(13, user.getFatLvl());
+         statement.setBoolean(14, user.isMetric);
+         statement.setInt(15, user.getCalcMethod());
+
+         for(Log i : user.getHistory()) {
+            if (i instanceof DataLog) storeLog((DataLog) i);
+            else if (i instanceof MealLog) storeLog((MealLog) i);
+            else if (i instanceof ExerciseLog) storeLog((ExerciseLog) i);
+         }
+      } catch (SQLException e) {e.printStackTrace();}
+   }
+
+   /**
+    * Stores the given DataLog into the database.
+    */
+    public static void storeLog(DataLog log) throws SQLException {
+      try (Connection query = DriverManager.getConnection("jdbc:mysql://localhost:3306", "root", "EECS3311_Project")) {
+         // Updating ProfileLog
+         PreparedStatement statement = query.prepareStatement(
+            "insert into ProfileLog (LogDate, LogType, UserID)" +
+            "values (?, ?, ?)" +
+            "on duplicate key update LogDate = LogDate" // On duplicates (log already in database), do nothing
+         );
+         java.sql.Date date = new java.sql.Date(log.getDate().getTime());
+         statement.setDate(1, date);
+         statement.setInt(2, log.getLogType());
+         statement.setInt(3, log.getUserID());
+         statement.executeUpdate();
+
+         // Updating DataLog
+         statement = query.prepareStatement(
+            "insert into DataLog (LogDate, LogType, UserID, LogHeight, LogWeight)" +
+            "values (?, 1, ?, ?, ?)" +
+            "on duplicate key update LogWeight = ?, LogHeight = ?"
+         );
+         statement.setDate(1, date);
+         statement.setInt(2, log.getUserID());
+         statement.setDouble(3, log.getLogHeight());
+         statement.setDouble(4, log.getLogWeight());
+         statement.setDouble(5, log.getLogHeight());
+         statement.setDouble(6, log.getLogWeight());
+         statement.executeUpdate();
+      } catch (SQLException e) {e.printStackTrace();}
+   }
+
+   public static void storeLog(MealLog log) {
+      try (Connection query = DriverManager.getConnection("jdbc:mysql://localhost:3306", "root", "EECS3311_Project")) {
+         // Updating ProfileLog
+         PreparedStatement statement = query.prepareStatement(
+            "insert into ProfileLog (LogDate, LogType, UserID)" +
+            "values (?, ?, ?)" +
+            "on duplicate key update LogDate = LogDate" // On duplicates (log already in database), do nothing
+         );
+         java.sql.Date date = new java.sql.Date(log.getDate().getTime());
+         statement.setDate(1, date);
+         statement.setInt(2, log.getLogType());
+         statement.setInt(3, log.getUserID());
+         statement.executeUpdate();
+
+         // Updating MealLog
+         statement = query.prepareStatement(
+            "insert into MealLog (LogDate, LogType, UserID, MealType, MealName, CaloVal, CarbVal, FatVal, ProtVal, OthersVal)" +
+            "values (?, 2, ?, ?, ?, ?, ?, ?, ?, ?)" +
+            "on duplicate key update" +
+            "CaloVal = ?, CarbVal = ?, FatVal = ?, ProtVal = ?, OthersVal = ?, Serving =?"
+         );
+         // Common attributes among ingredients of a meal
+         statement.setDate(1, date);
+         statement.setInt(2, log.getUserID());
+         statement.setString(3, log.getType());
+
+         statement.setString(4, log.getName());
+         statement.setInt(5, log.calculateCalories());
+         statement.setInt(6, log.calculateCarbs());
+         statement.setInt(7, log.calculateFat());
+         statement.setInt(8, log.calculateProtein());
+         statement.setInt(9, log.calculateOthers());
+         // If already existed, update
+         statement.setInt(10, log.calculateCalories());
+         statement.setInt(11, log.calculateCarbs());
+         statement.setInt(12, log.calculateFat());
+         statement.setInt(13, log.calculateProtein());
+         statement.setInt(14, log.calculateOthers());
+
+         statement.executeUpdate();
+      } catch (SQLException e) {e.printStackTrace();}
+   }
+
+   /**
+    * Stores the given ExerciseLog in the database.
+    */
+   public static void storeLog(ExerciseLog log) throws SQLException {
+      try (Connection query = DriverManager.getConnection("jdbc:mysql://localhost:3306", "root", "EECS3311_Project")) {
+         // Updating ProfileLog
+         PreparedStatement statement = query.prepareStatement(
+            "insert into ProfileLog (LogDate, LogType, UserID)" +
+            "values (?, ?, ?)" +
+            "on duplicate key update LogDate = LogDate" // On duplicates (log already in database), do nothing
+         );
+         java.sql.Date date = new java.sql.Date(log.getDate().getTime());
+         statement.setDate(1, date);
+         statement.setInt(2, log.getLogType());
+         statement.setInt(3, log.getUserID());
+         statement.executeUpdate();
+
+         // Updating ExerciseLog
+         statement = query.prepareStatement(
+            "insert into DataLog (LogDate, LogType, UserID, CaloBurnt, ExerciseTime, ExerciseName)" +
+            "values (?, 3, ?, ?, ?, ?)" +
+            "on duplicate key update CaloBurnt = ?, ExciseTime = ?, ExerciseName = ?"
+         );
+         statement.setDate(1, date);
+         statement.setInt(2, log.getUserID());
+         statement.setInt(3, log.getCaloBurnt());
+         statement.setDouble(4, log.getTime());
+         statement.setString(5, log.getName());
+         statement.setInt(6, log.getCaloBurnt());
+         statement.setDouble(7, log.getTime());
+         statement.setString(8, log.getName());
+         statement.executeUpdate();
+      } catch (SQLException e) {e.printStackTrace();}
+   }
+
 }
