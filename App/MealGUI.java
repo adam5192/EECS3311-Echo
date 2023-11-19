@@ -1,12 +1,14 @@
 package App;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.sql.SQLException;
 import java.util.*;
+import java.util.List;
 
 public class MealGUI extends JFrame {
     // GUI componenets declaration
@@ -19,7 +21,7 @@ public class MealGUI extends JFrame {
     private JComboBox ingredientComboBox;
     private JLabel servingLabel;
     private MealLogger mealLogger = new MealLogger();
-    private ArrayList < Ingredient > ingredientList = new ArrayList < > ();
+    private ArrayList<Ingredient> ingredientList = new ArrayList<>();
 
     public MealGUI() throws SQLException {
         setContentPane(MainPanel);
@@ -30,13 +32,14 @@ public class MealGUI extends JFrame {
         setVisible(true);
 
         // Year JComboBox
-        JComboBox < Integer > yearComboBox = new JComboBox < > ();
+        JComboBox<Integer> yearComboBox = new JComboBox<>();
         for (int year = 2020; year <= 2025; year++) {
             yearComboBox.addItem(year);
         }
 
         //Array of ingredients
         String[] ops = DBQuery.getIngredientNames();
+
 
         // Add ingredients to combo box
         for (int i = 0; i < ops.length; i++) {
@@ -58,10 +61,10 @@ public class MealGUI extends JFrame {
                 "November",
                 "December"
         };
-        JComboBox < String > monthComboBox = new JComboBox < > (months);
+        JComboBox<String> monthComboBox = new JComboBox<>(months);
 
         // Day combo box setup
-        JComboBox < Integer > dayComboBox = new JComboBox < > ();
+        JComboBox<Integer> dayComboBox = new JComboBox<>();
         for (int day = 1; day <= 31; day++) {
             dayComboBox.addItem(day);
         }
@@ -71,15 +74,15 @@ public class MealGUI extends JFrame {
             @Override
             public void keyReleased(KeyEvent e) {
                 String searchText = ingredientField.getText();
-                List < String > suggestions = getMatchingIngredients(searchText);
+                List<String> suggestions = getMatchingIngredients(searchText);
                 updateSuggestionList(suggestions);
             }
 
             // Method to get matching ingredients based on user input
-            private List < String > getMatchingIngredients(String searchText) {
-                List < String > matchedIngredients = new ArrayList < > ();
+            private List<String> getMatchingIngredients(String searchText) {
+                List<String> matchedIngredients = new ArrayList<>();
                 String searchTextLower = searchText.toLowerCase(); // Set properties to lowercase for case insensitivity
-                for (String ingredient: ops) {
+                for (String ingredient : ops) {
                     if (ingredient.toLowerCase().contains(searchTextLower)) {
                         matchedIngredients.add(ingredient);
                     }
@@ -88,9 +91,9 @@ public class MealGUI extends JFrame {
             }
 
             // Method to update combo box with matching ingredients
-            private void updateSuggestionList(List < String > suggestions) {
+            private void updateSuggestionList(List<String> suggestions) {
                 ingredientComboBox.removeAllItems();
-                for (String s: suggestions) {
+                for (String s : suggestions) {
                     ingredientComboBox.addItem(s);
                 }
             }
@@ -106,7 +109,7 @@ public class MealGUI extends JFrame {
                     int servings = Integer.parseInt(servingField.getText());
 
                     // Servings must be positive
-                    if(servings > 0) {
+                    if (servings > 0) {
                         String name = ingredientComboBox.getSelectedItem().toString();
                         Ingredient ingredient = new Ingredient();
                         ingredient.setServing(servings);
@@ -140,7 +143,7 @@ public class MealGUI extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 Meal meal = new Meal();
                 // List of meal types
-                List < String > optionsList = new ArrayList < > (Arrays.asList("Breakfast", "Lunch", "Dinner", "Snacks"));
+                List<String> optionsList = new ArrayList<>(Arrays.asList("Breakfast", "Lunch", "Dinner", "Snacks"));
 
                 boolean validDateSelected = false;
                 while (!validDateSelected) {
@@ -163,7 +166,7 @@ public class MealGUI extends JFrame {
                             JOptionPane.DEFAULT_OPTION,
                             JOptionPane.PLAIN_MESSAGE,
                             null,
-                            new Object[] {
+                            new Object[]{
                                     "OK"
                             }, // Array of options. Only "OK" button here
                             null // Default button, null for no default
@@ -232,7 +235,7 @@ public class MealGUI extends JFrame {
                         meal.setType(selectedMeal);
 
                         // Add all ingredients to meal
-                        for (Ingredient ingredient: ingredientList) {
+                        for (Ingredient ingredient : ingredientList) {
                             meal.addIngredient(ingredient);
                         }
 
@@ -263,7 +266,7 @@ public class MealGUI extends JFrame {
                 int totalCalories = 0, totalFat = 0, totalProtein = 0, totalCarbs = 0;
 
                 // Calculate nutritional information for all meals in meal log
-                for (Meal meal: mealLogger.getMeals()) {
+                for (Meal meal : mealLogger.getMeals()) {
                     int calories = meal.calculateCalories();
                     int fat = meal.calculateFat();
                     int protein = meal.calculateProtein();
@@ -292,6 +295,7 @@ public class MealGUI extends JFrame {
             }
         });
     }
+
     // This method checks if the inputted date by the user is a real date
     public boolean isValidDate(int year, int month, int day) {
         Calendar cal = Calendar.getInstance();
@@ -305,5 +309,109 @@ public class MealGUI extends JFrame {
 
     public static void main(String[] args) throws SQLException {
         new MealGUI();
+    }
+
+    {
+// GUI initializer generated by IntelliJ IDEA GUI Designer
+// >>> IMPORTANT!! <<<
+// DO NOT EDIT OR ADD ANY CODE HERE!
+        $$$setupUI$$$();
+    }
+
+    /**
+     * Method generated by IntelliJ IDEA GUI Designer
+     * >>> IMPORTANT!! <<<
+     * DO NOT edit this method OR call it in your code!
+     *
+     * @noinspection ALL
+     */
+    private void $$$setupUI$$$() {
+        MainPanel = new JPanel();
+        MainPanel.setLayout(new GridBagLayout());
+        ingredientField = new JTextField();
+        ingredientField.setText("");
+        GridBagConstraints gbc;
+        gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        gbc.weightx = 2.0;
+        gbc.weighty = 1.0;
+        gbc.ipadx = 70;
+        MainPanel.add(ingredientField, gbc);
+        addIngredientBtn = new JButton();
+        addIngredientBtn.setText("Add Ingredient");
+        gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 5;
+        gbc.gridwidth = 3;
+        gbc.gridheight = 2;
+        gbc.weightx = 1.0;
+        gbc.weighty = 1.0;
+        MainPanel.add(addIngredientBtn, gbc);
+        servingField = new JTextField();
+        servingField.setText("");
+        gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 4;
+        gbc.gridwidth = 3;
+        gbc.weightx = 1.0;
+        gbc.weighty = 1.0;
+        gbc.ipadx = 30;
+        MainPanel.add(servingField, gbc);
+        final JLabel label1 = new JLabel();
+        label1.setText("Ingedient:");
+        gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.gridwidth = 3;
+        gbc.weightx = 1.0;
+        gbc.weighty = 1.0;
+        gbc.anchor = GridBagConstraints.SOUTH;
+        MainPanel.add(label1, gbc);
+        servingLabel = new JLabel();
+        servingLabel.setText("Servings");
+        gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 2;
+        gbc.gridwidth = 3;
+        gbc.gridheight = 2;
+        gbc.weightx = 1.0;
+        gbc.weighty = 1.0;
+        gbc.anchor = GridBagConstraints.SOUTH;
+        MainPanel.add(servingLabel, gbc);
+        logMealButton = new JButton();
+        logMealButton.setText("Log Meal");
+        gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 7;
+        gbc.weightx = 1.0;
+        gbc.weighty = 1.0;
+        MainPanel.add(logMealButton, gbc);
+        viewMealLogButton = new JButton();
+        viewMealLogButton.setText("View Meal Log");
+        gbc = new GridBagConstraints();
+        gbc.gridx = 1;
+        gbc.gridy = 7;
+        gbc.gridwidth = 2;
+        gbc.weightx = 1.0;
+        gbc.weighty = 1.0;
+        MainPanel.add(viewMealLogButton, gbc);
+        ingredientComboBox = new JComboBox();
+        final DefaultComboBoxModel defaultComboBoxModel1 = new DefaultComboBoxModel();
+        ingredientComboBox.setModel(defaultComboBoxModel1);
+        gbc = new GridBagConstraints();
+        gbc.gridx = 2;
+        gbc.gridy = 1;
+        gbc.weightx = 1.0;
+        gbc.weighty = 1.0;
+        gbc.ipadx = 70;
+        MainPanel.add(ingredientComboBox, gbc);
+    }
+
+    /**
+     * @noinspection ALL
+     */
+    public JComponent $$$getRootComponent$$$() {
+        return MainPanel;
     }
 }
