@@ -1,4 +1,10 @@
-package ECHO.UseCase6Test;
+/**
+ * Team Echo
+ * EECS 3311
+ * Use case 5 that visualizes the daily
+ * nutrient intakes
+ */
+package ECHO.UseCase5Test;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -6,11 +12,15 @@ import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
@@ -21,7 +31,6 @@ import org.jfree.data.general.DefaultPieDataset;
 
 @SuppressWarnings("serial")
 public class DNGraph extends JFrame implements ActionListener {
-	private static DNGraph instance;
 	private String startDate;
 	private String endDate;
 	private JLabel inputDate;
@@ -29,16 +38,10 @@ public class DNGraph extends JFrame implements ActionListener {
 	private JLabel to;
 	private JTextField end;
 	private JLabel example;
-	private JButton graph;
+	private JButton graphTen;
+	private JButton graphFive;
 
-	public static DNGraph getInstance() {
-		if (instance == null)
-			instance = new DNGraph();
-
-		return instance;
-	}// end getInstance
-
-	private DNGraph() {
+	public DNGraph(MealLogger myMealLogger) {
 		// Set window title
 		super("Daily Nutrients Intake");
 
@@ -47,60 +50,129 @@ public class DNGraph extends JFrame implements ActionListener {
 		to = new JLabel("To");
 		end = new JTextField(10);
 		example = new JLabel("dd/mm/yyyy");
-		graph = new JButton("Graph");
-		JPanel west = new JPanel();
-		west.setLayout(new GridLayout(2, 0));
-		JPanel north = new JPanel();
-		graph.addActionListener(new ActionListener() {
+		graphTen = new JButton("Graph Top 10");
+		graphFive = new JButton("Graph Top 5");
+		JPanel panel = new JPanel();
+		panel.setLayout(new GridLayout(2, 0));
+		JPanel header = new JPanel();
+		graphTen.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				startDate = start.getText();
 				endDate = end.getText();
-				createPie(west, startDate, endDate);
-			}// end actionPerformeds
+				try {
+					createChartTopTen(panel, startDate, endDate, myMealLogger);
+				} catch (ParseException e1) {
+					e1.printStackTrace();
+				}
+			}// end actionPerformed
 		});// end actionPerformed
-		north.add(inputDate);
-		north.add(start);
-		north.add(to);
-		north.add(end);
-		north.add(example);
-		north.add(graph);
+		graphFive.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				startDate = start.getText();
+				endDate = end.getText();
+				try {
+					createChartTopFive(panel, startDate, endDate, myMealLogger);
+				} catch (ParseException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+			}// end actionPerformed
 
-		getContentPane().add(north, BorderLayout.NORTH);
-		getContentPane().add(west, BorderLayout.WEST);
+		});// end actionPerformed
+		header.add(inputDate);
+		header.add(start);
+		header.add(to);
+		header.add(end);
+		header.add(example);
+		header.add(graphTen);
+		header.add(graphFive);
+
+		getContentPane().add(header, BorderLayout.NORTH);
+		getContentPane().add(panel, BorderLayout.WEST);
+		setExtendedState(JFrame.MAXIMIZED_BOTH);// make fullscreen
+		setVisible(true);
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	}// end DNGraph
 
-	private void createPie(JPanel west, String startDate, String endDate) {
-		// example data set
+	private void createChartTopTen(JPanel panel, String startDate, String endDate, MealLogger myMealLogger)
+			throws ParseException {
+		panel.removeAll();// removes any previous charts that where made
+		panel.revalidate();
+		panel.repaint();
+		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy");
+		Date start = simpleDateFormat.parse(startDate);
+		Date end = simpleDateFormat.parse(endDate);
+		// data set
 		DefaultPieDataset result = new DefaultPieDataset();
 
-		result.setValue("Sodium", 20);
-		result.setValue("Fat", 15);
-		result.setValue("Protein", 25);
-		result.setValue("Carbs", 30);
-		result.setValue("Sugars", 10);
+		if (startDate.equals("") || endDate.equals("") || start.after(end)) {
+			JOptionPane.showMessageDialog(null, "Incorrect Date Info");
+		} else {
+			JFreeChart chart = ChartFactory.createPieChart("Daily Nutrient Intake", result, true, true, false);
 
-		result.setValue("Sodium", 30);
-		result.setValue("Fat", 20);
-		result.setValue("Protein", 10);
-		result.setValue("Carbs", 15);
-		result.setValue("Sugars", 25);
+			ChartPanel chartPanel = new ChartPanel(chart);
+			chartPanel.setPreferredSize(new Dimension(900, 600));
+			chartPanel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
+			chartPanel.setBackground(Color.white);
+			panel.add(chartPanel);
+			panel.revalidate();
+			panel.repaint();
+		} // end if statement
+	}// end createChartTopTen
 
-		JFreeChart chart = ChartFactory.createPieChart("Daily Nutrient Intake", result, true, true, false);
+	private void createChartTopFive(JPanel panel, String startDate, String endDate, MealLogger myMealLogger)
+			throws ParseException {
+		panel.removeAll();// removes any previous charts that where made
+		panel.revalidate();
+		panel.repaint();
+		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy");
+		Date start = simpleDateFormat.parse(startDate);
+		Date end = simpleDateFormat.parse(endDate);
+		// data set
+		DefaultPieDataset result = new DefaultPieDataset();
+		int totalCalories = 0;
+		int totalFat = 0;
+		int totalProtein = 0;
+		int totalCarbs = 0;
+		int other = 0;
 
-		ChartPanel chartPanel = new ChartPanel(chart);
-		chartPanel.setPreferredSize(new Dimension(900, 600));
-		chartPanel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
-		chartPanel.setBackground(Color.white);
-		west.add(chartPanel);
-	}// end createPie
+		for (Meal meal : myMealLogger.getMeals()) {
+			Date mealDate = simpleDateFormat.parse(meal.getDate());
+			if (mealDate.equals(start) || mealDate.equals(end) || mealDate.after(start) && mealDate.before(end)) {
+				totalCalories += meal.calculateCalories();
+				totalFat += meal.calculateFat();
+				totalProtein += meal.calculateProtein();
+				totalCarbs += meal.calculateCarbs();
+				other += meal.calculateOthers();
+			} // end if statement
+		} // end for loop
+			// adds nutrients to the data set
+		result.setValue("Carbs", totalCarbs);
+		result.setValue("Protein", totalProtein);
+		result.setValue("Fat", totalFat);
+		result.setValue("Calories", totalCalories);
+		result.setValue("Other", other);
+		// catch when the user inputs a end date that is earlier than the start
+		if (startDate.equals("") || endDate.equals("") || start.after(end)) {
+			JOptionPane.showMessageDialog(null, "Incorrect Date Info");
+		} else {
+			JFreeChart chart = ChartFactory.createPieChart("Daily Nutrient Intake", result, true, true, false);
+
+			ChartPanel chartPanel = new ChartPanel(chart);
+			chartPanel.setPreferredSize(new Dimension(900, 600));
+			chartPanel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
+			chartPanel.setBackground(Color.white);
+			panel.add(chartPanel);
+			panel.revalidate();
+			panel.repaint();
+		} // end if statement
+	}// end createChartTopFive
 
 	public static void main(String[] args) {
-
-		JFrame frame = DNGraph.getInstance();
-		frame.setSize(900, 600);
-		frame.pack();
-		frame.setVisible(true);
+		MealLogger myMealLogger = new MealLogger();
+		new DNGraph(myMealLogger);
 	}// end main
 
 	@Override
