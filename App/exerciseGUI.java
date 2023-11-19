@@ -162,7 +162,7 @@ public class exerciseGUI extends JFrame {
     }
 
     public static void main(String[] args) {
-//        Profile user = new Profile();
+        Profile user = new Profile();
         new exerciseGUI();
     }
 
