@@ -4,7 +4,7 @@
  * Use case 4 that visualizes the daily calorie intakes
  * and daily exercise within an inputed time period
  */
-package ECHO.UseCase4Test;
+package App;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -16,7 +16,9 @@ import java.awt.event.ActionListener;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -46,34 +48,22 @@ public class CEGraph extends JFrame implements ActionListener {
 	private JLabel example;
 	private JButton graph;
 
-	public CEGraph(Profile user, MealLogger myMealLogger, ExerciseLogger myExerciseLogger) {
+	public CEGraph(MealLogger myMealLogger, ExerciseLogger myExerciseLogger) {
 		// Set window title
 		super("Daily Calory Intake & Daily Exercise");
+		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy");
+		Profile user = DBQuery.getCurrentProfile();
+		double userBMR = Calculator.calculateBMR(user);
 		// Set charts region
 		JPanel panel = new JPanel();
 		panel.setLayout(new GridLayout(2, 0));
 
-		// Create top bar which takes time period from the user
 		inputDate = new JLabel("Input Date");
 		start = new JTextField(10);
 		to = new JLabel("To");
 		end = new JTextField(10);
 		example = new JLabel("dd/mm/yyyy");
 		graph = new JButton("Graph");
-		// programs button to create the chart
-		graph.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				startDate = start.getText();
-				endDate = end.getText();
-				try {
-					createTimeSeries(panel, startDate, endDate, Calculator.calculateBMR(user), myMealLogger,
-							myExerciseLogger);
-				} catch (ParseException e1) {
-					e1.printStackTrace();
-				}
-			}// end actionPerformeds
-		});// end actionPerformed
 
 		JPanel header = new JPanel();
 		header.add(inputDate);
@@ -83,6 +73,20 @@ public class CEGraph extends JFrame implements ActionListener {
 		header.add(example);
 		header.add(graph);
 
+		// programs button to create the chart
+		graph.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				startDate = start.getText();
+				endDate = end.getText();
+				try {
+					createTimeSeries(panel, simpleDateFormat.parse(startDate), simpleDateFormat.parse(endDate),
+							Calculator.calculateBMR(user), myMealLogger, myExerciseLogger);
+				} catch (ParseException e1) {
+					e1.printStackTrace();
+				}
+			}// end actionPerformeds
+		});// end actionPerformed
 		getContentPane().add(header, BorderLayout.NORTH);
 		getContentPane().add(panel, BorderLayout.WEST);
 		setExtendedState(JFrame.MAXIMIZED_BOTH);
@@ -90,19 +94,17 @@ public class CEGraph extends JFrame implements ActionListener {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	}// end UC5test
 
-	public void createTimeSeries(JPanel panel, String startDate, String endDate, double userBMR,
-			MealLogger myMealLogger, ExerciseLogger myExerciseLogger) throws ParseException {
+	public void createTimeSeries(JPanel panel, Date startDate, Date endDate, double userBMR, MealLogger myMealLogger,
+			ExerciseLogger myExerciseLogger) throws ParseException {
 		panel.removeAll();// removes previous chart that was made
 		panel.revalidate();
 		panel.repaint();
 		TimeSeries caloryIntake = new TimeSeries("Daily Calory Intake");
 		TimeSeries amountOfExercise = new TimeSeries("Daily Amount of Exercise");
 		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy");
-		int day, month, year;
+
 		// turns date inputed from the user into a format
 		// that allows comparison of dates
-		Date start = simpleDateFormat.parse(startDate);
-		Date end = simpleDateFormat.parse(endDate);
 		// will receive the user BMR from profile
 		// will receive myMealLogger, log of the users meals, from mealLog
 		// will receive myExerciseLogger, log of the users
@@ -110,34 +112,42 @@ public class CEGraph extends JFrame implements ActionListener {
 		// catch when the user inputs an end date that is
 		// earlier than the start date
 
-		if (start.after(end)) {
+		if (startDate.after(endDate)) {
 			JOptionPane.showMessageDialog(null, "Incorrect Date Info");
+			System.out.println("test");
 		} else {
 			// for loop that adds info to the chart that fits
 			// into the inputed time period
+			Map<Date, Double> amountOfCalsPerDate = new HashMap<>();
 			for (int i = 0; i < myMealLogger.getMeals().size(); i++) {
-				Date mealDate = simpleDateFormat.parse(myMealLogger.getMeals().get(i).getDate());
-				if (mealDate.equals(start) || mealDate.equals(end) || mealDate.after(start) && mealDate.before(end)) {
-					day = Integer.valueOf(myMealLogger.getMeals().get(i).getDate().substring(0, 2));
-					month = Integer.valueOf(myMealLogger.getMeals().get(i).getDate().substring(3, 5));
-					year = Integer.valueOf(myMealLogger.getMeals().get(i).getDate().substring(6, 10));
-					caloryIntake.add(new Day(day, month, year), myMealLogger.getMeals().get(i).calculateCalories());
-				} // end if statement
+				Double calories = amountOfCalsPerDate
+						.get((simpleDateFormat.parse(myMealLogger.getMeals().get(i).getDate())));
+				Double amount = calories == null ? 0 : calories;
+				amountOfCalsPerDate.put(simpleDateFormat.parse(myMealLogger.getMeals().get(i).getDate()),
+						amount + myMealLogger.getMeals().get(i).calculateCalories());
 			} // end for loop
 
-			for (int i = 0; i < myExerciseLogger.getExercises().size(); i++) {
-				Date exerciseDate = simpleDateFormat.parse(myExerciseLogger.getExercises().get(i).getDate());
-				if (exerciseDate.equals(start) || exerciseDate.equals(end)
-						|| exerciseDate.after(start) && exerciseDate.before(end)) {
-					day = Integer.valueOf(myExerciseLogger.getExercises().get(i).getDate().substring(0, 2));
-					month = Integer.valueOf(myExerciseLogger.getExercises().get(i).getDate().substring(3, 5));
-					year = Integer.valueOf(myExerciseLogger.getExercises().get(i).getDate().substring(6, 10));
-					amountOfExercise.add(new Day(day, month, year),
-							myExerciseLogger.getExercises().get(i).calculateCaloriesBurnt(userBMR));
-				} // end if statement
+			for (Entry<Date, Double> e : amountOfCalsPerDate.entrySet()) {
+				caloryIntake.add(new Day(e.getKey()), e.getValue());
 			} // end for loop
-				// creates the chart and adds the data
-				// adds the different axis'
+
+			Map<Date, Double> amountOfExPerDate = new HashMap<>();
+			for (int i = 0; i < myExerciseLogger.getExercises().size(); i++) {
+				Double exercise = amountOfExPerDate
+						.get((simpleDateFormat.parse(myExerciseLogger.getExercises().get(i).getDate())));
+				Double amount = exercise == null ? 0 : exercise;
+				amountOfExPerDate.put(simpleDateFormat.parse(myExerciseLogger.getExercises().get(i).getDate()),
+						amount + myExerciseLogger.getExercises().get(i).calculateCaloriesBurnt(userBMR));
+			} // end for loop
+
+			for (Entry<Date, Double> e : amountOfExPerDate.entrySet()) {
+				if (e.getKey().after(startDate) && e.getKey().before(endDate) || e.getKey().equals(startDate)
+						|| e.getKey().equals(endDate))
+					amountOfExercise.add(new Day(e.getKey()), e.getValue());
+			} // end for loop
+
+			// creates the chart and adds the data
+			// adds the different axis'
 			TimeSeriesCollection dataset = new TimeSeriesCollection();
 			dataset.addSeries(caloryIntake);
 
@@ -177,10 +187,9 @@ public class CEGraph extends JFrame implements ActionListener {
 	}// end createTimeSeries
 
 	public static void main(String[] args) {
-		Profile user = new Profile();
 		MealLogger myMealLogger = new MealLogger();
 		ExerciseLogger myExerciseLogger = new ExerciseLogger();
-		new CEGraph(user, myMealLogger, myExerciseLogger);
+		new CEGraph(myMealLogger, myExerciseLogger);
 	}// end main
 
 	@Override

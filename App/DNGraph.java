@@ -4,7 +4,7 @@
  * Use case 5 that visualizes the daily
  * nutrient intakes
  */
-package ECHO.UseCase5Test;
+package App;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
