@@ -1,63 +1,17 @@
+-- Basic guides to load
+-- 1. Open server and check IP, should be automatic. If not, check Windows+S -> Services -> MySQL is on.
+-- 2. Run all commands except drop commands. 
+--       (Minimal load: Only FoodGroup, FoodSource, FoodName, NutrientName, NutrientAmount, 
+--                           UserProfile, ProfileLog, DataLog, MealLog, and ExerciseLog are needed)
+-- 3. Load data: Check left column in the SCHEMA tab, Right-click > Table Data Import Wizard and select the files
+--       Note: NutrientAmount is very large (500k rows) and might take a while.
+
 -- Diagram/table constructions
 create schema Project_Database;
 drop schema Project_Database;
 use Project_Database;
 
-create table FoodName (
- FoodID INT(11) NOT NULL,
- FoodCode INT(8) NOT NULL,
- FoodGroupID INT(15),
- FoodSourceID INT(15),
- FoodDescription VARCHAR(255),
- FoodDescriptionF VARCHAR(255),
- CountryCode INT(20),
- FoodDateOfEntry DATETIME,
- FoodDateOfPublication DATETIME,
- ScientificName VARCHAR(100),
- constraint FoodName_PK PRIMARY KEY (FoodID),
- constraint FoodGroup_FK FOREIGN KEY (FoodGroupID) references FoodGroup(FoodGroupID),
- constraint FoodSource_FK FOREIGN KEY (FoodSourceID) references FoodSource(FoodSourceID));
-
-create table NutrientAmount (
- FoodID INT(8) NOT NULL,
- NutrientNameID INT(4) NOT NULL,
- NutrientValue INT(12),
- StandardError FLOAT(8, 4),
- NumberOfObservations INT(6),
- NutrientSourceID INT(15) NOT NULL,
- NutrientDateEntry DATETIME,
- constraint NutrientAmount_PK PRIMARY KEY (FoodID, NutrientNameID, NutrientSourceID),
- constraint FoodName_FK FOREIGN KEY (FoodID) references FoodName(FoodID),
- constraint NutrientNameID FOREIGN KEY (NutrientNameID) references NutrientName(NutrientNameID),
- constraint NutrientSourceID FOREIGN KEY (NutrientSourceID) references NutrientSource(NutrientSourceID));
-
-create table ConversionFactor (
- FoodID INT(8) NOT NULL,
- MeasureID INT(10) NOT NULL,
- ConversionFactorValue INT(10),
- ConvFactorDateOfEntry DATETIME,
- constraint ConvFactor_PK PRIMARY KEY (FoodID, MeasureID),
- constraint ConvFoodName_FK FOREIGN KEY (FoodID) references FoodName(FoodID),
- constraint MeasureName_FK FOREIGN KEY (MeasureID) references MeasureName(MeasureID));
-
-create table RefuseAmount (
- FoodID INT(8) NOT NULL,
- RefuseID INT(10) NOT NULL,
- RefuseAmount FLOAT(9, 5),
- RefuseDateOfEntry DATETIME,
- constraint RefuseAmount_PK PRIMARY KEY (FoodID, RefuseID),
- constraint RefuseFoodName_FK FOREIGN KEY (FoodID) references FoodName(FoodID),
- constraint RefuseName_FK FOREIGN KEY (RefuseID) references RefuseName(RefuseID));
-
-create table YieldAmount (
- FoodID INT(8) NOT NULL,
- YieldID INT(10) NOT NULL,
- YieldAmount FLOAT(9, 5),
- YieldDateOfEntry DATETIME,
- constraint YieldAmount_PK PRIMARY KEY (FoodID, YieldID),
- constraint YieldFoodName_FK FOREIGN KEY (FoodID) references FoodName(FoodID),
- constraint YieldName_FK FOREIGN KEY (YieldID) references YieldName(YieldID));
-
+-- Importan, must load tables 
 create table FoodGroup (
  FoodGroupID INT(15) NOT NULL,
  FoodGroupCode INT(15) NOT NULL,
@@ -90,23 +44,26 @@ create table NutrientSource (
  NutrientSourceDescriptionF VARCHAR(200),
  constraint NutrientSource_PK PRIMARY KEY (NutrientSourceID));
 
-create table MeasureName (
- MeasureID INT(10) NOT NULL,
- MeasureName VARCHAR(200),
- MeasureNameF VARCHAR(200),
- constraint MeasureName_PK PRIMARY KEY (MeasureID));
- 
-create table RefuseName (
- RefuseID INT(10) NOT NULL,
- RefuseName VARCHAR(200),
- RefuseNameF VARCHAR(200),
- constraint RefuseName_PK PRIMARY KEY (RefuseID));
+create table FoodName (
+ FoodID INT(11) NOT NULL,
+ FoodCode INT(8) NOT NULL,
+ FoodGroupID INT(15),
+ FoodSourceID INT(15),
+ FoodDescription VARCHAR(255),
+ FoodDescriptionF VARCHAR(255),
+ constraint FoodName_PK PRIMARY KEY (FoodID),
+ constraint FoodGroup_FK FOREIGN KEY (FoodGroupID) references FoodGroup(FoodGroupID),
+ constraint FoodSource_FK FOREIGN KEY (FoodSourceID) references FoodSource(FoodSourceID));
 
-create table YieldName (
- YieldID INT(10) NOT NULL,
- YieldName VARCHAR(200),
- YieldNameF VARCHAR(200),
- constraint YieldName_PK PRIMARY KEY (YieldID));
+create table NutrientAmount (
+ FoodID INT(8) NOT NULL,
+ NutrientNameID INT(4) NOT NULL,
+ NutrientValue INT(12),
+ NutrientSourceID INT(15) NOT NULL,
+ constraint NutrientAmount_PK PRIMARY KEY (FoodID, NutrientNameID, NutrientSourceID),
+ constraint FoodName_FK FOREIGN KEY (FoodID) references FoodName(FoodID),
+ constraint NutrientNameID FOREIGN KEY (NutrientNameID) references NutrientName(NutrientNameID),
+ constraint NutrientSourceID FOREIGN KEY (NutrientSourceID) references NutrientSource(NutrientSourceID));
 
 create table UserProfile (
  UserID INT(8) NOT NULL,
@@ -160,6 +117,53 @@ create table MealLog (
   ExerciseName VARCHAR(200),
   constraint ExerciseLog_PK PRIMARY KEY (LogDate, UserID),
   constraint ExerciseLog_FK FOREIGN KEY (LogDate, LogType, UserID) references ProfileLog(LogDate, LogType, UserID));
+  
+  
+  -- Less important tables (not currently needed)
+  create table MeasureName (
+ MeasureID INT(10) NOT NULL,
+ MeasureName VARCHAR(200),
+ MeasureNameF VARCHAR(200),
+ constraint MeasureName_PK PRIMARY KEY (MeasureID));
+ 
+create table RefuseName (
+ RefuseID INT(10) NOT NULL,
+ RefuseName VARCHAR(200),
+ RefuseNameF VARCHAR(200),
+ constraint RefuseName_PK PRIMARY KEY (RefuseID));
+
+create table YieldName (
+ YieldID INT(10) NOT NULL,
+ YieldName VARCHAR(200),
+ YieldNameF VARCHAR(200),
+ constraint YieldName_PK PRIMARY KEY (YieldID));
+
+create table ConversionFactor (
+ FoodID INT(8) NOT NULL,
+ MeasureID INT(10) NOT NULL,
+ ConversionFactorValue INT(10),
+ ConvFactorDateOfEntry DATETIME,
+ constraint ConvFactor_PK PRIMARY KEY (FoodID, MeasureID),
+ constraint ConvFoodName_FK FOREIGN KEY (FoodID) references FoodName(FoodID),
+ constraint MeasureName_FK FOREIGN KEY (MeasureID) references MeasureName(MeasureID));
+
+create table RefuseAmount (
+ FoodID INT(8) NOT NULL,
+ RefuseID INT(10) NOT NULL,
+ RefuseAmount FLOAT(9, 5),
+ RefuseDateOfEntry DATETIME,
+ constraint RefuseAmount_PK PRIMARY KEY (FoodID, RefuseID),
+ constraint RefuseFoodName_FK FOREIGN KEY (FoodID) references FoodName(FoodID),
+ constraint RefuseName_FK FOREIGN KEY (RefuseID) references RefuseName(RefuseID));
+
+create table YieldAmount (
+ FoodID INT(8) NOT NULL,
+ YieldID INT(10) NOT NULL,
+ YieldAmount FLOAT(9, 5),
+ YieldDateOfEntry DATETIME,
+ constraint YieldAmount_PK PRIMARY KEY (FoodID, YieldID),
+ constraint YieldFoodName_FK FOREIGN KEY (FoodID) references FoodName(FoodID),
+ constraint YieldName_FK FOREIGN KEY (YieldID) references YieldName(YieldID));
   
 -- Triggers
 -- Drop tables
