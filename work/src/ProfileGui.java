@@ -42,7 +42,6 @@ public class ProfileGui implements ActionListener, FocusListener {
 	double height;
 	double weight;
 	double fatlevel;
-	double bmr;
 	int bmrSetting;
 	boolean gender;
 	Date birth;
