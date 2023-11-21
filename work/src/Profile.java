@@ -1,8 +1,11 @@
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
-
+import java.util.*;
 import javax.naming.directory.InvalidAttributesException;
+
+@SuppressWarnings("deprecation")
+//Date values of:
+//Year as (year - 1900) (automatically corrected aside from default )
+//Month from 0-11 (corrected in log.toString() but be mindful of month in)
+//Date is as normal.
 
 public class Profile {
    private static int nextId = 0;
@@ -35,7 +38,7 @@ public class Profile {
 
       //Log Update
       Date logDate = new Date();
-      logDate.setYear(logDate.getYear() + 1900);
+      logDate.setYear(logDate.getYear()+1900);
       logDate.setMonth(logDate.getMonth());
       history = new LinkedList<Log>();
       history.add(new DataLog(this.height, this.weight, logDate, this.userId));
@@ -67,10 +70,7 @@ public class Profile {
    }
 
    //Two options: Use whatever more convenient (or just ask for a specific one)
-   public void setBirth(Date birth) {
-      this.birth = birth;
-   }
-
+   public void setBirth(Date birth) {this.birth = birth;}
    public void setBirth(int year, int month, int day) {
       this.birth = new Date(year, month, day); //TODO: Deprecated object, possible need for different implementation
    }
@@ -81,8 +81,7 @@ public class Profile {
          //TODO: Implement get current date & handling 'x ft y in' as input
          Date logDate = new Date();
          //Adjustments to date values for the correct display
-         logDate.setYear(logDate.getYear() + 1900);
-         logDate.setMonth(logDate.getMonth());
+         logDate.setYear(logDate.getYear()+1900);
 
          if (isMetric)
             this.height = height;
@@ -100,8 +99,8 @@ public class Profile {
       try {
          Date logDate = new Date();
          //Adjustments to date values for the correct display
-         logDate.setYear(logDate.getYear() + 1900);
-         logDate.setMonth(logDate.getMonth());
+         logDate.setYear(logDate.getYear()+1900);
+
          if (isMetric)
             this.weight = weight;
          else
@@ -114,8 +113,7 @@ public class Profile {
 
    public void setFatLvl(double fatLvl) {
       try {
-         if (fatLvl < 0.0 || fatLvl > 100.0)
-            throw new InvalidAttributesException("Invalid fatLvl value, value must be between 0.0 to 100.0");
+         if (fatLvl < 0.0 || fatLvl > 100.0) throw new InvalidAttributesException("Invalid fatLvl value, value must be between 0.0 to 100.0");
       } catch (Exception e) {
          e.printStackTrace();
       }
@@ -123,14 +121,11 @@ public class Profile {
       this.fatLvl = fatLvl;
    }
 
-   public void setUnit(boolean isMetric) {
-      this.isMetric = isMetric;
-   }
+   public void setUnit(boolean isMetric) {this.isMetric = isMetric;}
 
    public void setBMR(int bmrSetting) {
       try {
-         if (bmrSetting < 0 || bmrSetting > 2)
-            throw new InvalidAttributesException("Invalid bmrSetting value, value must be between 1 to 3.");
+         if (bmrSetting < 0 || bmrSetting > 2) throw new InvalidAttributesException("Invalid bmrSetting value, value must be between 1 to 3.");
       } catch (Exception e) {
          e.printStackTrace();
       }
@@ -144,68 +139,48 @@ public class Profile {
    }
 
    //Getters
-   public boolean getSex() {
-      return sex;
-   }
+   public int getUserID() {return userId;}
+   public boolean getSex() {return sex;}
+   public Date getBirth() {return birth;}
+   public double getHeight() {return height;}
+   public double getWeight() {return weight;}
 
-   public Date getBirth() {
-      return birth;
-   }
+   public double getFatLvl() {return fatLvl;}
 
-   public double getHeight() {
-      return height;
-   }
-
-   public double getWeight() {
-      return weight;
-
-   }
-
-   public double getFatLvl() {
-      return fatLvl;
-   }
-
-   public boolean getIsMetric() {
-      return isMetric;
-   }
+   public boolean getIsMetric() {return isMetric;}
 
    //Not sure if calc method should just return the name or the value
-   public int getCalcMethod() {
-      return bmrSetting;
-   }
+   public int getCalcMethod() {return bmrSetting;}
 
-   public String getHistory() {
+   public List<Log> getHistory() {return history;}
+   public String getHistoryString() {
       String out = "";
       for (int i = 0; i < history.size(); i++)
-         out += history.get(i).toString() + "\n";
+         out += history.get(i).toString()+"\n";
       return out;
    }
 
    //Log creation and management
-
    /**
     * Overloaded method for adding a new log to the profile.
     */
    public void addLog(double height, double weight, Date logDate) {
       history.add(new DataLog(height, weight, logDate, this.userId));
    }
-
-   public void addLog(Ingredient[] ingredients, String mealType, Date logDate) {
-      MealLog meal = new MealLog(mealType, logDate, this.userId);
+   public void addLog(String mealName, Ingredient[] ingredients, String mealType, Date logDate) {
+      MealLog meal = new MealLog(mealName, mealType, logDate, this.userId);
       for (Ingredient i : ingredients) {
          if (i != null)
             meal.addIngredient(i);
       }
       history.add(meal);
    }
-
    public void addLog(int caloBurnt, double time, Date logDate) {
       history.add(new ExerciseLog(caloBurnt, time, logDate, this.userId));
    }
 
    /**
     * Remove the first log that matched (based on specified date and type) from history and returns it. Returns null if none matches.
-    *
     * @param type 0 for any log, 1 for DataLog, 2 for MealLog, 3 for ExerciseLog
     */
    public Log removeLog(Date logDate, int type) {
@@ -221,5 +196,56 @@ public class Profile {
       }
 
       return removedLog;
+   }
+
+   //Temp test method
+   public static void main(String args[]) {
+      //Creation
+      Profile user0 = new Profile(); //Default
+      Profile user1 = new Profile(false, new Date(1974, 06, 10), 155.0, 50.0);
+
+      //Getters
+      if (user0.getSex() && user0.getBirth() == null && user0.getHeight() == 0.0 && user0.getWeight() == 0.0)
+         System.out.println("Correct default values.");
+
+      if (!user1.getSex() && user1.getBirth().equals(new Date(1974, 06, 10))
+              && user1.getHeight() == (155.0 * 3.281 / 100) && user1.getWeight() == 50.0 * 2.2046)
+         System.out.println("Correct data assignments.");
+
+      if (!user1.isMetric && user1.getFatLvl() == 0)
+         System.out.println("Correct default settings.");
+
+      //Setters
+      user1.setBirth(2002, 03, 24);
+      if (user1.getBirth().equals(new Date(2002, 03, 24))) System.out.println("Correct setBirth(int, int, int).");
+
+      user1.setBirth(new Date(2023, 10, 06));
+      if (user1.getBirth().equals(new Date(2023, 10, 06))) System.out.println("Correct setBirth(Date).");
+
+      user1.setFatLvl(20);
+      if (user1.getFatLvl() == 20) System.out.println("Correct setFatLvl.");
+
+      user1.isMetric = true;
+      user1.setHeight(123.0);
+      user1.setWeight(75.0);
+      if (user1.getHeight() == 123.0) System.out.println("Correct setHeight().");
+      if (user1.getWeight() == 75.0) System.out.println("Correct setWeight().");
+
+      user1.isMetric = false;
+      if (user1.getHeight() == 123.0 * 3.281 / 100) System.out.println("Correct setHeight().");
+      if (user1.getWeight() == 75.0 * 2.2046) System.out.println("Correct setWeight().");
+
+      //Add, remove logs
+      Date today = new Date(2023, 11, 17);
+      user1.addLog(170.0, 120.0, today);
+      String[] list = new String[5];
+      list[0] = "milk";
+      user1.addLog(200, 20.0, today);
+      System.out.println(user1.getHistory());
+
+      user1.removeLog(today, 1);
+      System.out.println(user1.getHistory());
+
+      System.out.println("End of test.");
    }
 }

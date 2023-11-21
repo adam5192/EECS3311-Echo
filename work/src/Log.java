@@ -54,7 +54,7 @@ class DataLog extends Log {
 class MealLog extends Log {
    private String mealType; //Valid values: "Breakfast", "Lunch", "Dinner", "Snack"
    private List<Ingredient> ingredients;
-
+   private String mealName;
    //Constructors
    public MealLog(int userId) {
       super(userId);
@@ -63,7 +63,7 @@ class MealLog extends Log {
       super.setLogType(2);
    }
 
-   public MealLog(String mealType, Date logDate, int userId) {
+   public MealLog(String mealName, String mealType, Date logDate, int userId) {
       super(logDate, userId);
       try {
          if (!(mealType.equals("Breakfast")
@@ -73,6 +73,7 @@ class MealLog extends Log {
             throw new InvalidAttributeValueException("Invalid mealType value.");
 
          this.mealType = mealType;
+         this.mealName = mealName;
          ingredients = new ArrayList<Ingredient>();
          super.setLogType(2);
       } catch (Exception e) {
@@ -80,8 +81,8 @@ class MealLog extends Log {
       }
    }
 
-   public MealLog(Ingredient[] ingredients, String mealType, Date logDate, int userId) {
-      this(mealType, logDate, userId);
+   public MealLog(String mealName, Ingredient[] ingredients, String mealType, Date logDate, int userId) {
+      this(mealName, mealType, logDate, userId);
       for (Ingredient i : ingredients)
          this.ingredients.add(i);
    }
@@ -92,6 +93,8 @@ class MealLog extends Log {
     * @return the meal type associated with the log, null if the value of mealType is invalid.
     */
    public String getType() {return mealType;}
+   public String getName() {return mealName;}
+   public List<Ingredient> getIngredients() {return ingredients;}
 
    //Setters
    public void setType(String mealType) {
@@ -229,23 +232,24 @@ class Ingredient {
    }
 
    public void setServing(int serving) {
-        this.serving = serving;
-    }
+      this.serving = serving;
+   }
 
-    public int getServing(){
-        return serving;
-    }
+   public int getServing(){
+      return serving;
+   }
    //will likely have additional variables
 
    @Override
    public String toString() {
-      return "Ingredient{" + "name= " + name + '\'' + ", calories = " + calories + ", fat = " + fat + ", protein = " + protein + ", carbs = " + carbs + '}';
+      return "Ingredient{" + "name= " + name + '\'' + ", calories = " + calories + "cals, fat = " + fat + "g, protein = " + protein + "g, carbs = " + carbs + "g}";
    }
 
 }
 
 class ExerciseLog extends Log {
    private int caloBurnt;
+   private String exerciseName;
    private double time;
 
    //Constructor
@@ -256,8 +260,9 @@ class ExerciseLog extends Log {
       super.setLogType(3);
    }
 
-   public ExerciseLog(int caloBurnt, double time, Date logDate, int userId) {
+   public ExerciseLog(String exerciseName, int caloBurnt, double time, Date logDate, int userId) {
       super(logDate, userId);
+      this.exerciseName = exerciseName;
       this.caloBurnt = caloBurnt;
       this.time  = time;
       super.setLogType(3);
@@ -284,6 +289,7 @@ class ExerciseLog extends Log {
 
    //Getters
    public int getCaloBurnt() {return this.caloBurnt;}
+   public String getName() {return exerciseName;}
    public double getTime() {return this.time;}
 
    //toString format: Date - Time exercised - Calorie burnt
@@ -329,7 +335,9 @@ public class Log {
       return logType;
    }
 
-   //toString format: YY/MM/DD 
+   public int getUserID() {return userId;}
+
+   //toString format: YY/MM/DD
    @Override
    public String toString() {
       return String.format("%d/%2d/%2d", loggedDate.getYear(), loggedDate.getMonth() + 1, loggedDate.getDate());

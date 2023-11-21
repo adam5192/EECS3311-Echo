@@ -23,7 +23,7 @@ public class exerciseGUI extends JFrame {
     JButton back = new JButton("Back");
 
     public exerciseGUI() {
-        //Profile user = DBQuery.getCurrentProfile();
+//        int userID =
         //double userBMR = Calculator.calculateBMR(user);
         setContentPane(MainPanel);
         setTitle("Exercise Log");

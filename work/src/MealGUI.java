@@ -2,10 +2,7 @@
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
+import java.awt.event.*;
 import java.sql.SQLException;
 import java.util.*;
 import java.util.List;
@@ -33,6 +30,26 @@ public class MealGUI extends JFrame {
         setVisible(true);
         back.setBounds(0, 0, 20, 20);
         MainPanel.add(back);
+        ingredientField.setForeground(Color.gray);
+        ingredientField.addFocusListener(new FocusListener() {
+            @Override
+            public void focusGained(FocusEvent e) {
+                JTextField textField = (JTextField) e.getSource();
+                if ( textField.getText().equals("Search") ) {
+                    textField.setText("");
+                    textField.setForeground(Color.black);
+                }
+            }
+
+            @Override
+            public void focusLost(FocusEvent e) {
+                JTextField textField = (JTextField) e.getSource();
+                if ( textField.getText().equals("") ) {
+                    textField.setText("Search");
+                    textField.setForeground(Color.gray);
+                }
+            }
+        });
         back.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -48,8 +65,10 @@ public class MealGUI extends JFrame {
         }
 
         //Array of ingredients
-//        String[] ops = DBQuery.getIngredientNames();
-        String[] ops = {"carrot", "apple"};
+        String[] ops = DBQuery.getIngredientNames();
+        //String[] ops = {"carrot", "apple"};
+        System.out.println(ops.length);
+        System.out.println(DBQuery.getNutrientVal("Cheese souffle", "KCAL"));
 
 
         // Add ingredients to combo box
@@ -126,10 +145,10 @@ public class MealGUI extends JFrame {
                         ingredient.setServing(servings);
 
                         // Get nutritional information from database
-//                        ingredient.setCalories(servings * DBQuery.getNutrientVal(name, "KCAL"));
-//                        ingredient.setProtein(servings * DBQuery.getNutrientVal(name, "PROT"));
-//                        ingredient.setFat(servings * DBQuery.getNutrientVal(name, "FAT"));
-//                        ingredient.setCarbs(servings * DBQuery.getNutrientVal(name, "CARB"));
+                        ingredient.setCalories(servings * DBQuery.getNutrientVal(name, "KCAL"));
+                        ingredient.setProtein(servings * DBQuery.getNutrientVal(name, "PROT"));
+                        ingredient.setFat(servings * DBQuery.getNutrientVal(name, "FAT"));
+                        ingredient.setCarbs(servings * DBQuery.getNutrientVal(name, "CARB"));
                         System.out.println(name);
                         ingredientList.add(ingredient);
                         ingredientField.setText("");
@@ -141,10 +160,9 @@ public class MealGUI extends JFrame {
                     JOptionPane.showMessageDialog(MainPanel, "Please enter valid number");
                 } catch (NullPointerException exception) {
                     JOptionPane.showMessageDialog(MainPanel, "Please select an ingredient");
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
                 }
-//                catch (SQLException ex) {
-//                    ex.printStackTrace();
-//                }
             }
         });
 
@@ -231,7 +249,7 @@ public class MealGUI extends JFrame {
                     }
                 }
 
-                // Convert list to array for option pane
+                 // Convert list to array for option pane
                 String[] options = optionsList.toArray(new String[0]);
 
                 // If at least one ingredient is selected, show message dialog to select meal type
@@ -340,7 +358,7 @@ public class MealGUI extends JFrame {
         MainPanel = new JPanel();
         MainPanel.setLayout(new GridBagLayout());
         ingredientField = new JTextField();
-        ingredientField.setText("");
+        ingredientField.setText("Search");
         GridBagConstraints gbc;
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
