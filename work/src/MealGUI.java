@@ -66,11 +66,7 @@ public class MealGUI extends JFrame {
 
         //Array of ingredients
         String[] ops = DBQuery.getIngredientNames();
-        //String[] ops = {"carrot", "apple"};
-        System.out.println(ops.length);
-        System.out.println(DBQuery.getNutrientVal("Cheese souffle", "KCAL"));
-
-
+        
         // Add ingredients to combo box
         for (int i = 0; i < ops.length; i++) {
             ingredientComboBox.addItem(ops[i]);
@@ -293,7 +289,6 @@ public class MealGUI extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 StringBuilder mealLogInfo = new StringBuilder();
                 int totalCalories = 0, totalFat = 0, totalProtein = 0, totalCarbs = 0;
-
                 // Calculate nutritional information for all meals in meal log
                 for (Meal meal : mealLogger.getMeals()) {
                     int calories = meal.calculateCalories();
@@ -371,7 +366,7 @@ public class MealGUI extends JFrame {
         addIngredientBtn.setText("Add Ingredient");
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
-        gbc.gridy = 5;
+        gbc.gridy = 6;
         gbc.gridwidth = 3;
         gbc.gridheight = 2;
         gbc.weightx = 1.0;
@@ -381,7 +376,7 @@ public class MealGUI extends JFrame {
         servingField.setText("");
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
-        gbc.gridy = 4;
+        gbc.gridy = 5;
         gbc.gridwidth = 3;
         gbc.weightx = 1.0;
         gbc.weighty = 1.0;
@@ -401,7 +396,7 @@ public class MealGUI extends JFrame {
         servingLabel.setText("Servings");
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
-        gbc.gridy = 2;
+        gbc.gridy = 3;
         gbc.gridwidth = 3;
         gbc.gridheight = 2;
         gbc.weightx = 1.0;
@@ -412,15 +407,15 @@ public class MealGUI extends JFrame {
         logMealButton.setText("Log Meal");
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
-        gbc.gridy = 7;
+        gbc.gridy = 8;
         gbc.weightx = 1.0;
         gbc.weighty = 1.0;
         MainPanel.add(logMealButton, gbc);
         viewMealLogButton = new JButton();
         viewMealLogButton.setText("View Meal Log");
         gbc = new GridBagConstraints();
-        gbc.gridx = 1;
-        gbc.gridy = 7;
+        gbc.gridx = 0;
+        gbc.gridy = 9;
         gbc.gridwidth = 2;
         gbc.weightx = 1.0;
         gbc.weighty = 1.0;
@@ -429,11 +424,11 @@ public class MealGUI extends JFrame {
         final DefaultComboBoxModel defaultComboBoxModel1 = new DefaultComboBoxModel();
         ingredientComboBox.setModel(defaultComboBoxModel1);
         gbc = new GridBagConstraints();
-        gbc.gridx = 2;
-        gbc.gridy = 1;
+        gbc.gridx = 0;
+        gbc.gridy = 2;
         gbc.weightx = 1.0;
         gbc.weighty = 1.0;
-        gbc.ipadx = 70;
+        gbc.ipadx = 50;
         MainPanel.add(ingredientComboBox, gbc);
     }
 
