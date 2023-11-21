@@ -75,7 +75,9 @@ public class Front implements ActionListener {
      } else if (e.getSource() == Profile) {
          // Open a new window for Profile GUI.
     	 main.dispose();
-    	 ProfileGui profilegui = new ProfileGui();
+    	 //if a profile exists
+    	 //ProfileGui profilegui = new ProfileGui(1);
+         //else  ProfileGui profilegui = new ProfileGui();
      }
  }
 }
