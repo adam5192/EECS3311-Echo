@@ -156,6 +156,10 @@ public class ProfileGui implements ActionListener, FocusListener {
 			
 			bmr=CalculateBMR.calculateBMR(date,weight,height,gender,bmrSetting,fatlevel); 
 			Profile user = new Profile(gender,birth,height,weight);
+			/*
+			* frame.dispose();
+			* ProfileGui profilegui = new ProfileGui( int user id);
+			* */
 			
 		}
 		
