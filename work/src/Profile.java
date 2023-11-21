@@ -1,3 +1,4 @@
+package App;
 import java.util.*;
 import javax.naming.directory.InvalidAttributesException;
 
@@ -12,23 +13,21 @@ public class Profile {
 
    //Data
    private int userId;  //Keeps track of which profile is being opened
+   private String name;
    private boolean sex; //true = male, false = female
    private Date birth;
    private double height; //In centimeters
    private double weight; //In kg
-   private double fatLvl;    //For Karth-McArdle's BMR Calc, range: 0-100
+   private double fatLvl; //For Karth-McArdle's BMR Calc, range: 0-100
    private List<Log> history;
+   private double bmrVal;
 
    //Settings
    public boolean isMetric; //True = Metric, False = Imperial
    private int bmrSetting;   //0 = Miffin St Jeor, 1 = Revised Harris-Benedict, 2 = Katch McArdle
 
    //Basic constructors
-   public Profile() {
-      this(true, null, 0.0, 0.0);
-   }
-
-   public Profile(boolean sex, Date birth, double height, double weight) {
+   public Profile(boolean sex, Date birth, double height, double weight, int bmrSetting) {
       //Data
       this.sex = sex;
       this.birth = birth;
@@ -46,49 +45,56 @@ public class Profile {
       //Settings
       userId = nextId++;
       isMetric = true; //Default in Metric
-      bmrSetting = 0;
+      this.bmrSetting = bmrSetting;
+
+      //Calculate BMR value
+      bmrVal = CalculateBMR.calculateBMR(birth, weight, height, sex, bmrSetting, fatLvl);
    }
 
    // Recreating profile saved in the database
-   public Profile(boolean sex, Date birth, double height, double weight, int userID) {
+   public Profile(String name, boolean sex, Date birth, double height, double weight, int bmrSetting, int userID) {
       //Settings
       this.userId = userID;
       isMetric = true; //Default in Metric
       bmrSetting = 0;
 
       //Data
+      this.name = name;
       this.sex = sex;
       this.birth = birth;
       this.setHeight(height);
       this.setWeight(weight);
+
+      //Calculate BMR Value
+      bmrVal = CalculateBMR.calculateBMR(birth, weight, height, sex, bmrSetting, fatLvl);
    }
 
    //Setters
-   public void setSex(boolean sex) {
-      //Not sure to use boolean instead :P
-      this.sex = sex;
-   }
+   public void setName(String name) {this.name = name;}
+
+   public void setBMR(int bmr) {this.bmrVal = bmr;}
+
+   public void setSex(boolean sex) {this.sex = sex;}
 
    //Two options: Use whatever more convenient (or just ask for a specific one)
    public void setBirth(Date birth) {this.birth = birth;}
    public void setBirth(int year, int month, int day) {
-      this.birth = new Date(year, month, day); //TODO: Deprecated object, possible need for different implementation
+      this.birth = new Date(year, month, day);
    }
 
    //Conversion rate: 1m = 3.281ft
    public void setHeight(double height) {
       try {
-         //TODO: Implement get current date & handling 'x ft y in' as input
-         Date logDate = new Date();
-         //Adjustments to date values for the correct display
-         logDate.setYear(logDate.getYear()+1900);
-
-         if (isMetric)
-            this.height = height;
-         else {
-            this.height = (height / 3.281) / 100.0; //Convert feet to centimeters
-         }
-         history.add(new DataLog(this.height, this.weight, logDate, this.userId));
+      Date logDate = new Date();
+      //Adjustments to date values for the correct display
+      logDate.setYear(logDate.getYear()+1900);
+      
+      if (isMetric)
+         this.height = height;
+      else {
+         this.height = (height / 3.281) / 100.0; //Convert feet to centimeters
+      }
+      history.add(new DataLog(this.height, this.weight, logDate, this.userId));
       } catch (Exception e) {
          e.printStackTrace();
       }
@@ -97,15 +103,15 @@ public class Profile {
    //Conversion rate: 1kg = 2.204bs
    public void setWeight(double weight) {
       try {
-         Date logDate = new Date();
-         //Adjustments to date values for the correct display
-         logDate.setYear(logDate.getYear()+1900);
+      Date logDate = new Date();
+      //Adjustments to date values for the correct display
+      logDate.setYear(logDate.getYear()+1900);
 
-         if (isMetric)
-            this.weight = weight;
-         else
-            this.weight = weight / 2.204; // Convert pounds input to centimeters
-         history.add(new DataLog(this.height, this.weight, logDate, this.userId));
+      if (isMetric)
+         this.weight = weight;
+      else
+         this.weight = weight / 2.204; // Convert pounds input to centimeters
+      history.add(new DataLog(this.height, this.weight, logDate, this.userId));
       } catch (Exception e) {
          e.printStackTrace();
       }
@@ -123,7 +129,7 @@ public class Profile {
 
    public void setUnit(boolean isMetric) {this.isMetric = isMetric;}
 
-   public void setBMR(int bmrSetting) {
+   public void setCalcMethod(int bmrSetting) {
       try {
          if (bmrSetting < 0 || bmrSetting > 2) throw new InvalidAttributesException("Invalid bmrSetting value, value must be between 1 to 3.");
       } catch (Exception e) {
@@ -140,13 +146,14 @@ public class Profile {
 
    //Getters
    public int getUserID() {return userId;}
+   public String getName() {return name;}
    public boolean getSex() {return sex;}
    public Date getBirth() {return birth;}
    public double getHeight() {return height;}
    public double getWeight() {return weight;}
 
    public double getFatLvl() {return fatLvl;}
-
+   public double getBMR() {return bmrVal;}
    public boolean getIsMetric() {return isMetric;}
 
    //Not sure if calc method should just return the name or the value
@@ -175,8 +182,8 @@ public class Profile {
       }
       history.add(meal);
    }
-   public void addLog(int caloBurnt, double time, Date logDate) {
-      history.add(new ExerciseLog(caloBurnt, time, logDate, this.userId));
+   public void addLog(String exerciseName, int caloBurnt, double time, Date logDate) {
+      history.add(new ExerciseLog(exerciseName, caloBurnt, time, logDate, this.userId));
    }
 
    /**
@@ -198,54 +205,54 @@ public class Profile {
       return removedLog;
    }
 
-   //Temp test method
-   public static void main(String args[]) {
-      //Creation
-      Profile user0 = new Profile(); //Default
-      Profile user1 = new Profile(false, new Date(1974, 06, 10), 155.0, 50.0);
+   // //Temp test method
+   // public static void main(String args[]) {
+   //    //Creation
+   //    Profile user0 = new Profile(); //Default
+   //    Profile user1 = new Profile(false, new Date(1974, 06, 10), 155.0, 50.0);
+      
+   //    //Getters
+   //    if (user0.getSex() && user0.getBirth() == null && user0.getHeight() == 0.0 && user0.getWeight() == 0.0)
+   //       System.out.println("Correct default values.");
+      
+   //    if (!user1.getSex() && user1.getBirth().equals(new Date(1974, 06, 10)) 
+   //       && user1.getHeight() == (155.0 * 3.281 / 100) && user1.getWeight() == 50.0 * 2.2046)
+   //       System.out.println("Correct data assignments.");
 
-      //Getters
-      if (user0.getSex() && user0.getBirth() == null && user0.getHeight() == 0.0 && user0.getWeight() == 0.0)
-         System.out.println("Correct default values.");
+   //    if (!user1.isMetric && user1.getFatLvl() == 0)
+   //       System.out.println("Correct default settings.");
 
-      if (!user1.getSex() && user1.getBirth().equals(new Date(1974, 06, 10))
-              && user1.getHeight() == (155.0 * 3.281 / 100) && user1.getWeight() == 50.0 * 2.2046)
-         System.out.println("Correct data assignments.");
+   //    //Setters
+   //    user1.setBirth(2002, 03, 24);
+   //    if (user1.getBirth().equals(new Date(2002, 03, 24))) System.out.println("Correct setBirth(int, int, int).");
 
-      if (!user1.isMetric && user1.getFatLvl() == 0)
-         System.out.println("Correct default settings.");
+   //    user1.setBirth(new Date(2023, 10, 06));
+   //    if (user1.getBirth().equals(new Date(2023, 10, 06))) System.out.println("Correct setBirth(Date).");
 
-      //Setters
-      user1.setBirth(2002, 03, 24);
-      if (user1.getBirth().equals(new Date(2002, 03, 24))) System.out.println("Correct setBirth(int, int, int).");
+   //    user1.setFatLvl(20);
+   //    if (user1.getFatLvl() == 20) System.out.println("Correct setFatLvl.");
 
-      user1.setBirth(new Date(2023, 10, 06));
-      if (user1.getBirth().equals(new Date(2023, 10, 06))) System.out.println("Correct setBirth(Date).");
+   //    user1.isMetric = true;
+   //    user1.setHeight(123.0);
+   //    user1.setWeight(75.0);
+   //    if (user1.getHeight() == 123.0) System.out.println("Correct setHeight().");
+   //    if (user1.getWeight() == 75.0) System.out.println("Correct setWeight().");
+      
+   //    user1.isMetric = false;
+   //    if (user1.getHeight() == 123.0 * 3.281 / 100) System.out.println("Correct setHeight().");
+   //    if (user1.getWeight() == 75.0 * 2.2046) System.out.println("Correct setWeight().");
 
-      user1.setFatLvl(20);
-      if (user1.getFatLvl() == 20) System.out.println("Correct setFatLvl.");
+   //    //Add, remove logs
+   //    Date today = new Date(2023, 11, 17);
+   //    user1.addLog(170.0, 120.0, today);
+   //    String[] list = new String[5];
+   //    list[0] = "milk";
+   //    user1.addLog(200, 20.0, today);
+   //    System.out.println(user1.getHistory());
 
-      user1.isMetric = true;
-      user1.setHeight(123.0);
-      user1.setWeight(75.0);
-      if (user1.getHeight() == 123.0) System.out.println("Correct setHeight().");
-      if (user1.getWeight() == 75.0) System.out.println("Correct setWeight().");
+   //    user1.removeLog(today, 1);
+   //    System.out.println(user1.getHistory());
 
-      user1.isMetric = false;
-      if (user1.getHeight() == 123.0 * 3.281 / 100) System.out.println("Correct setHeight().");
-      if (user1.getWeight() == 75.0 * 2.2046) System.out.println("Correct setWeight().");
-
-      //Add, remove logs
-      Date today = new Date(2023, 11, 17);
-      user1.addLog(170.0, 120.0, today);
-      String[] list = new String[5];
-      list[0] = "milk";
-      user1.addLog(200, 20.0, today);
-      System.out.println(user1.getHistory());
-
-      user1.removeLog(today, 1);
-      System.out.println(user1.getHistory());
-
-      System.out.println("End of test.");
-   }
+   //    System.out.println("End of test.");
+   // }
 }
