@@ -73,7 +73,7 @@ public class DBQuery {
     */
    public static String[] getIngredientNames() throws SQLException {
       try (Connection query = DriverManager.getConnection("jdbc:mysql://localhost:3306", "root", "EECS3311_Project")) {
-         PreparedStatement statement = query.prepareStatement("select * from FoodName");
+         PreparedStatement statement = query.prepareStatement("select * from FoodName", ResultSet.TYPE_SCROLL_INSENSITIVE);
          ResultSet rs = statement.executeQuery();
          
          // Set size of String array
@@ -102,7 +102,8 @@ public class DBQuery {
          PreparedStatement statement = query.prepareStatement(
             "select * from UserProfile inner join ProfileLog " + 
             "on UserProfile.UserID = ProfileLog.UserID" +
-            "where UserID = ? order by ProfileLog.LogDate"
+            "where UserID = ? order by ProfileLog.LogDate",
+            ResultSet.TYPE_SCROLL_INSENSITIVE // Allow for first(), last(), etc. operations on ResultSet instance
             );
          statement.setInt(2, userID);
          ResultSet rs = statement.executeQuery(); // A set of rows representing logs of the profile being recovered.
@@ -141,7 +142,8 @@ public class DBQuery {
                      "select * from ProfileLog inner join MealLog " + 
                      "on ProfileLog.LogDate = MealLog.LogDate and ProfileLog.LogType = MealLog.LogType " +
                      "where ProfileLog.UserID = ? and ProfileLog.LogDate = ?" +
-                     "group by MealLog.MealID"
+                     "group by MealLog.MealID",
+                     ResultSet.TYPE_SCROLL_INSENSITIVE // Allow for first(), last(), etc. operations on ResultSet instance
                   );
                   log = stmt.executeQuery();
                   Ingredient[] list = new Ingredient[100]; // Assumption: No meal has more than 100 ingredients
@@ -175,8 +177,8 @@ public class DBQuery {
                   while(log.next()) { // In case there is multiple logs with the same date of the same type from the same user
                      java.util.Date date = new java.util.Date(log.getDate("LogDate").getTime());
                      date.setYear(date.getYear() + 1970);
-                     history.add(new ExerciseLog(log.getInt("CaloBurnt"), log.getDouble("ExerciseTime"),
-                                 date, log.getInt("UserID")));
+                     history.add(new ExerciseLog(log.getString("ExerciseName"), log.getInt("CaloBurnt"), 
+                                 log.getDouble("ExerciseTime"), date, log.getInt("UserID")));
                   }
                   break;
             }
