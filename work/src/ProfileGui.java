@@ -113,8 +113,7 @@ public class ProfileGui implements ActionListener, FocusListener {
 			birth = new Date(Integer.parseInt(Birth.substring(0,4)),Integer.parseInt(Birth.substring(5,7))-1,Integer.parseInt(Birth.substring(8,10)));
 			
 			bmr=CalculateBMR.calculateBMR(gender,weight,height,bmrSetting,fatlevel); 
-			Profile user = new Profile();
-			//set the profile with attributesProfile(gender, birth, height, weight,fatlevel,bmr) 
+			Profile user = new Profile(gender,birth,height,weight);
 		}
 		
 	}
