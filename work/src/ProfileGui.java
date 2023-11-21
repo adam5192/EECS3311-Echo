@@ -86,6 +86,48 @@ public class ProfileGui implements ActionListener, FocusListener {
 		 frame.setVisible(true); //makes frame visible
 	 }
 
+	public ProfileGui( int user) {
+		back.setBounds(350, 20, 70, 30);
+
+		title.setBounds(230, 20, 100, 70);
+		title.setForeground(Color.BLACK);
+
+
+		JLabel Userid = new JLabel("UserId:  " /* +getter here */ );
+		JLabel HeightTitle = new JLabel("Height:  "+"m");
+		JLabel WeightTitle = new JLabel("Weight:  "+"kg");
+		JLabel BodyFatTitle = new JLabel("BodyFat%:  ");
+		JLabel GenderTitle = new JLabel("Gender:  ");
+		JLabel dateTitle = new JLabel("Birth day:  ");
+		JLabel BMRTitle = new JLabel("BMR:  ");
+
+
+		Userid.setBounds(120,70,100,30);
+		HeightTitle.setBounds(120, 110, 100, 30);
+		WeightTitle.setBounds(120, 150, 100, 30);
+		BodyFatTitle.setBounds(120, 190, 100, 30);
+		GenderTitle.setBounds(120, 230, 100, 30);
+		dateTitle.setBounds(120, 270, 100, 30);
+		BMRTitle.setBounds(120, 310, 100, 30);
+
+
+
+		frame.add(title);
+		frame.add(Userid);
+		frame.add(HeightTitle);
+		frame.add(WeightTitle);
+		frame.add(BodyFatTitle);
+		frame.add(GenderTitle);
+		frame.add(dateTitle);
+		frame.add(BMRTitle);
+		frame.add(back);
+
+		back.addActionListener(this);
+		frame.setLayout(null);
+		frame.setLocationRelativeTo(null);
+		frame.setVisible(true); //makes frame visible
+
+	}
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
