@@ -260,8 +260,9 @@ class ExerciseLog extends Log {
       super.setLogType(3);
    }
 
-   public ExerciseLog(int caloBurnt, double time, Date logDate, int userId) {
+   public ExerciseLog(String exerciseName, int caloBurnt, double time, Date logDate, int userId) {
       super(logDate, userId);
+      this.exerciseName = exerciseName;
       this.caloBurnt = caloBurnt;
       this.time  = time;
       super.setLogType(3);
