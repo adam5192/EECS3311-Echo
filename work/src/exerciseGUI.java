@@ -3,12 +3,13 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Calendar;
 
 public class exerciseGUI extends JFrame {
     // GUI componenets declaration
-    private JPanel MainPanel;
+    public JPanel MainPanel;
     private JComboBox exerciseComboBox;
     private JLabel exerciseLabel;
     private JTextField timeField;
@@ -22,23 +23,22 @@ public class exerciseGUI extends JFrame {
     private ExerciseLogger exerciseLogger = new ExerciseLogger();
     JButton back = new JButton("Back");
 
-    public exerciseGUI() {
-//        int userID =
+    public exerciseGUI(Front front) {
         //double userBMR = Calculator.calculateBMR(user);
         setContentPane(MainPanel);
         setTitle("Exercise Log");
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setSize(500, 400);
         setLocationRelativeTo(null);
-        setVisible(true);
+        setVisible(false);
 
         back.setBounds(0, 0, 20, 20);
         MainPanel.add(back);
         back.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                MainPanel.setVisible(false);
-                Front cal = new Front();
+                setVisible(false);
+                front.main.setVisible(true);
             }
         });
 
@@ -171,9 +171,8 @@ public class exerciseGUI extends JFrame {
         return day >= 1 && day <= maxDay;
     }
 
-    public static void main(String[] args) {
-        Profile user = new Profile();
-        new exerciseGUI();
+    public static void main(String[] args) throws SQLException {
+        new exerciseGUI(new Front());
     }
 
     private void createUIComponents() {
