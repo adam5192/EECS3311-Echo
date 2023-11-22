@@ -41,17 +41,19 @@ public class DNGraph extends JFrame implements ActionListener {
 	// private JButton graphTen;
 	private JButton graphFive;
 
-	public DNGraph() {
+	public DNGraph()  {
 		// Set window title
 		super("Daily Nutrients Intake");
-		Profile user = DBQuery.getCurrentProfile();
+		@SuppressWarnings("deprecation")
+		Profile user = new Profile(false, new Date(1974, 06, 10), 155.0, 50.0, 1);
 		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy");
+		DBQuery.getCurrentProfile();
 		inputDate = new JLabel("Input Date");
 		start = new JTextField(10);
 		to = new JLabel("To");
 		end = new JTextField(10);
 		example = new JLabel("dd/mm/yyyy");
-		graphTen = new JButton("Graph Top 10");
+		// graphTen = new JButton("Graph Top 10");
 		graphFive = new JButton("Graph Top 5");
 		JPanel panel = new JPanel();
 		panel.setLayout(new GridLayout(2, 0));
@@ -89,7 +91,6 @@ public class DNGraph extends JFrame implements ActionListener {
 		panel.removeAll();// removes any previous charts that where made
 		panel.revalidate();
 		panel.repaint();
-		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy");
 		// data set
 		DefaultPieDataset result = new DefaultPieDataset();
 		int totalCalories = 0;
@@ -101,8 +102,10 @@ public class DNGraph extends JFrame implements ActionListener {
 		for (int i = 0; i < user.getHistory().size(); i++) {
 			if (user.getHistory().get(i).getLogType() == 2 && user.getHistory().get(i).getDate().after(startDate)
 					&& user.getHistory().get(i).getDate().before(endDate)
-					|| user.getHistory().get(i).getDate().equals(startDate)
-					|| user.getHistory().get(i).getDate().equals(endDate)) {
+					|| (user.getHistory().get(i).getLogType() == 2
+							&& user.getHistory().get(i).getDate().equals(startDate))
+					|| (user.getHistory().get(i).getLogType() == 2
+							&& user.getHistory().get(i).getDate().equals(endDate))) {
 				totalCalories += ((MealLog) user.getHistory().get(i)).calculateCalories();
 				totalFat += ((MealLog) user.getHistory().get(i)).calculateFat();
 				totalProtein += ((MealLog) user.getHistory().get(i)).calculateProtein();
@@ -117,7 +120,7 @@ public class DNGraph extends JFrame implements ActionListener {
 		result.setValue("Calories", totalCalories);
 		result.setValue("Other", other);
 		// catch when the user inputs a end date that is earlier than the start
-		if (startDate.equals(null) || endDate.equals(null) || startDate.after(endDate)) {
+		if (startDate.after(endDate)) {
 			JOptionPane.showMessageDialog(null, "Incorrect Date Info");
 		} else {
 			JFreeChart chart = ChartFactory.createPieChart("Daily Nutrient Intake", result, true, true, false);

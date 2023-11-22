@@ -13,7 +13,6 @@ import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -53,7 +52,9 @@ public class CEGraph extends JFrame implements ActionListener {
 		// Set window title
 		super("Daily Calory Intake & Daily Exercise");
 		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy");
-		Profile user = DBQuery.getCurrentProfile();
+		@SuppressWarnings("deprecation")
+		Profile user = new Profile(false, new Date(1974, 06, 10), 155.0, 50.0, 1);
+		DBQuery.getCurrentProfile();
 		// Set charts region
 		JPanel panel = new JPanel();
 		panel.setLayout(new GridLayout(2, 0));
@@ -118,10 +119,7 @@ public class CEGraph extends JFrame implements ActionListener {
 
 			Map<Date, Double> amountOfCalsPerDate = new HashMap<>();
 			for (int i = 0; i < user.getHistory().size(); i++) {
-				if (user.getHistory().get(i).getLogType() == 2 && user.getHistory().get(i).getDate().after(startDate)
-						&& user.getHistory().get(i).getDate().before(endDate)
-						|| user.getHistory().get(i).getDate().equals(startDate)
-						|| user.getHistory().get(i).getDate().equals(endDate)) {
+				if (user.getHistory().get(i).getLogType() == 2) {
 					Double calories = amountOfCalsPerDate.get(user.getHistory().get(i).getDate());
 					Double amountOfCals = calories == null ? 0 : calories;
 					amountOfCalsPerDate.put(user.getHistory().get(i).getDate(),
@@ -130,15 +128,15 @@ public class CEGraph extends JFrame implements ActionListener {
 			} // end for loop
 
 			for (Entry<Date, Double> e : amountOfCalsPerDate.entrySet()) {
-				caloryIntake.add(new Day(e.getKey()), e.getValue());
+				if (e.getKey().after(startDate) && e.getKey().before(endDate) || e.getKey().equals(startDate)
+						|| e.getKey().equals(endDate)) {
+					caloryIntake.add(new Day(e.getKey()), e.getValue());
+				} // end if statement
 			} // end for loop
 
 			Map<Date, Double> amountOfExPerDate = new HashMap<>();
 			for (int i = 0; i < user.getHistory().size(); i++) {
-				if (user.getHistory().get(i).getLogType() == 3 && user.getHistory().get(i).getDate().after(startDate)
-						&& user.getHistory().get(i).getDate().before(endDate)
-						|| user.getHistory().get(i).getDate().equals(startDate)
-						|| user.getHistory().get(i).getDate().equals(endDate)) {
+				if (user.getHistory().get(i).getLogType() == 3) {
 					Double exercise = amountOfExPerDate.get(user.getHistory().get(i).getDate());
 					Double amountOfEx = exercise == null ? 0 : exercise;
 					amountOfExPerDate.put(user.getHistory().get(i).getDate(),
@@ -148,8 +146,9 @@ public class CEGraph extends JFrame implements ActionListener {
 
 			for (Entry<Date, Double> e : amountOfExPerDate.entrySet()) {
 				if (e.getKey().after(startDate) && e.getKey().before(endDate) || e.getKey().equals(startDate)
-						|| e.getKey().equals(endDate))
+						|| e.getKey().equals(endDate)) {
 					amountOfExercise.add(new Day(e.getKey()), e.getValue());
+				} // end if statement
 			} // end for loop
 
 			// creates the chart and adds the data
