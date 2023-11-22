@@ -9,7 +9,7 @@ import java.util.List;
 
 public class MealGUI extends JFrame {
     // GUI componenets declaration
-    private JPanel MainPanel;
+    public JPanel MainPanel;
     private JTextField ingredientField;
     private JButton addIngredientBtn;
     private JTextField servingField;
@@ -21,14 +21,14 @@ public class MealGUI extends JFrame {
     private ArrayList<Ingredient> ingredientList = new ArrayList<>();
     JButton back = new JButton("Back");
 
-    public MealGUI() throws SQLException {
+    public MealGUI(Front front) throws SQLException {
         setContentPane(MainPanel);
         setTitle("Meal Log");
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setSize(400, 400);
         setLocationRelativeTo(null);
-        setVisible(true);
         back.setBounds(0, 0, 20, 20);
+        setVisible(false);
         MainPanel.add(back);
         ingredientField.setForeground(Color.gray);
         ingredientField.addFocusListener(new FocusListener() {
@@ -53,8 +53,8 @@ public class MealGUI extends JFrame {
         back.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                MainPanel.setVisible(false);
-                Front cal = new Front();
+                setVisible(false);
+                front.main.setVisible(true);
             }
         });
 
@@ -332,7 +332,7 @@ public class MealGUI extends JFrame {
     }
 
     public static void main(String[] args) throws SQLException {
-        new MealGUI();
+        new MealGUI(new Front());
     }
 
     {
