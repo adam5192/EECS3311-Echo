@@ -4,7 +4,6 @@
  * Use case 4 that visualizes the daily calorie intakes
  * and daily exercise within an inputed time period
  */
-package App;
 
 import java.awt.BorderLayout;
 import java.awt.Color;

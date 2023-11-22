@@ -15,7 +15,7 @@ public class GraphingGUI extends JFrame implements ActionListener {
 	private JButton DNGraph;
 	JFrame main = new JFrame();
 
-	public GraphingGUI() {
+	public GraphingGUI(Front Front) {
 		main.setTitle("Graphs");
 		JPanel panel = new JPanel();
 		CEGraph = new JButton("Graph Daily Calory Intake and Exercise");

@@ -1,10 +1,10 @@
+
 /**
  * Team Echo
  * EECS 3311
  * Use case 5 that visualizes the daily
  * nutrient intakes
  */
-package App;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -41,7 +41,7 @@ public class DNGraph extends JFrame implements ActionListener {
 	// private JButton graphTen;
 	private JButton graphFive;
 
-	public DNGraph()  {
+	public DNGraph() {
 		// Set window title
 		super("Daily Nutrients Intake");
 		@SuppressWarnings("deprecation")
