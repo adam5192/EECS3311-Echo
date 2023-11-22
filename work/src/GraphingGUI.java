@@ -13,10 +13,11 @@ import javax.swing.JPanel;
 public class GraphingGUI extends JFrame implements ActionListener {
 	private JButton CEGraph;
 	private JButton DNGraph;
+	JFrame main = new JFrame();
 
 	public GraphingGUI() {
+		main.setTitle("Graphs");
 		JPanel panel = new JPanel();
-		panel.setLayout(new GridLayout(2, 0));
 		CEGraph = new JButton("Graph Daily Calory Intake and Exercise");
 		DNGraph = new JButton("Graph Daily Nutrient Intake");
 
@@ -24,17 +25,16 @@ public class GraphingGUI extends JFrame implements ActionListener {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				MealLogger myMealLogger = new MealLogger();
-				ExerciseLogger myExerciseLogger = new ExerciseLogger();
-				CEGraph UC4 = new CEGraph(myMealLogger, myExerciseLogger);
+				main.dispose();
+				new CEGraph();
 			}// end actionPerformed
 
 		});
 		DNGraph.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				MealLogger myMealLogger = new MealLogger();
-				CEGraph UC5 = new CEGraph(myMealLogger);
+				main.dispose();
+				new DNGraph();
 			}// end actionPerformed
 		});
 
@@ -47,8 +47,7 @@ public class GraphingGUI extends JFrame implements ActionListener {
 	}// end GraphingGUI
 
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-
+		new GraphingGUI();
 	}// end main
 
 	@Override
