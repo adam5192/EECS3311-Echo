@@ -41,10 +41,11 @@ public class Profile {
       Date logDate = new Date();
       logDate.setYear(logDate.getYear()+1900);
       logDate.setMonth(logDate.getMonth());
+      String date = String.format("%s/%s/%s", logDate.getYear(), logDate.getMonth() + 1, logDate.getDate());
       dataHistory = new LinkedList<Log>();
       exerciseHistory = new LinkedList<Exercise>();
       mealHistory = new LinkedList<Meal>();
-      dataHistory.add(new Log(this.height, this.weight, logDate, this.userId));
+      dataHistory.add(new Log(this.height, this.weight, date, this.userId));
 
       //Settings
       userId = nextId++;
@@ -98,7 +99,7 @@ public class Profile {
       else {
          this.height = (height / 3.281) / 100.0; //Convert feet to centimeters
       }
-      dataHistory.add(new Log(this.height, this.weight, logDate, this.userId));
+      dataHistory.add(new Log(this.height, this.weight, String.format("%s/%s/%s", logDate.getYear(), logDate.getMonth() + 1, logDate.getDate()), this.userId));
       } catch (Exception e) {
          e.printStackTrace();
       }
@@ -115,7 +116,7 @@ public class Profile {
          this.weight = weight;
       else
          this.weight = weight / 2.204; // Convert pounds input to centimeters
-      dataHistory.add(new Log(this.height, this.weight, logDate, this.userId));
+      dataHistory.add(new Log(this.height, this.weight, String.format("%s/%s/%s", logDate.getYear(), logDate.getMonth() + 1, logDate.getDate()), this.userId));
       } catch (Exception e) {
          e.printStackTrace();
       }
@@ -181,12 +182,14 @@ public class Profile {
     * Overloaded method for adding a new log to the profile.
     */
    public void addLog(double height, double weight, Date logDate) {
-      dataHistory.add(new Log(height, weight, logDate, this.userId));
+      dataHistory.add(new Log(height, weight, String.format("%s/%s/%s", logDate.getYear()+1900, logDate.getMonth() + 1, logDate.getDate()), this.userId));
    }
    public void addLog(Log data) {dataHistory.add(data);}
 
-   public void addLog(Ingredient[] ingredients, String mealType, Date logDate) {
+   public void addLog(Ingredient[] ingredients, String mealType, String logDate) {
       Meal meal = new Meal();
+      meal.setType(mealType);
+      meal.setDate(logDate);
       for (Ingredient i : ingredients) {
          if (i != null)
             meal.addIngredient(i);
