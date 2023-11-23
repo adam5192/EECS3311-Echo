@@ -1,4 +1,4 @@
-package work.src;
+package App;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -104,20 +104,22 @@ public class Front implements ActionListener {
         } else if (e.getSource() == Profile) {
              //TODO: implement same logic from Meal and Exercise for profile
 
-	        	/* if a user created their userid is added to the list and based on whoever the user pick the profile of that userid is called 
-	        	JComboBox<Integer> users = new JComboBox<>(list.toArray(new Integer[0]));
-		    	panel.add(users);
-	        	JOptionPane.showConfirmDialog(main, panel, "Select a Number", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
-	        	  Integer selectedNumber = (Integer) ((JComboBox<?>) panel.getComponent(0)).getSelectedItem();
-	        	  main.setVisible(false);
-	        	  profileGUIInstance = new ProfileGui(this,selectedNumber);
-	        	  profileGUIInstance.frame.setVisible(true);
-	        	  
-	        	  /* else if no is create profile then you do  
-	        	   * main.setVisible(false); 
-	        	   * profileGUIInstance = new ProfileGui(this);
-	        	   * profileGUIInstance.frame.setVisible(true);
-	        	   */
+	        	if (DBQuery.getUsers() != null) {
+                    list.addAll(DBQuery.getUsers());
+                    JComboBox<Integer> users = new JComboBox<>(list.toArray(new Integer[0]));
+                    panel.add(users);
+                    JOptionPane.showConfirmDialog(main, panel, "Select a Number", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+                    Integer selectedNumber = (Integer) ((JComboBox<?>) panel.getComponent(0)).getSelectedItem();
+                    main.setVisible(false);
+                    profileGUIInstance = new ProfileGui(this,(int) selectedNumber);
+                    profileGUIInstance.frame.setVisible(true);
+                }
+                
+                else { 
+                    main.setVisible(false); 
+                    profileGUIInstance = new ProfileGui(this);
+                    profileGUIInstance.frame.setVisible(true);
+                }
         }
     }
 }
