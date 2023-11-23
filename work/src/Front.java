@@ -4,6 +4,11 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.sql.SQLException;
 
+import javax.swing.JPanel;
+import java.util.ArrayList;
+import javax.swing.JComboBox;
+import javax.swing.JOptionPane;
+
 import javax.swing.JButton;
 
 //This class represents the main front-end interface of the application and implements the ActionListener interface.
@@ -14,6 +19,9 @@ public class Front implements ActionListener {
     JButton Exercise = new JButton("Exercise log");
     JButton Graphing = new JButton("Graphing");
     JButton Profile = new JButton("Profile");
+
+    ArrayList<Integer> list = new ArrayList<Integer>();
+    JPanel panel = new JPanel();
 
     MealGUI mealGUIInstance;
     exerciseGUI exGUIInstance;
@@ -92,14 +100,22 @@ public class Front implements ActionListener {
 //            graphingGUIInstance.setVisible(true);
 
         } else if (e.getSource() == Profile) {
-            // TODO: implement same logic from Meal and Exercise for profile
-            //if profile exists
-//            profileGUIInstance = new ProfileGui(this, 1);
-            main.setVisible(false);
-            profileGUIInstance.frame.setVisible(true);
-            //else
-            //profileGUIInstance = new ProfileGui(this);
-            //profileGUIInstance.frame.setVisible(true);
+             //TODO: implement same logic from Meal and Exercise for profile
+
+	        	/* if a user created their userid is added to the list and based on whoever the user pick the profile of that userid is called 
+	        	JComboBox<Integer> users = new JComboBox<>(list.toArray(new Integer[0]));
+		    	panel.add(users);
+	        	JOptionPane.showConfirmDialog(main, panel, "Select a Number", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+	        	  Integer selectedNumber = (Integer) ((JComboBox<?>) panel.getComponent(0)).getSelectedItem();
+	        	  main.setVisible(false);
+	        	  profileGUIInstance = new ProfileGui(this,selectedNumber);
+	        	  profileGUIInstance.frame.setVisible(true);
+	        	  
+	        	  /* else if no is create profile then you do  
+	        	   * main.setVisible(false); 
+	        	   * profileGUIInstance = new ProfileGui(this);
+	        	   * profileGUIInstance.frame.setVisible(true);
+	        	   */
         }
     }
 }
