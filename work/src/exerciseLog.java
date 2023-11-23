@@ -1,3 +1,4 @@
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -39,7 +40,7 @@ class Exercise  {
     }
 
     // Setters
-    public void setDate(String date) {
+    public void setDate(String date) throws ParseException {
         this.date = date;
     }
 

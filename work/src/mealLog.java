@@ -61,95 +61,6 @@ class Meal {
     //will likely have additional variables
 }
 
-////This class represents a single ingredient, and includes all of the macros in it (calories, fat, protein, etc...)
-//class Ingredient {
-//    //declare all vairables of an ingredient
-//    private String name;
-//    private int calories;
-//    private int fat;
-//    private int protein;
-//    private int carbs;
-//    private int grams;
-//    private int serving;
-//    //likely will be more variables
-//
-//    //Default constructor
-//    public Ingredient() {
-//        this.name = "";
-//        this.calories = 0;
-//        this.fat = 0;
-//        this.protein = 0;
-//        this.carbs = 0;
-//        this.grams = 0;
-//    }
-//
-//    //Constructor with all parameters
-//    public Ingredient(String name, int calories, int fat, int protein, int carbs) {
-//        this.name = name;
-//        this.calories = calories;
-//        this.fat = fat;
-//        this.protein = protein;
-//        this.carbs = carbs;
-//    }
-//
-//    //getters and setters below
-//
-//    public String getName() {
-//        return name;
-//    }
-//
-//    public void setName(String name) {
-//        this.name = name;
-//    }
-//
-//    public int getCalories() {
-//        return calories;
-//    }
-//
-//    public void setCalories(int calories) {
-//        this.calories = calories;
-//    }
-//
-//    public void setFat(int fat) {
-//        this.fat = fat;
-//    }
-//
-//    public int getFat() {
-//        return fat;
-//    }
-//
-//    public void setProtein(int protein) {
-//        this.protein = protein;
-//    }
-//
-//    public int getProtein() {
-//        return protein;
-//    }
-//
-//    public void setCarbs(int carbs) {
-//        this.carbs = carbs;
-//    }
-//
-//    public int getCarbs() {
-//        return carbs;
-//    }
-//
-//    //will likely have additional variables
-//
-//    @Override
-//    public String toString() {
-//        return "Ingredient{" + "name= " + name + '\'' + ", calories = " + calories + ", fat = " + fat + ", protein = " + protein + ", carbs = " + carbs + '}';
-//    }
-//
-//    public void setServing(int serving) {
-//        this.serving = serving;
-//    }
-//
-//    public int getServing(){
-//        return serving;
-//    }
-//}
-
 //This class keeps track of multiple meals
 class MealLogger {
     private List<Meal> meals; //this list holds each meal
@@ -169,34 +80,101 @@ class MealLogger {
     }
 }
 
-// TODO: Implement database helper
+//This class represents a single ingredient, and includes all of the macros in it (calories, fat, protein, etc...)
+class Ingredient {
+    //declare all vairables of an ingredient
+    private String name;
+    private int calories;
+    private int fat;
+    private int protein;
+    private int carbs;
+    private int others;
+    private int serving;
+    //likely will be more variables
 
-//temporary test cases for running without database
-//public class mealLog {
-//    public static void main(String[] args) {
-//        // examples
-//        Ingredient tomato = new Ingredient("Tomato", 20, 0, 1, 6, 100);
-//        Ingredient bread = new Ingredient("Bread", 255, 3, 8, 51, 100);
-//        Ingredient egg = new Ingredient("Egg", 145, 11, 14, 2, 100);
-//
-//        // create Meal object
-//        Meal breakfast = new Meal();
-//        breakfast.setType("Breakfast");
-//        breakfast.setDate("10/14/2023");
-//        breakfast.addIngredient(tomato);
-//        breakfast.addIngredient(bread);
-//        breakfast.addIngredient(egg);
-//
-//        System.out.println("Total calories: " + breakfast.calculateCalories());
-//        System.out.println("Total protein: " + breakfast.calculateProtein());
-//        System.out.println("Total fat: " + breakfast.calculateFat());
-//        System.out.println("Total carbs: " + breakfast.calculateCarbs());
-//
-//        // create meal logger object and add breakfast to it
-//        MealLogger myMealLogger = new MealLogger();
-//        myMealLogger.logMeal(breakfast);
-//
-//        // display all meals logged in the MealLogger
-//        System.out.println("All logged meals: " + myMealLogger.getMeals());
-//    }
-//}
+    //Default constructor
+    public Ingredient() {
+        this.name = "";
+        this.calories = 0;
+        this.fat = 0;
+        this.protein = 0;
+        this.carbs = 0;
+        this.others = 0;
+        this.serving = 0;
+    }
+
+    //Constructor with all parameters
+    public Ingredient(String name, int calories, int fat, int protein, int carbs, int others, int serving) {
+        this.name = name;
+        this.calories = calories;
+        this.fat = fat;
+        this.protein = protein;
+        this.carbs = carbs;
+        this.others = others;
+        this.serving = serving;
+    }
+
+    //getters and setters below
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public int getCalories() {
+        return calories;
+    }
+
+    public void setCalories(int calories) {
+        this.calories = calories;
+    }
+
+    public void setFat(int fat) {
+        this.fat = fat;
+    }
+
+    public int getFat() {
+        return fat;
+    }
+
+    public void setProtein(int protein) {
+        this.protein = protein;
+    }
+
+    public int getProtein() {
+        return protein;
+    }
+
+    public void setCarbs(int carbs) {
+        this.carbs = carbs;
+    }
+
+    public int getCarbs() {
+        return carbs;
+    }
+
+    public void setOthers(int others) {
+        this.others = others;
+    }
+    public int getOthers() {
+        return others;
+    }
+
+    public void setServing(int serving) {
+        this.serving = serving;
+    }
+
+    public int getServing(){
+        return serving;
+    }
+    //will likely have additional variables
+
+    @Override
+    public String toString() {
+        return "Ingredient{" + "name= " + name + '\'' + ", calories = " + calories + "cals, fat = " + fat + "g, protein = " + protein + "g, carbs = " + carbs + "g}";
+    }
+
+}

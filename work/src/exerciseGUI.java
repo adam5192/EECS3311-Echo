@@ -3,6 +3,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -27,20 +29,10 @@ public class exerciseGUI extends JFrame {
         //double userBMR = Calculator.calculateBMR(user);
         setContentPane(MainPanel);
         setTitle("Exercise Log");
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         setSize(500, 400);
         setLocationRelativeTo(null);
         setVisible(false);
-
-        back.setBounds(0, 0, 20, 20);
-        MainPanel.add(back);
-        back.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                setVisible(false);
-                front.main.setVisible(true);
-            }
-        });
 
         // Year JComboBox
         JComboBox<Integer> yearComboBox = new JComboBox<>();
@@ -58,6 +50,25 @@ public class exerciseGUI extends JFrame {
         for (int day = 1; day <= 31; day++) {
             dayComboBox.addItem(day);
         }
+
+        // listener for back button
+        back.setBounds(0, 0, 20, 20);
+        MainPanel.add(back);
+        back.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                setVisible(false);
+                front.main.setVisible(true);
+            }
+        });
+
+        // listener for clicking X
+        addWindowListener(new WindowAdapter(){
+            public void windowClosing(WindowEvent e){
+                setVisible(false);
+                front.main.setVisible(true);
+            }
+        });
 
         // Listener for logButton
         logButton.addActionListener(new ActionListener() {
