@@ -5,6 +5,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
+import java.sql.SQLException;
 import java.util.Date;
 
 import javax.swing.ButtonGroup;
@@ -25,53 +26,74 @@ public class ProfileGui implements ActionListener, FocusListener {
 	JTextField date = new JTextField("yy/mm/dd");
 	JRadioButton Male = new JRadioButton("Male");
 	JRadioButton Female = new JRadioButton("Female");
+	JRadioButton Metric = new JRadioButton("Metric"); 
+	JRadioButton Imperial = new JRadioButton("Imperial"); 
 
 	JRadioButton setting1 = new JRadioButton("Miffin St Jeor");
 	JRadioButton setting2 = new JRadioButton("Revised Harris-Benedict");
 	JRadioButton setting3 = new JRadioButton("Katch McArdle");
 
 	JLabel title = new JLabel("Profile");
+	JLabel GenderButtonsLabel = new JLabel("Gender");
+	JLabel UnitButtonsLabel = new JLabel("Unit");
+	JLabel BMRSettingLabel = new JLabel("BMR setting");
+	
 	ButtonGroup group = new ButtonGroup();
 	ButtonGroup groupSettings = new ButtonGroup();
+	ButtonGroup UnitGroups = new ButtonGroup();
 
 
-
-
+	Front front;
 	
 	
 	double height;
 	double weight;
 	double fatlevel;
 	int bmrSetting;
+	boolean unitSetting;
 	boolean gender;
 	Date birth;
 	String Birth;
 
 	
 
-	 public ProfileGui() {
+	 public ProfileGui(Front front) {
+		 
+		 this.front = front;
 		 
 		 frame.setTitle("Profile");
 		 
 		// frame.setLayout(new FlowLayout(FlowLayout.CENTER, 100, 20));
 		 back.setBounds(350, 20, 70, 30);
 		 
+		 frame.setVisible(false);
+		 
 		 title.setBounds(230, 0, 100, 70);
 		 title.setForeground(Color.BLACK);
+		 
+		
+		 
+		 
 
 		 Height.setBounds(200, 50, 100, 30);
-		 Weight.setBounds(200, 100, 100, 30);
-		 BodyFat.setBounds(200, 150, 100, 30);
-		 date.setBounds(200, 200, 100, 30);
+		 Weight.setBounds(200, 85, 100, 30);
+		 BodyFat.setBounds(200, 120, 100, 30);
+		 date.setBounds(200, 155, 100, 30);
 		 
-		 Male.setBounds(170, 250, 65, 30);
-		 Female.setBounds(255, 250, 75, 30);
-
+		 GenderButtonsLabel.setBounds(65, 175, 100, 70);
+		 Male.setBounds(20, 220, 65, 30);
+		 Female.setBounds(85, 220, 75, 30);
+		 
+		 BMRSettingLabel.setBounds(200, 250, 100, 70);
 		 setting1.setBounds(100, 300, 100, 30);
 		 setting2.setBounds(250, 300, 200, 30);
-		 setting3.setBounds(180, 330, 200, 30);
+		 setting3.setBounds(180, 340, 200, 30);
+
+		 UnitButtonsLabel.setBounds(350, 175, 100, 70);
+		 Metric.setBounds(280, 225, 100, 30);
+		 Imperial.setBounds(380, 225, 100, 30);
 		 
-		 Create.setBounds(190, 360, 120, 40);
+		 Create.setBounds(180, 400, 120, 40);
 		 
 		 group.add(Male);
 		 group.add(Female);
@@ -79,6 +101,9 @@ public class ProfileGui implements ActionListener, FocusListener {
 		 groupSettings.add(setting1);
 		 groupSettings.add(setting2);
 		 groupSettings.add(setting3);
+		 
+		 UnitGroups.add(Metric);
+		 UnitGroups.add(Imperial);
 		 
 		 frame.add(back);
 		 frame.add(title);
@@ -91,6 +116,11 @@ public class ProfileGui implements ActionListener, FocusListener {
 		 frame.add(setting1);
 		 frame.add(setting2);
 		 frame.add(setting3);
+		 frame.add(Metric);
+		 frame.add(Imperial);
+		 frame.add(GenderButtonsLabel);
+		 frame.add(UnitButtonsLabel);
+		 frame.add(BMRSettingLabel);
 		 frame.add(Create);
 		 
 		 Weight.addFocusListener(this);
@@ -106,7 +136,10 @@ public class ProfileGui implements ActionListener, FocusListener {
 		 frame.setVisible(true); //makes frame visible
 	 }
 
-	public ProfileGui( int user) {
+	public ProfileGui( Front front,int user) {
+		
+		this.front = front;
+		
 		back.setBounds(350, 20, 70, 30);
 
 		title.setBounds(230, 20, 100, 70);
@@ -155,8 +188,8 @@ public class ProfileGui implements ActionListener, FocusListener {
 		// TODO Auto-generated method stub
 		if(e.getSource()==back) 
 		{
-			frame.dispose();
-	    	Front cal = new Front();
+			frame.setVisible(false);
+            front.main.setVisible(true);
 		}
 		else if(e.getSource()==Male) 
 		{
@@ -178,6 +211,14 @@ public class ProfileGui implements ActionListener, FocusListener {
 		{
 			bmrSetting=2;
 		}
+		else if(e.getSource()==Metric)
+		{
+			unitSetting=true;
+		}
+		else if(e.getSource()==Imperial)
+		{
+			unitSetting=false;
+		}
 		else if(e.getSource()==Create) 
 		{
 			height =  Double.parseDouble(Height.getText());
@@ -186,12 +227,6 @@ public class ProfileGui implements ActionListener, FocusListener {
 			Birth = date.getText();
 			
 			birth = new Date(Integer.parseInt(Birth.substring(0,4)),Integer.parseInt(Birth.substring(5,7))-1,Integer.parseInt(Birth.substring(8,10)));
-			
-			//Profile user = new Profile(gender,birth,height,weight);
-			/*
-			* frame.dispose();
-			* ProfileGui profilegui = new ProfileGui( int user id);
-			* */
 			
 		}
 		
