@@ -140,9 +140,9 @@ public class exerciseGUI extends JFrame {
                 StringBuilder exerciseLogInfo = new StringBuilder();
                 int totalCaloriesBurned = 0;
                 for (Exercise exercise : exerciseLogger.getExercises()) {
-                    int caloriesBurned = exercise.calculateCaloriesBurnt(1200);
+                    exercise.setCaloriesBurned(exercise.calculateCaloriesBurnt(1200));
 
-                    totalCaloriesBurned += caloriesBurned;
+                    totalCaloriesBurned += exercise.getCaloriesBurned();
 
                     // Display all corresponding info for each exercise in log
                     exerciseLogInfo.append(exercise.getDate())
@@ -152,7 +152,7 @@ public class exerciseGUI extends JFrame {
                             .append(exercise.getDuration())
                             .append(" minutes,")
                             .append(" Calories Burned: ")
-                            .append(caloriesBurned)
+                            .append(exercise.getCaloriesBurned())
                             .append("\n");
                 }
                 JOptionPane.showMessageDialog(MainPanel, exerciseLogInfo.toString(), "Daily Exercise Log", JOptionPane.INFORMATION_MESSAGE);
@@ -212,6 +212,9 @@ public class exerciseGUI extends JFrame {
         defaultComboBoxModel1.addElement("Running");
         defaultComboBoxModel1.addElement("Biking");
         defaultComboBoxModel1.addElement("Swimming");
+        defaultComboBoxModel1.addElement("Boxing");
+        defaultComboBoxModel1.addElement("Weight Lifting");
+        defaultComboBoxModel1.addElement("Jump Roping");
         defaultComboBoxModel1.addElement("Boxing");
         exerciseComboBox.setModel(defaultComboBoxModel1);
         gbc = new GridBagConstraints();
