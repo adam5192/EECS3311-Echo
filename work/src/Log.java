@@ -1,3 +1,4 @@
+package App;
 import java.util.*;
 import javax.management.InvalidAttributeValueException;
 
@@ -150,7 +151,7 @@ class MealLog extends Log {
 
 //This class represents a single ingredient, and includes all of the macros in it (calories, fat, protein, etc...)
 class Ingredient {
-   //declare all vairables of an ingredient
+   //declare all variables of an ingredient
    private String name;
    private int calories;
    private int fat;
@@ -232,12 +233,12 @@ class Ingredient {
    }
 
    public void setServing(int serving) {
-      this.serving = serving;
-   }
+        this.serving = serving;
+    }
 
-   public int getServing(){
-      return serving;
-   }
+    public int getServing(){
+        return serving;
+    }
    //will likely have additional variables
 
    @Override
@@ -249,22 +250,26 @@ class Ingredient {
 
 class ExerciseLog extends Log {
    private int caloBurnt;
-   private String exerciseName;
-   private double time;
+   private String intensity;
+   private String type;
+   private String name;
+   private int duration;
 
    //Constructor
    public ExerciseLog(int userId) {
       super(userId);
       caloBurnt = 0;
-      time = 0.0;
+      duration = 0;
+      intensity = ""; // Will be considered 0 when calculated
       super.setLogType(3);
    }
 
-   public ExerciseLog(String exerciseName, int caloBurnt, double time, Date logDate, int userId) {
+   public ExerciseLog(String name, String intensity, String type, int duration, Date logDate, int userId) {
       super(logDate, userId);
-      this.exerciseName = exerciseName;
-      this.caloBurnt = caloBurnt;
-      this.time  = time;
+      this.name = name;
+      this.intensity = intensity;
+      this.type = type;
+      this.duration  = duration;
       super.setLogType(3);
    }
 
@@ -278,28 +283,49 @@ class ExerciseLog extends Log {
       }
    }
 
-   public void setTime(double time) {
+   public void setDuration(int duration) {
       try {
-         if (time < 0.0) throw new InvalidAttributeValueException("Time spent exercising cannot be negative.");
-         this.time = time;
+         if (duration < 0.0) throw new InvalidAttributeValueException("Time spent exercising cannot be negative.");
+         this.duration = duration;
       } catch (Exception e) {
          e.printStackTrace();
       }
    }
 
+   public void setType(String type) {
+        this.type = type;
+    }
+
+   public void setIntensity(String intensity) {
+        this.intensity = intensity;
+    }
+
    //Getters
-   public int getCaloBurnt() {return this.caloBurnt;}
-   public String getName() {return exerciseName;}
-   public double getTime() {return this.time;}
+   public int getCaloBurnt() {return caloBurnt;}
+   public String getType() {return type;}
+   public String getName() {return name;}
+   public double getDuration() {return duration;}
+
+   // This method calculates calories burnt
+   public int calculateCaloriesBurnt(double BMR) {
+      double factor = switch (intensity) {
+         case "low" -> 0.5;
+         case "medium" -> 0.7;
+         case "high" -> 0.9;
+         case "very high" -> 1.2;
+         default -> 0;
+      };
+      return (int) ((BMR/24) * factor * (duration));
+   }
 
    //toString format: Date - Time exercised - Calorie burnt
    public String toString() {
-      return super.toString() + String.format(" - %.2f min - %d cal burnt", time, caloBurnt);
+      return super.toString() + 
+      "Exercise{" + "type='" + type + '\'' + ", duration=" + duration + ", intensity='" + intensity + '\'' + "}";
    }
 }
 
 @SuppressWarnings("deprecation")
-//TODO: Implement storing and accessing database
 public class Log {
    private int userId;
    private Date loggedDate;
@@ -337,7 +363,7 @@ public class Log {
 
    public int getUserID() {return userId;}
 
-   //toString format: YY/MM/DD
+   //toString format: YY/MM/DD 
    @Override
    public String toString() {
       return String.format("%d/%2d/%2d", loggedDate.getYear(), loggedDate.getMonth() + 1, loggedDate.getDate());
