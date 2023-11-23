@@ -24,7 +24,7 @@ public class MealGUI extends JFrame {
     public MealGUI(Front front) throws SQLException {
         setContentPane(MainPanel);
         setTitle("Meal Log");
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         setSize(400, 400);
         setLocationRelativeTo(null);
         back.setBounds(0, 0, 20, 20);
@@ -50,9 +50,17 @@ public class MealGUI extends JFrame {
                 }
             }
         });
+        // listener for back button
         back.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                setVisible(false);
+                front.main.setVisible(true);
+            }
+        });
+
+        addWindowListener(new WindowAdapter(){
+            public void windowClosing(WindowEvent e){
                 setVisible(false);
                 front.main.setVisible(true);
             }

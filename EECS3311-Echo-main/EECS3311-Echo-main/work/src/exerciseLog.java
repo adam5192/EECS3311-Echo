@@ -1,3 +1,4 @@
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -7,6 +8,7 @@ class Exercise  {
     private String type; // walking, running, etc...
     private int duration; // in minutes
     private String intensity; // low, medium, high, very high
+    private int caloriesBurned;
 
     // constructor to initialize exercise data
     public Exercise(String date, String time, String type, int duration, String intensity) {
@@ -38,7 +40,7 @@ class Exercise  {
     }
 
     // Setters
-    public void setDate(String date) {
+    public void setDate(String date) throws ParseException {
         this.date = date;
     }
 
@@ -58,6 +60,14 @@ class Exercise  {
         this.intensity = intensity;
     }
 
+    public void setCaloriesBurned(int caloriesBurned) {
+        this.caloriesBurned =  caloriesBurned;
+    }
+
+    public int getCaloriesBurned() {
+        return this.caloriesBurned;
+    }
+
     // this method calculates calories burnt
     public int calculateCaloriesBurnt(double BMR) {
         double factor = switch (intensity) {
@@ -67,7 +77,7 @@ class Exercise  {
             case "very high" -> 1.2;
             default -> 0;
         };
-        return (int) (BMR * factor * (duration / 60.0)); // calories burned = BMR * duration (hours) * factor
+        return (int) ((BMR/24) * factor * (duration));
     }
 
     @Override
@@ -94,27 +104,3 @@ class ExerciseLogger {
         return exercises;
     }
 }
-
-// TODO: Implement database helper
-
-//public class exerciseLog {
-//    public static void main(String[] args) {
-//        // sample bmr, this will be retrieved from user profile
-//        double userBMR = 2000;
-//
-//        // create an example exercise
-//        Exercise morningJog = new Exercise("2023-10-19", "09:30", "jogging", 25, "medium");
-//
-//        // Display the estimated calories burnt during the walk.
-//        System.out.println("Calories burnt: " + morningJog.calculateCaloriesBurnt(userBMR));
-//
-//        // create and exercise logger that logs all exercises
-//        ExerciseLogger myExerciseLogger = new ExerciseLogger();
-//
-//        // add morningJog to logger
-//        myExerciseLogger.logExercise(morningJog);
-//
-//        // displays all logged exercises
-//        System.out.println("logged exercises: " + myExerciseLogger.getExercises());
-//    }
-//}
