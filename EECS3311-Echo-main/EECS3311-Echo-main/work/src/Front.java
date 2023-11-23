@@ -1,3 +1,5 @@
+package work.src;
+
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
@@ -26,7 +28,7 @@ public class Front implements ActionListener {
     MealGUI mealGUIInstance;
     exerciseGUI exGUIInstance;
     ProfileGui profileGUIInstance;
-//    private GraphingGUI graphingGUIInstance;
+    GraphingGUI graphingGUIInstance;
 
     // Frame to hold the main interface components.
     MyFrame main = new MyFrame();
@@ -74,7 +76,7 @@ public class Front implements ActionListener {
         // then become visibile when corresponding button is pressed
         mealGUIInstance = new MealGUI(this);
         exGUIInstance = new exerciseGUI(this);
-//        graphingGUIInstance = new GraphingGUI(this);
+        graphingGUIInstance = new GraphingGUI(this);
 
         // TODO: implement above logic for ProfileGUI
        profileGUIInstance = new ProfileGui(this);
@@ -97,7 +99,7 @@ public class Front implements ActionListener {
         } else if (e.getSource() == Graphing) {
             // Open a new window for Graphing GUI.
             main.setVisible(false);
-//            graphingGUIInstance.setVisible(true);
+            graphingGUIInstance.setVisible(true);
 
         } else if (e.getSource() == Profile) {
              //TODO: implement same logic from Meal and Exercise for profile
