@@ -45,7 +45,7 @@ public class ProfileGui implements ActionListener, FocusListener {
 
 	Front front;
 	
-	
+	public static Profile currProfile;
 	double height;
 	double weight;
 	double fatlevel;
@@ -59,86 +59,94 @@ public class ProfileGui implements ActionListener, FocusListener {
 
 	 public ProfileGui(Front front) {
 		 
-		 this.front = front;
+		this.front = front;
 		 
-		 frame.setTitle("Profile");
+		frame.setTitle("Profile");
 		 
 		// frame.setLayout(new FlowLayout(FlowLayout.CENTER, 100, 20));
-		 back.setBounds(350, 20, 70, 30);
+		back.setBounds(350, 20, 70, 30);
 		 
-		 frame.setVisible(false);
+		frame.setVisible(false);
 		 
-		 title.setBounds(230, 0, 100, 70);
-		 title.setForeground(Color.BLACK);
-		 
-		
-		 
-		 
+		title.setBounds(230, 0, 100, 70);
+		title.setForeground(Color.BLACK);
 
-		 Height.setBounds(200, 50, 100, 30);
-		 Weight.setBounds(200, 85, 100, 30);
-		 BodyFat.setBounds(200, 120, 100, 30);
-		 date.setBounds(200, 155, 100, 30);
-		 
-		 GenderButtonsLabel.setBounds(65, 175, 100, 70);
-		 Male.setBounds(20, 220, 65, 30);
-		 Female.setBounds(85, 220, 75, 30);
-		 
-		 BMRSettingLabel.setBounds(200, 250, 100, 70);
-		 setting1.setBounds(100, 300, 100, 30);
-		 setting2.setBounds(250, 300, 200, 30);
-		 setting3.setBounds(180, 340, 200, 30);
+		if (currProfile == null) {
+			if (DBQuery.getUsers() == null) { //No profile is loaded and no profile is in database
+				Height.setBounds(200, 50, 100, 30);
+				Weight.setBounds(200, 85, 100, 30);
+				BodyFat.setBounds(200, 120, 100, 30);
+				date.setBounds(200, 155, 100, 30);
+				
+				GenderButtonsLabel.setBounds(65, 175, 100, 70);
+				Male.setBounds(20, 220, 65, 30);
+				Female.setBounds(85, 220, 75, 30);
+				
+				BMRSettingLabel.setBounds(200, 250, 100, 70);
+				setting1.setBounds(100, 300, 100, 30);
+				setting2.setBounds(250, 300, 200, 30);
+				setting3.setBounds(180, 340, 200, 30);
 
-		 UnitButtonsLabel.setBounds(350, 175, 100, 70);
-		 Metric.setBounds(280, 225, 100, 30);
-		 Imperial.setBounds(380, 225, 100, 30);
-		 
-		 Create.setBounds(180, 400, 120, 40);
-		 
-		 group.add(Male);
-		 group.add(Female);
+				UnitButtonsLabel.setBounds(350, 175, 100, 70);
+				Metric.setBounds(280, 225, 100, 30);
+				Imperial.setBounds(380, 225, 100, 30);
+				
+				Create.setBounds(180, 400, 120, 40);
+				
+				group.add(Male);
+				group.add(Female);
 
-		 groupSettings.add(setting1);
-		 groupSettings.add(setting2);
-		 groupSettings.add(setting3);
-		 
-		 UnitGroups.add(Metric);
-		 UnitGroups.add(Imperial);
-		 
-		 frame.add(back);
-		 frame.add(title);
-		 frame.add(Height);
-		 frame.add(Weight);
-		 frame.add(BodyFat);
-		 frame.add(Male);
-		 frame.add(Female);
-		 frame.add(date);
-		 frame.add(setting1);
-		 frame.add(setting2);
-		 frame.add(setting3);
-		 frame.add(Metric);
-		 frame.add(Imperial);
-		 frame.add(GenderButtonsLabel);
-		 frame.add(UnitButtonsLabel);
-		 frame.add(BMRSettingLabel);
-		 frame.add(Create);
-		 
-		 Weight.addFocusListener(this);
-		 Height.addFocusListener(this);
-		 BodyFat.addFocusListener(this);
-		 date.addFocusListener(this);
-		 
-		 back.addActionListener(this);
-		 Create.addActionListener(this);
-		 
-		 frame.setLayout(null);
-		 frame.setLocationRelativeTo(null);
-		 frame.setVisible(true); //makes frame visible
+				groupSettings.add(setting1);
+				groupSettings.add(setting2);
+				groupSettings.add(setting3);
+				
+				UnitGroups.add(Metric);
+				UnitGroups.add(Imperial);
+				
+				frame.add(back);
+				frame.add(title);
+				frame.add(Height);
+				frame.add(Weight);
+				frame.add(BodyFat);
+				frame.add(Male);
+				frame.add(Female);
+				frame.add(date);
+				frame.add(setting1);
+				frame.add(setting2);
+				frame.add(setting3);
+				frame.add(Metric);
+				frame.add(Imperial);
+				frame.add(GenderButtonsLabel);
+				frame.add(UnitButtonsLabel);
+				frame.add(BMRSettingLabel);
+				frame.add(Create);
+				
+				Weight.addFocusListener(this);
+				Height.addFocusListener(this);
+				BodyFat.addFocusListener(this);
+				date.addFocusListener(this);
+				
+				back.addActionListener(this);
+				Create.addActionListener(this);
+				
+				frame.setLayout(null);
+				frame.setLocationRelativeTo(null);
+				frame.setVisible(true); //makes frame visible
+			}
+			else {
+				//Display a selection for profile id
+				int user = 0; //Save id into this var
+				currProfile = DBQuery.getProfile(user); // Get Profile from database
+				displayProfile();
+			}
+		}
+		else {
+			// Profile is loaded, display as normal
+			displayProfile();
+		}
 	 }
 
-	public ProfileGui( Front front,int user) {
-		
-		this.front = front;
+	public void displayProfile() {
 		
 		back.setBounds(350, 20, 70, 30);
 
@@ -146,13 +154,13 @@ public class ProfileGui implements ActionListener, FocusListener {
 		title.setForeground(Color.BLACK);
 
 
-		JLabel Userid = new JLabel("UserId:  " /* +getter here */ );
-		JLabel HeightTitle = new JLabel("Height:  "+"m");
-		JLabel WeightTitle = new JLabel("Weight:  "+"kg");
-		JLabel BodyFatTitle = new JLabel("BodyFat%:  ");
-		JLabel GenderTitle = new JLabel("Gender:  ");
-		JLabel dateTitle = new JLabel("Birth day:  ");
-		JLabel BMRTitle = new JLabel("BMR:  ");
+		JLabel Userid = new JLabel("UserId:  " + currProfile.getName());
+		JLabel HeightTitle = new JLabel("Height:  "+ currProfile.getHeight() +"m");
+		JLabel WeightTitle = new JLabel("Weight:  "+ currProfile.getWeight()+"kg");
+		JLabel BodyFatTitle = new JLabel("BodyFat%:  " + currProfile.getFatLvl());
+		JLabel GenderTitle = new JLabel("Gender:  " + currProfile.getSex());
+		JLabel dateTitle = new JLabel("Birth day:  " + currProfile.getBirth());
+		JLabel BMRTitle = new JLabel("BMR:  " + currProfile.getBMR());
 
 
 		Userid.setBounds(120,70,100,30);
@@ -163,7 +171,7 @@ public class ProfileGui implements ActionListener, FocusListener {
 		dateTitle.setBounds(120, 270, 100, 30);
 		BMRTitle.setBounds(120, 310, 100, 30);
 
-
+		
 
 		frame.add(title);
 		frame.add(Userid);
@@ -261,4 +269,3 @@ public class ProfileGui implements ActionListener, FocusListener {
 	    }
 	  }
 }
-
