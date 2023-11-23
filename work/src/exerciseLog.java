@@ -7,6 +7,7 @@ class Exercise  {
     private String type; // walking, running, etc...
     private int duration; // in minutes
     private String intensity; // low, medium, high, very high
+    private int caloriesBurned;
 
     // constructor to initialize exercise data
     public Exercise(String date, String time, String type, int duration, String intensity) {
@@ -56,6 +57,14 @@ class Exercise  {
 
     public void setIntensity(String intensity) {
         this.intensity = intensity;
+    }
+
+    public void setCaloriesBurned(int caloriesBurned) {
+        this.caloriesBurned =  caloriesBurned;
+    }
+
+    public int getCaloriesBurned() {
+        return this.caloriesBurned;
     }
 
     // this method calculates calories burnt
