@@ -25,9 +25,6 @@ public class MyFrame extends JFrame {
      // Set the frame's icon using the created ImageIcon.
      this.setIconImage(image.getImage());
 
-     // Set the background color of the frame.
-     this.getContentPane().setBackground(Color.gray);
-
      // Set the frame to appear in the center of the screen.
      this.setLocationRelativeTo(null);
 
