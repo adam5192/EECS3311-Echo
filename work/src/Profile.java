@@ -19,9 +19,9 @@ public class Profile {
    private double height; //In centimeters
    private double weight; //In kg
    private double fatLvl; //For Karth-McArdle's BMR Calc, range: 0-100
-   private List<DataLog> dataHistory;
-   private List<ExerciseLog> exerciseHistory;
-   private List<MealLog> mealHistory;
+   private List<Log> dataHistory;
+   private List<Exercise> exerciseHistory;
+   private List<Meal> mealHistory;
    private double bmrVal;
 
    //Settings
@@ -41,10 +41,10 @@ public class Profile {
       Date logDate = new Date();
       logDate.setYear(logDate.getYear()+1900);
       logDate.setMonth(logDate.getMonth());
-      dataHistory = new LinkedList<DataLog>();
-      exerciseHistory = new LinkedList<ExerciseLog>();
-      mealHistory = new LinkedList<MealLog>();
-      dataHistory.add(new DataLog(this.height, this.weight, logDate, this.userId));
+      dataHistory = new LinkedList<Log>();
+      exerciseHistory = new LinkedList<Exercise>();
+      mealHistory = new LinkedList<Meal>();
+      dataHistory.add(new Log(this.height, this.weight, logDate, this.userId));
 
       //Settings
       userId = nextId++;
@@ -98,7 +98,7 @@ public class Profile {
       else {
          this.height = (height / 3.281) / 100.0; //Convert feet to centimeters
       }
-      dataHistory.add(new DataLog(this.height, this.weight, logDate, this.userId));
+      dataHistory.add(new Log(this.height, this.weight, logDate, this.userId));
       } catch (Exception e) {
          e.printStackTrace();
       }
@@ -115,7 +115,7 @@ public class Profile {
          this.weight = weight;
       else
          this.weight = weight / 2.204; // Convert pounds input to centimeters
-      dataHistory.add(new DataLog(this.height, this.weight, logDate, this.userId));
+      dataHistory.add(new Log(this.height, this.weight, logDate, this.userId));
       } catch (Exception e) {
          e.printStackTrace();
       }
@@ -144,15 +144,15 @@ public class Profile {
    }
 
    // Sets the history log of a profile to a pre-generated history
-   public void setDataHistory(List<DataLog> history) {
+   public void setDataHistory(List<Log> history) {
       this.dataHistory = history;
    }
 
-   public void setExerciseHistory(List<ExerciseLog> history) {
+   public void setExerciseHistory(List<Exercise> history) {
       this.exerciseHistory = history;
    }
 
-   public void setMealHistory(List<MealLog> history) {
+   public void setMealHistory(List<Meal> history) {
       this.mealHistory = history;
    }
 
@@ -171,33 +171,34 @@ public class Profile {
    //Not sure if calc method should just return the name or the value
    public int getCalcMethod() {return bmrSetting;}
 
-   public List<DataLog> getDataHistory() {return dataHistory;}
-   public List<ExerciseLog> getExerciseHistory() {return exerciseHistory;}
-   public List<MealLog> getMealHistory() {return mealHistory;}
+   public List<Log> getDataHistory() {return dataHistory;}
+   public List<Exercise> getExerciseHistory() {return exerciseHistory;}
+   public List<Meal> getMealHistory() {return mealHistory;}
+
 
    //Log creation and management
    /**
     * Overloaded method for adding a new log to the profile.
     */
    public void addLog(double height, double weight, Date logDate) {
-      dataHistory.add(new DataLog(height, weight, logDate, this.userId));
+      dataHistory.add(new Log(height, weight, logDate, this.userId));
    }
-   public void addLog(DataLog data) {dataHistory.add(data);}
+   public void addLog(Log data) {dataHistory.add(data);}
 
-   public void addLog(String mealName, Ingredient[] ingredients, String mealType, Date logDate) {
-      MealLog meal = new MealLog(mealName, mealType, logDate, this.userId);
+   public void addLog(Ingredient[] ingredients, String mealType, Date logDate) {
+      Meal meal = new Meal();
       for (Ingredient i : ingredients) {
          if (i != null)
             meal.addIngredient(i);
       }
       mealHistory.add(meal);
    }
-   public void addLog(MealLog meal) {mealHistory.add(meal);}
+   public void addLog(Meal meal) {mealHistory.add(meal);}
 
-   public void addLog(String name, String intensity, String type, int duration, Date logDate) {
-      exerciseHistory.add(new ExerciseLog(name, intensity, type, duration, logDate, this.userId));
+   public void addLog(String date, String time, String intensity, String type, int duration, Date logDate) {
+      exerciseHistory.add(new Exercise(date, time, type, duration, intensity));
    }
-   public void addLog(ExerciseLog exercise) {exerciseHistory.add(exercise);}
+   public void addLog(Exercise exercise) {exerciseHistory.add(exercise);}
 
    /*
     * Remove the first log that matched (based on specified date and type) from history and returns it. Returns null if none matches.
