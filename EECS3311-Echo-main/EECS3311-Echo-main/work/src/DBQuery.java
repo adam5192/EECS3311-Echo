@@ -182,8 +182,7 @@ public class DBQuery {
                   for(int i = 0; log.next() && i < 100;) { // In case there is multiple logs with the same date of the same type
                      if (lastIn.equals(null) || lastIn.equals(log.getString("IngredientName"))) {// If first iteration or current ingredient and previous is part of the same meal, add to list as normal
                         Ingredient e = new Ingredient(log.getString("IngredientName"), log.getInt("CaloVal"), log.getInt("FatVal"),
-                                                log.getInt("ProtVal"), log.getInt("CarbVal"), log.getInt("Others"));
-                        e.setServing(log.getInt("Serving"));
+                                                log.getInt("ProtVal"), log.getInt("CarbVal"), log.getInt("Others"), log.getInt("Serving"));
                         meal.addIngredient(e);
 
                         lastIn = log.getString("IngredientName");
