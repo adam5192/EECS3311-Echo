@@ -30,6 +30,11 @@ class Meal {
         return ingredients.stream().mapToInt(Ingredient::getCarbs).sum();
     }
 
+    public int calculateOthers() {
+        return ingredients.stream().mapToInt(Ingredient::getOthers).sum();
+    }
+
+
     //Setters below
     public void setType(String mealType) {
         this.mealType = mealType;
