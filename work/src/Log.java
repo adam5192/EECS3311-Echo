@@ -303,6 +303,7 @@ class ExerciseLog extends Log {
    //Getters
    public int getCaloBurnt() {return caloBurnt;}
    public String getType() {return type;}
+   public String getIntensity() {return intensity;}
    public String getName() {return name;}
    public double getDuration() {return duration;}
 
