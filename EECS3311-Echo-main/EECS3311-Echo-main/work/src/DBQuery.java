@@ -1,4 +1,4 @@
-package work.src;
+package src;
 import java.sql.*;
 import java.util.*;
 
@@ -73,7 +73,7 @@ public class DBQuery {
     * @return Array of Strings that contain of all food's descriptions in the database
     * @throws SQLException
     */
-   public static String[] getIngredientNames() throws SQLException {
+   public static String[] getIngredientNames() {
       try (Connection query = DriverManager.getConnection("jdbc:mysql://localhost:3306", "root", "EECS3311_Project")) {
          PreparedStatement statement = query.prepareStatement("select * from FoodName", ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
          ResultSet rs = statement.executeQuery();
