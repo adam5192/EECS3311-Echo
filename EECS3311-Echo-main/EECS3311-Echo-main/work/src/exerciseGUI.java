@@ -26,7 +26,7 @@ public class exerciseGUI extends JFrame {
     JButton back = new JButton("Back");
 
     public exerciseGUI(Front front) {
-        //double userBMR = Calculator.calculateBMR(user);
+        double userBMR = front.profileGUIInstance.currProfile.getBMR();
         setContentPane(MainPanel);
         setTitle("Exercise Log");
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
@@ -151,7 +151,7 @@ public class exerciseGUI extends JFrame {
                 StringBuilder exerciseLogInfo = new StringBuilder();
                 int totalCaloriesBurned = 0;
                 for (Exercise exercise : exerciseLogger.getExercises()) {
-                    exercise.setCaloriesBurned(exercise.calculateCaloriesBurnt(1200));
+                    exercise.setCaloriesBurned(exercise.calculateCaloriesBurnt(userBMR));
 
                     totalCaloriesBurned += exercise.getCaloriesBurned();
 
