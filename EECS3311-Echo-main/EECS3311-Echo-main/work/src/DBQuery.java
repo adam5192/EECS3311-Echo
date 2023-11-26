@@ -102,17 +102,17 @@ public class DBQuery {
       try (Connection query = DriverManager.getConnection("jdbc:mysql://localhost:3306", "root", "EECS3311_Project")) {
          PreparedStatement statement = query.prepareStatement("select count(*) as ProfileCount from UserProfile");
          int size = statement.executeQuery().getInt("ProfileCount");
+         if (size <= 0) throw new SQLException();
          statement = query.prepareStatement("select Username from UserProfile");
          ResultSet rs = statement.executeQuery();
          List<Integer> out = new ArrayList<Integer>();
          
-         for (int i = 0;rs.next() && i < size; i++) {
+         for (int i = 0; rs.next() && i < size; i++) {
             out.add(rs.getInt("UserID"));
          }
 
          return out;
       } catch (SQLException e) {
-         e.printStackTrace();
          return null;
       }
    }
