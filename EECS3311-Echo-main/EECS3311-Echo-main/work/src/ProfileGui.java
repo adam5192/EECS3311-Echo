@@ -6,7 +6,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
-import java.sql.SQLException;
 import java.util.Date;
 
 import javax.swing.ButtonGroup;
@@ -141,6 +140,7 @@ public class ProfileGui implements ActionListener, FocusListener {
 		title.setBounds(230, 20, 100, 70);
 		title.setForeground(Color.BLACK);
 
+		currProfile = DBQuery.getProfile(user);
 
 		JLabel Userid = new JLabel("UserId:  " + currProfile.getName());
 		JLabel HeightTitle = new JLabel("Height:  "+ currProfile.getHeight() +"m");
@@ -224,6 +224,7 @@ public class ProfileGui implements ActionListener, FocusListener {
 			
 			birth = new Date(Integer.parseInt(Birth.substring(0,4)),Integer.parseInt(Birth.substring(5,7))-1,Integer.parseInt(Birth.substring(8,10)));
 			
+			currProfile = new Profile(gender, birth, height, weight, bmrSetting);
 		}
 		
 	}
