@@ -65,7 +65,7 @@ public class CEGraph extends JFrame implements ActionListener {
 		start = new JTextField(10);
 		to = new JLabel("To");
 		end = new JTextField(10);
-		example = new JLabel("dd/mm/yyyy");
+		example = new JLabel("YYYY-MM-DD");
 		graph = new JButton("Graph");
 		back = new JButton("Back");
 		back.addActionListener(new ActionListener() {
