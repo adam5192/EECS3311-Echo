@@ -101,10 +101,12 @@ public class DBQuery {
    public static List<Integer> getUsers() {
       try (Connection query = DriverManager.getConnection("jdbc:mysql://localhost:3306", "root", "EECS3311_Project")) {
          PreparedStatement statement = query.prepareStatement("select count(*) as ProfileCount from UserProfile");
-         int size = statement.executeQuery().getInt("ProfileCount");
+         ResultSet rs = statement.executeQuery();
+         rs.next();
+         int size = rs.getInt("ProfileCount");
          if (size <= 0) throw new SQLException();
          statement = query.prepareStatement("select UserId from UserProfile");
-         ResultSet rs = statement.executeQuery();
+         rs = statement.executeQuery();
          List<Integer> out = new ArrayList<Integer>();
          
          for (int i = 0; rs.next() && i < size; i++) {
