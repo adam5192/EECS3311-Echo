@@ -102,12 +102,13 @@ public class DBQuery {
          PreparedStatement statement = query.prepareStatement("select count(*) as ProfileCount from UserProfile");
          ResultSet rs = statement.executeQuery();
          rs.next();
-         if (rs.getInt("ProfileCount") <= 0) throw new SQLException();
+         int size = rs.getInt("ProfileCount");
+         if (size <= 0) throw new SQLException();
          statement = query.prepareStatement("select UserId from UserProfile");
          rs = statement.executeQuery();
          List<Integer> out = new ArrayList<Integer>();
 
-         while (rs.next()) {
+         for (int i = 0; rs.next() && i < size; i++) {
             out.add(rs.getInt("UserID"));
          }
 
@@ -136,8 +137,7 @@ public class DBQuery {
          //if (rs.wasNull()) return null; // Returns null if no Profile matching userID is found
 
          // Profile object generation
-
-
+         rs.first();
          Profile userProfile = new Profile(rs.getString("Username"), rs.getBoolean("Sex"), new java.util.Date(rs.getDate("Birth").getTime()),
                  rs.getDouble("CurrHeight"), rs.getDouble("CurrWeight"), rs.getInt("BMRSetting"), userID);
          userProfile.setUnit(rs.getBoolean("IsMetric"));
@@ -161,7 +161,7 @@ public class DBQuery {
          }
 
          statement = query.prepareStatement(
-                 "select * from MealLog " +
+                 "select * from Meal " +
                          "where UserID = ? group by LogDate, MealType",
                  ResultSet.TYPE_SCROLL_INSENSITIVE, // Allow for first(), last(), etc. operations on ResultSet instance
                  ResultSet.CONCUR_UPDATABLE
@@ -170,8 +170,8 @@ public class DBQuery {
          rs = statement.executeQuery();
          Meal meal = new Meal();
          String lastIn = null;
-         while(rs.next()) { // In case there is multiple logs with the same date of the same type
-            if (lastIn == null || lastIn.equals(rs.getString("IngredientName"))) {// If first iteration or current ingredient and previous is part of the same meal, add to list as normal
+         for(int i = 0; rs.next() && i < 100;) { // In case there is multiple logs with the same date of the same type
+            if (lastIn.equals(null) || lastIn.equals(rs.getString("IngredientName"))) {// If first iteration or current ingredient and previous is part of the same meal, add to list as normal
                Ingredient e = new Ingredient(rs.getString("IngredientName"), rs.getInt("CaloVal"), rs.getInt("FatVal"),
                        rs.getInt("ProtVal"), rs.getInt("CarbVal"), rs.getInt("Others"), rs.getInt("Serving"));
                meal.addIngredient(e);
@@ -180,6 +180,8 @@ public class DBQuery {
             }
             else { // Current ingredient is for a different meal
                rs.previous(); // info required is from the previous index
+               java.util.Date date = new java.util.Date(rs.getDate("LogDate").getTime());
+               date.setYear(date.getYear() + 1970);
 
                meal.setType(rs.getString("MealType"));
                mealHistory.add(meal);
@@ -187,6 +189,7 @@ public class DBQuery {
                // Restart the process for the next meal
                meal = new Meal();
                lastIn = null;
+               i = 0;
             }
          }
          statement = query.prepareStatement(
@@ -267,7 +270,7 @@ public class DBQuery {
          statement.setDouble(4, log.getLogWeight());
          statement.setDouble(5, log.getLogHeight());
          statement.setDouble(6, log.getLogWeight());
-         statement.execute();
+         statement.executeUpdate();
       } catch (SQLException e) {e.printStackTrace();}
    }
 
@@ -278,7 +281,7 @@ public class DBQuery {
                  "insert into MealLog (LogDate, UserID, MealType, CaloVal, CarbVal, FatVal, ProtVal, OthersVal) " +
                          "values (?, ?, ?, ?, ?, ?, ?, ?) " +
                          "on duplicate key update " +
-                         "CaloVal = ?, CarbVal = ?, FatVal = ?, ProtVal = ?, OthersVal = ?, Serving =?"
+                         "CaloVal = ?, CarbVal = ?, FatVal = ?, ProtVal = ?, OthersVal = ?"
          );
          // Common attributes among ingredients of a meal
          statement.setString(1, log.getDate());
@@ -297,7 +300,7 @@ public class DBQuery {
          statement.setInt(12, log.calculateProtein());
          statement.setInt(13, log.calculateOthers());
 
-         statement.execute();
+         statement.executeUpdate();
       } catch (SQLException e) {e.printStackTrace();}
    }
 
@@ -316,7 +319,7 @@ public class DBQuery {
          statement.setString(2, log.getTime());
          statement.setInt(3, userID);
          statement.setInt(4, log.getCaloriesBurned());
-         statement.setDouble(5, log.getDuration());
+         statement.setInt(5, log.getDuration());
          statement.setString(6, log.getIntensity());
          statement.setString(7, log.getType());
          //If already existed, update
@@ -324,7 +327,7 @@ public class DBQuery {
          statement.setDouble(9, log.getDuration());
          statement.setString(10, log.getType());
          statement.setString(11, log.getIntensity());
-         statement.execute();
+         statement.executeUpdate();
       } catch (SQLException e) {e.printStackTrace();}
    }
 
