@@ -71,6 +71,9 @@ public class Profile {
       this.name = name;
       this.sex = sex;
       this.birth = birth;
+      dataHistory = new LinkedList<Log>();
+      exerciseHistory = new LinkedList<Exercise>();
+      mealHistory = new LinkedList<Meal>();
       this.setHeight(height);
       this.setWeight(weight);
 
