@@ -1,3 +1,4 @@
+
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
@@ -26,13 +27,13 @@ public class Front implements ActionListener {
     MealGUI mealGUIInstance;
     exerciseGUI exGUIInstance;
     ProfileGui profileGUIInstance;
-//    private GraphingGUI graphingGUIInstance;
+    GraphingGUI graphingGUIInstance;
 
     // Frame to hold the main interface components.
     MyFrame main = new MyFrame();
 
     // Constructor for the Front class.
-    public Front() throws SQLException {
+    public Front() {
 
         // Set the title of the main frame.
         main.setTitle("Echo");
@@ -74,10 +75,12 @@ public class Front implements ActionListener {
         // then become visibile when corresponding button is pressed
         mealGUIInstance = new MealGUI(this);
         exGUIInstance = new exerciseGUI(this);
-//        graphingGUIInstance = new GraphingGUI(this);
+        graphingGUIInstance = new GraphingGUI(this);
 
         // TODO: implement above logic for ProfileGUI
-       profileGUIInstance = new ProfileGui(this);
+        profileGUIInstance = new ProfileGui(this);
+
+        System.out.println(DBQuery.getUsers());
     }
 
     // ActionListener method for button clicks.
@@ -87,8 +90,13 @@ public class Front implements ActionListener {
 
         if (e.getSource() == Meal) {
             // Open a new window for Meal log GUI.
-            main.setVisible(false);
-            mealGUIInstance.setVisible(true);
+            if(profileGUIInstance.currProfile != null){
+                main.setVisible(false);
+                mealGUIInstance.setVisible(true);
+            } else {
+                JOptionPane.showMessageDialog(main, "Must create/select profile first");
+            }
+
         } else if (e.getSource() == Exercise) {
             // Open a new window for Exercise log GUI.
             main.setVisible(false);
@@ -97,25 +105,27 @@ public class Front implements ActionListener {
         } else if (e.getSource() == Graphing) {
             // Open a new window for Graphing GUI.
             main.setVisible(false);
-//            graphingGUIInstance.setVisible(true);
+            graphingGUIInstance.setVisible(true);
 
         } else if (e.getSource() == Profile) {
-             //TODO: implement same logic from Meal and Exercise for profile
+            //TODO: implement same logic from Meal and Exercise for profile
 
-	        	/* if a user created their userid is added to the list and based on whoever the user pick the profile of that userid is called 
-	        	JComboBox<Integer> users = new JComboBox<>(list.toArray(new Integer[0]));
-		    	panel.add(users);
-	        	JOptionPane.showConfirmDialog(main, panel, "Select a Number", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
-	        	  Integer selectedNumber = (Integer) ((JComboBox<?>) panel.getComponent(0)).getSelectedItem();
-	        	  main.setVisible(false);
-	        	  profileGUIInstance = new ProfileGui(this,selectedNumber);
-	        	  profileGUIInstance.frame.setVisible(true);
-	        	  
-	        	  /* else if no is create profile then you do  
-	        	   * main.setVisible(false); 
-	        	   * profileGUIInstance = new ProfileGui(this);
-	        	   * profileGUIInstance.frame.setVisible(true);
-	        	   */
+            if (DBQuery.getUsers() != null) {
+                list.addAll(DBQuery.getUsers());
+                JComboBox<Integer> users = new JComboBox<>(list.toArray(new Integer[0]));
+                panel.add(users);
+                JOptionPane.showConfirmDialog(main, panel, "Select a Number", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+                Integer selectedNumber = (Integer) ((JComboBox<?>) panel.getComponent(0)).getSelectedItem();
+                main.setVisible(false);
+                profileGUIInstance = new ProfileGui(this,(int) selectedNumber);
+                profileGUIInstance.frame.setVisible(true);
+            }
+
+            else {
+                main.setVisible(false);
+                profileGUIInstance = new ProfileGui(this);
+                profileGUIInstance.frame.setVisible(true);
+            }
         }
     }
 }

@@ -12,6 +12,9 @@ import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -46,14 +49,13 @@ public class CEGraph extends JFrame implements ActionListener {
 	private JTextField end;
 	private JLabel example;
 	private JButton graph;
+	private JButton back;
 
-	public CEGraph() {
+	public CEGraph(GraphingGUI previous, Profile profile) {
 		// Set window title
 		super("Daily Calory Intake & Daily Exercise");
-		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy");
-		@SuppressWarnings("deprecation")
-		Profile user = new Profile(false, new Date(1974, 06, 10), 155.0, 50.0, 1);
-		DBQuery.getCurrentProfile();
+		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("YYYY-MM-DD");
+		Profile user = profile;
 		// Set charts region
 		JPanel panel = new JPanel();
 		panel.setLayout(new GridLayout(2, 0));
@@ -63,6 +65,22 @@ public class CEGraph extends JFrame implements ActionListener {
 		end = new JTextField(10);
 		example = new JLabel("dd/mm/yyyy");
 		graph = new JButton("Graph");
+		back = new JButton("Back");
+		back.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				setVisible(false);
+				previous.main.setVisible(true);
+			}
+		});
+
+		// listener for clicking X
+		addWindowListener(new WindowAdapter() {
+			public void windowClosing(WindowEvent e) {
+				setVisible(false);
+				previous.main.setVisible(true);
+			}
+		});
 
 		JPanel header = new JPanel();
 		header.add(inputDate);
@@ -71,6 +89,7 @@ public class CEGraph extends JFrame implements ActionListener {
 		header.add(end);
 		header.add(example);
 		header.add(graph);
+		header.add(back);
 
 		// programs button to create the chart
 		graph.addActionListener(new ActionListener() {
@@ -89,7 +108,7 @@ public class CEGraph extends JFrame implements ActionListener {
 		getContentPane().add(panel, BorderLayout.WEST);
 		setExtendedState(JFrame.MAXIMIZED_BOTH);
 		setVisible(true);
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 	}// end UC5test
 
 	public void createTimeSeries(JPanel panel, Date startDate, Date endDate, Profile user) throws ParseException {
@@ -98,8 +117,7 @@ public class CEGraph extends JFrame implements ActionListener {
 		panel.repaint();
 		TimeSeries caloryIntake = new TimeSeries("Daily Calory Intake");
 		TimeSeries amountOfExercise = new TimeSeries("Daily Amount of Exercise");
-		// SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy");
-
+		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("YYYY-MM-DD");
 		// turns date inputed from the user into a format
 		// that allows comparison of dates
 		// will receive the user BMR from profile
@@ -108,22 +126,19 @@ public class CEGraph extends JFrame implements ActionListener {
 		// exercise info, from exerciseLog
 		// catch when the user inputs an end date that is
 		// earlier than the start date
-
 		if (startDate.after(endDate)) {
 			JOptionPane.showMessageDialog(null, "Incorrect Date Info");
 			System.out.println("test");
 		} else {
 			// for loop that adds info to the chart that fits
 			// into the inputed time period
-
 			Map<Date, Double> amountOfCalsPerDate = new HashMap<>();
-			for (int i = 0; i < user.getHistory().size(); i++) {
-				if (user.getHistory().get(i).getLogType() == 2) {
-					Double calories = amountOfCalsPerDate.get(user.getHistory().get(i).getDate());
-					Double amountOfCals = calories == null ? 0 : calories;
-					amountOfCalsPerDate.put(user.getHistory().get(i).getDate(),
-							amountOfCals + ((MealLog) user.getHistory().get(i)).calculateCalories());
-				} // end if statement
+			for (int i = 0; i < user.getMealHistory().size(); i++) {
+				Double calories = amountOfCalsPerDate
+						.get(simpleDateFormat.parse(user.getMealHistory().get(i).getDate()));
+				Double amountOfCals = calories == null ? 0 : calories;
+				amountOfCalsPerDate.put(simpleDateFormat.parse(user.getMealHistory().get(i).getDate()),
+						amountOfCals + (user.getMealHistory().get(i)).calculateCalories());
 			} // end for loop
 
 			for (Entry<Date, Double> e : amountOfCalsPerDate.entrySet()) {
@@ -134,13 +149,12 @@ public class CEGraph extends JFrame implements ActionListener {
 			} // end for loop
 
 			Map<Date, Double> amountOfExPerDate = new HashMap<>();
-			for (int i = 0; i < user.getHistory().size(); i++) {
-				if (user.getHistory().get(i).getLogType() == 3) {
-					Double exercise = amountOfExPerDate.get(user.getHistory().get(i).getDate());
-					Double amountOfEx = exercise == null ? 0 : exercise;
-					amountOfExPerDate.put(user.getHistory().get(i).getDate(),
-							amountOfEx + ((ExerciseLog) user.getHistory().get(i)).getCaloBurnt());
-				} // end if statement
+			for (int i = 0; i < user.getExerciseHistory().size(); i++) {
+				Double exercise = amountOfExPerDate
+						.get(simpleDateFormat.parse(user.getExerciseHistory().get(i).getDate()));
+				Double amountOfEx = exercise == null ? 0 : exercise;
+				amountOfExPerDate.put(simpleDateFormat.parse(user.getExerciseHistory().get(i).getDate()),
+						amountOfEx + (user.getExerciseHistory().get(i)).getCaloriesBurned());
 			} // end for loop
 
 			for (Entry<Date, Double> e : amountOfExPerDate.entrySet()) {
@@ -190,8 +204,9 @@ public class CEGraph extends JFrame implements ActionListener {
 		} // end if statement
 	}// end createTimeSeries
 
-	public static void main(String[] args) {
-		new CEGraph();
+	public static void main(String[] args) throws SQLException {
+		GraphingGUI back = new GraphingGUI(new Front());
+		new CEGraph(back, new Profile(false, null, 0, 0, 0));
 	}// end main
 
 	@Override

@@ -1,8 +1,10 @@
+import java.time.LocalDate;
+import java.util.Date;
 
 public class CalculateBMR {
 
 	
-	public static double calculateBMR(Date date, double weight, double height, Boolean gender, int bmrSetting, double FatLvl) 
+	public static double calculateBMR(Date date, double weight, double height, Boolean gender, int bmrSetting, double FatLvl)
     {
         double bmr = 0;
         int age = ( LocalDate.now().getYear() )- ( date.getYear() );

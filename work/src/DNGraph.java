@@ -1,4 +1,3 @@
-
 /**
  * Team Echo
  * EECS 3311
@@ -12,6 +11,9 @@ import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -38,16 +40,14 @@ public class DNGraph extends JFrame implements ActionListener {
 	private JLabel to;
 	private JTextField end;
 	private JLabel example;
-	// private JButton graphTen;
 	private JButton graphFive;
+	private JButton back;
 
-	public DNGraph() {
+	public DNGraph(GraphingGUI previous, Profile profile) {
 		// Set window title
 		super("Daily Nutrients Intake");
-		@SuppressWarnings("deprecation")
-		Profile user = new Profile(false, new Date(1974, 06, 10), 155.0, 50.0, 1);
-		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy");
-		DBQuery.getCurrentProfile();
+		Profile user = profile;
+		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("YYYY-MM-DD");
 		inputDate = new JLabel("Input Date");
 		start = new JTextField(10);
 		to = new JLabel("To");
@@ -55,6 +55,7 @@ public class DNGraph extends JFrame implements ActionListener {
 		example = new JLabel("dd/mm/yyyy");
 		// graphTen = new JButton("Graph Top 10");
 		graphFive = new JButton("Graph Top 5");
+		back = new JButton("Back");
 		JPanel panel = new JPanel();
 		panel.setLayout(new GridLayout(2, 0));
 		JPanel header = new JPanel();
@@ -72,19 +73,34 @@ public class DNGraph extends JFrame implements ActionListener {
 			}// end actionPerformed
 
 		});// end actionPerformed
+		back.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				setVisible(false);
+				previous.main.setVisible(true);
+			}
+		});
+
+		// listener for clicking X
+		addWindowListener(new WindowAdapter() {
+			public void windowClosing(WindowEvent e) {
+				setVisible(false);
+				previous.main.setVisible(true);
+			}
+		});
 		header.add(inputDate);
 		header.add(start);
 		header.add(to);
 		header.add(end);
 		header.add(example);
-		// header.add(graphTen);
+		header.add(back);
 		header.add(graphFive);
 
 		getContentPane().add(header, BorderLayout.NORTH);
 		getContentPane().add(panel, BorderLayout.WEST);
 		setExtendedState(JFrame.MAXIMIZED_BOTH);// make fullscreen
 		setVisible(true);
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 	}// end DNGraph
 
 	private void createChartTopFive(JPanel panel, Date startDate, Date endDate, Profile user) throws ParseException {
@@ -93,24 +109,23 @@ public class DNGraph extends JFrame implements ActionListener {
 		panel.repaint();
 		// data set
 		DefaultPieDataset result = new DefaultPieDataset();
+		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("YYYY-MM-DD");
 		int totalCalories = 0;
 		int totalFat = 0;
 		int totalProtein = 0;
 		int totalCarbs = 0;
 		int other = 0;
 
-		for (int i = 0; i < user.getHistory().size(); i++) {
-			if (user.getHistory().get(i).getLogType() == 2 && user.getHistory().get(i).getDate().after(startDate)
-					&& user.getHistory().get(i).getDate().before(endDate)
-					|| (user.getHistory().get(i).getLogType() == 2
-							&& user.getHistory().get(i).getDate().equals(startDate))
-					|| (user.getHistory().get(i).getLogType() == 2
-							&& user.getHistory().get(i).getDate().equals(endDate))) {
-				totalCalories += ((MealLog) user.getHistory().get(i)).calculateCalories();
-				totalFat += ((MealLog) user.getHistory().get(i)).calculateFat();
-				totalProtein += ((MealLog) user.getHistory().get(i)).calculateProtein();
-				totalCarbs += ((MealLog) user.getHistory().get(i)).calculateCarbs();
-				other += ((MealLog) user.getHistory().get(i)).calculateOthers();
+		for (int i = 0; i < user.getMealHistory().size(); i++) {
+			if (simpleDateFormat.parse(user.getMealHistory().get(i).getDate()).after(startDate)
+					&& simpleDateFormat.parse(user.getMealHistory().get(i).getDate()).before(endDate)
+					|| simpleDateFormat.parse(user.getMealHistory().get(i).getDate()).equals(startDate)
+					|| simpleDateFormat.parse(user.getMealHistory().get(i).getDate()).equals(endDate)) {
+				totalCalories += (user.getMealHistory().get(i)).calculateCalories();
+				totalFat += (user.getMealHistory().get(i)).calculateFat();
+				totalProtein += (user.getMealHistory().get(i)).calculateProtein();
+				totalCarbs += (user.getMealHistory().get(i)).calculateCarbs();
+				other += (user.getMealHistory().get(i)).calculateOthers();
 			} // end if statement
 		} // end for loop
 			// adds nutrients to the data set
@@ -135,8 +150,9 @@ public class DNGraph extends JFrame implements ActionListener {
 		} // end if statement
 	}// end createChartTopFive
 
-	public static void main(String[] args) {
-		new DNGraph();
+	public static void main(String[] args) throws SQLException {
+		GraphingGUI back = new GraphingGUI(new Front());
+		new DNGraph(back, new Profile(false, null, 0, 0, 0));
 	}// end main
 
 	@Override

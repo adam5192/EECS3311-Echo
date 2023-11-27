@@ -26,7 +26,6 @@ public class exerciseGUI extends JFrame {
     JButton back = new JButton("Back");
 
     public exerciseGUI(Front front) {
-        //double userBMR = Calculator.calculateBMR(user);
         setContentPane(MainPanel);
         setTitle("Exercise Log");
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
@@ -128,7 +127,8 @@ public class exerciseGUI extends JFrame {
                                     exerciseLogger.logExercise(exercise);
                                     timeField.setText("");
                                     validDateSelected = true;
-                                    // Process the date as needed
+                                    // add current exercise to profile log
+                                    front.profileGUIInstance.currProfile.addLog(exercise);
                                 } else {
                                     System.out.println("Invalid Date");
                                     JOptionPane.showMessageDialog(MainPanel, "Please enter valid date");
@@ -150,8 +150,9 @@ public class exerciseGUI extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 StringBuilder exerciseLogInfo = new StringBuilder();
                 int totalCaloriesBurned = 0;
+                double userBMR = front.profileGUIInstance.currProfile.getBMR();
                 for (Exercise exercise : exerciseLogger.getExercises()) {
-                    exercise.setCaloriesBurned(exercise.calculateCaloriesBurnt(1200));
+                    exercise.setCaloriesBurned(exercise.calculateCaloriesBurnt(userBMR));
 
                     totalCaloriesBurned += exercise.getCaloriesBurned();
 

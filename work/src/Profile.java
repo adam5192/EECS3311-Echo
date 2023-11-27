@@ -1,4 +1,3 @@
-package App;
 import java.util.*;
 import javax.naming.directory.InvalidAttributesException;
 
@@ -9,7 +8,7 @@ import javax.naming.directory.InvalidAttributesException;
 //Date is as normal.
 
 public class Profile {
-   private static int nextId = 0;
+   private static int nextId = 1;
 
    //Data
    private int userId;  //Keeps track of which profile is being opened
@@ -29,6 +28,10 @@ public class Profile {
    private int bmrSetting;   //0 = Miffin St Jeor, 1 = Revised Harris-Benedict, 2 = Katch McArdle
 
    //Basic constructors
+   public Profile() {
+      this(true, null, 0.0, 0.0, 0);
+   }
+
    public Profile(boolean sex, Date birth, double height, double weight, int bmrSetting) {
       //Data
       this.sex = sex;
@@ -67,6 +70,9 @@ public class Profile {
       this.name = name;
       this.sex = sex;
       this.birth = birth;
+      dataHistory = new LinkedList<Log>();
+      exerciseHistory = new LinkedList<Exercise>();
+      mealHistory = new LinkedList<Meal>();
       this.setHeight(height);
       this.setWeight(weight);
 
@@ -90,16 +96,16 @@ public class Profile {
    //Conversion rate: 1m = 3.281ft
    public void setHeight(double height) {
       try {
-      Date logDate = new Date();
-      //Adjustments to date values for the correct display
-      logDate.setYear(logDate.getYear()+1900);
-      
-      if (isMetric)
-         this.height = height;
-      else {
-         this.height = (height / 3.281) / 100.0; //Convert feet to centimeters
-      }
-      dataHistory.add(new Log(this.height, this.weight, String.format("%s/%s/%s", logDate.getYear(), logDate.getMonth() + 1, logDate.getDate()), this.userId));
+         Date logDate = new Date();
+         //Adjustments to date values for the correct display
+         logDate.setYear(logDate.getYear()+1900);
+
+         if (isMetric)
+            this.height = height;
+         else {
+            this.height = (height / 3.281) / 100.0; //Convert feet to centimeters
+         }
+         dataHistory.add(new Log(this.height, this.weight, String.format("%s/%s/%s", logDate.getYear(), logDate.getMonth() + 1, logDate.getDate()), this.userId));
       } catch (Exception e) {
          e.printStackTrace();
       }
@@ -108,15 +114,15 @@ public class Profile {
    //Conversion rate: 1kg = 2.204bs
    public void setWeight(double weight) {
       try {
-      Date logDate = new Date();
-      //Adjustments to date values for the correct display
-      logDate.setYear(logDate.getYear()+1900);
+         Date logDate = new Date();
+         //Adjustments to date values for the correct display
+         logDate.setYear(logDate.getYear()+1900);
 
-      if (isMetric)
-         this.weight = weight;
-      else
-         this.weight = weight / 2.204; // Convert pounds input to centimeters
-      dataHistory.add(new Log(this.height, this.weight, String.format("%s/%s/%s", logDate.getYear(), logDate.getMonth() + 1, logDate.getDate()), this.userId));
+         if (isMetric)
+            this.weight = weight;
+         else
+            this.weight = weight / 2.204; // Convert pounds input to centimeters
+         dataHistory.add(new Log(this.height, this.weight, String.format("%s/%s/%s", logDate.getYear(), logDate.getMonth() + 1, logDate.getDate()), this.userId));
       } catch (Exception e) {
          e.printStackTrace();
       }
@@ -228,12 +234,12 @@ public class Profile {
    //    //Creation
    //    Profile user0 = new Profile(); //Default
    //    Profile user1 = new Profile(false, new Date(1974, 06, 10), 155.0, 50.0);
-      
+
    //    //Getters
    //    if (user0.getSex() && user0.getBirth() == null && user0.getHeight() == 0.0 && user0.getWeight() == 0.0)
    //       System.out.println("Correct default values.");
-      
-   //    if (!user1.getSex() && user1.getBirth().equals(new Date(1974, 06, 10)) 
+
+   //    if (!user1.getSex() && user1.getBirth().equals(new Date(1974, 06, 10))
    //       && user1.getHeight() == (155.0 * 3.281 / 100) && user1.getWeight() == 50.0 * 2.2046)
    //       System.out.println("Correct data assignments.");
 
@@ -255,7 +261,7 @@ public class Profile {
    //    user1.setWeight(75.0);
    //    if (user1.getHeight() == 123.0) System.out.println("Correct setHeight().");
    //    if (user1.getWeight() == 75.0) System.out.println("Correct setWeight().");
-      
+
    //    user1.isMetric = false;
    //    if (user1.getHeight() == 123.0 * 3.281 / 100) System.out.println("Correct setHeight().");
    //    if (user1.getWeight() == 75.0 * 2.2046) System.out.println("Correct setWeight().");

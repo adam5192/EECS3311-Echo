@@ -34,7 +34,6 @@ class Meal {
         return ingredients.stream().mapToInt(Ingredient::getOthers).sum();
     }
 
-
     //Setters below
     public void setType(String mealType) {
         this.mealType = mealType;

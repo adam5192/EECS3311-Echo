@@ -1,5 +1,3 @@
-
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -21,7 +19,7 @@ public class MealGUI extends JFrame {
     private ArrayList<Ingredient> ingredientList = new ArrayList<>();
     JButton back = new JButton("Back");
 
-    public MealGUI(Front front) throws SQLException {
+    public MealGUI(Front front) {
         setContentPane(MainPanel);
         setTitle("Meal Log");
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
@@ -235,6 +233,9 @@ public class MealGUI extends JFrame {
                             meal.setDate(formattedDate);
                             validDateSelected = true;
 
+                            // add current meal to profile log
+                            front.profileGUIInstance.currProfile.addLog(meal);
+
                             // Remove all logged meal types except snacks
                             mealLogger.getMeals().stream()
                                     .filter(m -> m.getDate().equals(formattedDate))
@@ -339,7 +340,7 @@ public class MealGUI extends JFrame {
         return day >= 1 && day <= maxDay;
     }
 
-    public static void main(String[] args) throws SQLException {
+    public static void main(String[] args) {
         new MealGUI(new Front());
     }
 
