@@ -98,8 +98,8 @@ create table Meal (
  constraint MealLog_PK PRIMARY KEY (LogDate, UserID, MealType));
 
  create table Exercise (
-  LogDate VARCHAR(200) NOT NULL,
-  LogTime VARCHAR(200) NOT NULL,
+  LogDate VARCHAR(100) NOT NULL,
+  LogTime VARCHAR(50) NOT NULL,
   UserID INT(8) NOT NULL,
   CaloBurnt INT(8),
   ExerciseTime FLOAT(8, 2),
