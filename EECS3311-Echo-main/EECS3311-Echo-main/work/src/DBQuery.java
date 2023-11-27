@@ -103,7 +103,7 @@ public class DBQuery {
          PreparedStatement statement = query.prepareStatement("select count(*) as ProfileCount from UserProfile");
          int size = statement.executeQuery().getInt("ProfileCount");
          if (size <= 0) throw new SQLException();
-         statement = query.prepareStatement("select Username from UserProfile");
+         statement = query.prepareStatement("select UserId from UserProfile");
          ResultSet rs = statement.executeQuery();
          List<Integer> out = new ArrayList<Integer>();
          
@@ -257,6 +257,7 @@ public class DBQuery {
          statement.setDouble(13, user.getFatLvl());
          statement.setBoolean(14, user.isMetric);
          statement.setInt(15, user.getCalcMethod());
+         statement.executeUpdate();
 
          for(Log i : user.getDataHistory()) {storeLog(i);}
          for(Exercise i : user.getExerciseHistory()) {storeLog(i, user.getUserID());}
