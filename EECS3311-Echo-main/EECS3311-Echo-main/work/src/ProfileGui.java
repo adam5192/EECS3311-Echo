@@ -61,7 +61,7 @@ public class ProfileGui implements ActionListener, FocusListener {
 		// frame.setLayout(new FlowLayout(FlowLayout.CENTER, 100, 20));
 		back.setBounds(350, 20, 70, 30);
 
-		frame.setVisible(true);
+		frame.setVisible(false);
 
 		title.setBounds(230, 0, 100, 70);
 		title.setForeground(Color.BLACK);
@@ -227,6 +227,7 @@ public class ProfileGui implements ActionListener, FocusListener {
 			try {
 				currProfile = new Profile(gender, birth, height, weight, bmrSetting);
 				JOptionPane.showMessageDialog(frame, "Profile Created");
+				DBQuery.storeProfile(currProfile);
 			} catch (NullPointerException exception) {
 				JOptionPane.showMessageDialog(frame, "Please fill in all fields correctly");
 			}
