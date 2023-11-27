@@ -47,12 +47,12 @@ public class DNGraph extends JFrame implements ActionListener {
 		// Set window title
 		super("Daily Nutrients Intake");
 		Profile user = profile;
-		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy/MM/dd");
+		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("YYYY-MM-DD");
 		inputDate = new JLabel("Input Date");
 		start = new JTextField(10);
 		to = new JLabel("To");
 		end = new JTextField(10);
-		example = new JLabel("yyyy/mm/dd");
+		example = new JLabel("dd/mm/yyyy");
 		// graphTen = new JButton("Graph Top 10");
 		graphFive = new JButton("Graph Top 5");
 		back = new JButton("Back");
@@ -109,7 +109,7 @@ public class DNGraph extends JFrame implements ActionListener {
 		panel.repaint();
 		// data set
 		DefaultPieDataset result = new DefaultPieDataset();
-		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy/MM/dd");
+		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("YYYY-MM-DD");
 		int totalCalories = 0;
 		int totalFat = 0;
 		int totalProtein = 0;
