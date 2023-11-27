@@ -128,20 +128,19 @@ public class DBQuery {
       try (Connection query = DriverManager.getConnection("jdbc:mysql://localhost:3306", "root", "EECS3311_Project")) {
          PreparedStatement statement = query.prepareStatement(
             "select * from UserProfile " + 
-            "where UserID = ? order by LogDate",
+            "where UserID = ?",
             ResultSet.TYPE_SCROLL_INSENSITIVE, // Allow for first(), last(), etc. operations on ResultSet instance
             ResultSet.CONCUR_UPDATABLE
             );
          statement.setInt(1, userID);
          ResultSet rs = statement.executeQuery(); // A set of rows representing logs of the profile being recovered.
 
-         if (rs.wasNull()) return null; // Returns null if no Profile matching userID is found
+         //if (rs.wasNull()) return null; // Returns null if no Profile matching userID is found
 
          // Profile object generation
          rs.first();
          Profile userProfile = new Profile(rs.getString("Username"), rs.getBoolean("Sex"), new java.util.Date(rs.getDate("Birth").getTime()), 
                                  rs.getDouble("CurrHeight"), rs.getDouble("CurrWeight"), rs.getInt("BMRSetting"), userID);
-         userProfile.setBMR(rs.getInt("BMR"));
          userProfile.setUnit(rs.getBoolean("IsMetric"));
          userProfile.setFatLvl(rs.getInt("FatLvl"));
 
@@ -150,72 +149,61 @@ public class DBQuery {
          List<Exercise> exerciseHistory = new LinkedList<Exercise>();
          List<Meal> mealHistory = new LinkedList<Meal>();
          rs.beforeFirst();
-         while (rs.next()) {
-            PreparedStatement stmt;
-            ResultSet log;
-            switch (rs.getInt("LogType")) {
-               case 1:
-                  stmt = query.prepareStatement(
-                     "select * from DataLog " + 
-                     "where UserID = ? group by LogDate"
-                  );
-                  stmt.setInt(1, userID);
+         statement = query.prepareStatement(
+            "select * from DataLog " + 
+            "where UserID = ? group by LogDate"
+         );
+         statement.setInt(1, userID);
 
-                  log = stmt.executeQuery();
-                  while(log.next()) { // In case there is multiple logs with the same date of the same type from the same user
-                     java.util.Date date = new java.util.Date(log.getDate("LogDate").getTime());
-                     date.setYear(date.getYear() + 1970);
-                     dataHistory.add(new Log(log.getDouble("Height"), log.getDouble("Weight"),
-                                 log.getString("LogDate"), log.getInt("UserID")));
-                  }
-                  break;
-               case 2:// TODO - Test for errors
-                  stmt = query.prepareStatement(
-                     "select * from Meal " + 
-                     "where UserID = ? group by LogDate",
-                     ResultSet.TYPE_SCROLL_INSENSITIVE, // Allow for first(), last(), etc. operations on ResultSet instance
-                     ResultSet.CONCUR_UPDATABLE
-                  );
-                  stmt.setInt(1, userID);
-                  log = stmt.executeQuery();
-                  Meal meal = new Meal(); 
-                  String lastIn = null;
-                  for(int i = 0; log.next() && i < 100;) { // In case there is multiple logs with the same date of the same type
-                     if (lastIn.equals(null) || lastIn.equals(log.getString("IngredientName"))) {// If first iteration or current ingredient and previous is part of the same meal, add to list as normal
-                        Ingredient e = new Ingredient(log.getString("IngredientName"), log.getInt("CaloVal"), log.getInt("FatVal"),
-                                                log.getInt("ProtVal"), log.getInt("CarbVal"), log.getInt("Others"), log.getInt("Serving"));
-                        meal.addIngredient(e);
+         rs = statement.executeQuery();
+         while(rs.next()) { // In case there is multiple logs with the same date of the same type from the same user
+            java.util.Date date = new java.util.Date(rs.getDate("LogDate").getTime());
+            date.setYear(date.getYear() + 1970);
+            dataHistory.add(new Log(rs.getDouble("Height"), rs.getDouble("Weight"),
+                        rs.getString("LogDate"), rs.getInt("UserID")));
+         }
 
-                        lastIn = log.getString("IngredientName");
-                     }
-                     else { // Current ingredient is for a different meal
-                        log.previous(); // info required is from the previous index
-                        java.util.Date date = new java.util.Date(log.getDate("LogDate").getTime());
-                        date.setYear(date.getYear() + 1970);
+         statement = query.prepareStatement(
+            "select * from Meal " + 
+            "where UserID = ? group by LogDate",
+            ResultSet.TYPE_SCROLL_INSENSITIVE, // Allow for first(), last(), etc. operations on ResultSet instance
+            ResultSet.CONCUR_UPDATABLE
+         );
+         statement.setInt(1, userID);
+         rs = statement.executeQuery();
+         Meal meal = new Meal(); 
+         String lastIn = null;
+         for(int i = 0; rs.next() && i < 100;) { // In case there is multiple logs with the same date of the same type
+            if (lastIn.equals(null) || lastIn.equals(rs.getString("IngredientName"))) {// If first iteration or current ingredient and previous is part of the same meal, add to list as normal
+               Ingredient e = new Ingredient(rs.getString("IngredientName"), rs.getInt("CaloVal"), rs.getInt("FatVal"),
+                                       rs.getInt("ProtVal"), rs.getInt("CarbVal"), rs.getInt("Others"), rs.getInt("Serving"));
+               meal.addIngredient(e);
 
-                        meal.setType(log.getString("MealType"));
-                        mealHistory.add(meal);
+               lastIn = rs.getString("IngredientName");
+            }
+            else { // Current ingredient is for a different meal
+               rs.previous(); // info required is from the previous index
+               java.util.Date date = new java.util.Date(rs.getDate("LogDate").getTime());
+               date.setYear(date.getYear() + 1970);
 
-                        // Restart the process for the next meal
-                        meal = new Meal();
-                        lastIn = null;
-                        i = 0;
-                     }
-                  }
-                  break;
-               case 3:
-                  stmt = query.prepareStatement(
+               meal.setType(rs.getString("MealType"));
+               mealHistory.add(meal);
+
+               // Restart the process for the next meal
+               meal = new Meal();
+               lastIn = null;
+               i = 0;
+            }
+         }
+         statement = query.prepareStatement(
                      "select * from Exercise " + 
                      "where UserID = ? group by LogDate"
                   );
 
-                  log = stmt.executeQuery();
-                  while(log.next()) { // In case there is multiple logs with the same date of the same type from the same user
-                     exerciseHistory.add(new Exercise(log.getString("LogDate"), log.getString("LogTime"), 
-                                 log.getString("ExerciseType"), log.getInt("Duration"), log.getString("Intensity")));
-                  }
-                  break;
-            }
+         rs = statement.executeQuery();
+         while(rs.next()) { // In case there is multiple logs with the same date of the same type from the same user
+            exerciseHistory.add(new Exercise(rs.getString("LogDate"), rs.getString("LogTime"), 
+                        rs.getString("ExerciseType"), rs.getInt("Duration"), rs.getString("Intensity")));
          }
 
          userProfile.setDataHistory(dataHistory);
