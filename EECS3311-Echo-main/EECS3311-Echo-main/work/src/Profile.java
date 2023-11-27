@@ -1,4 +1,4 @@
-package App;
+package src;
 import java.util.*;
 import javax.naming.directory.InvalidAttributesException;
 
@@ -9,7 +9,7 @@ import javax.naming.directory.InvalidAttributesException;
 //Date is as normal.
 
 public class Profile {
-   private static int nextId = 0;
+   private static int nextId = 1;
 
    //Data
    private int userId;  //Keeps track of which profile is being opened
@@ -19,7 +19,9 @@ public class Profile {
    private double height; //In centimeters
    private double weight; //In kg
    private double fatLvl; //For Karth-McArdle's BMR Calc, range: 0-100
-   private List<Log> history;
+   private List<Log> dataHistory;
+   private List<Exercise> exerciseHistory;
+   private List<Meal> mealHistory;
    private double bmrVal;
 
    //Settings
@@ -27,6 +29,10 @@ public class Profile {
    private int bmrSetting;   //0 = Miffin St Jeor, 1 = Revised Harris-Benedict, 2 = Katch McArdle
 
    //Basic constructors
+   public Profile() {
+      this(true, null, 0.0, 0.0, 0);
+   }
+
    public Profile(boolean sex, Date birth, double height, double weight, int bmrSetting) {
       //Data
       this.sex = sex;
@@ -39,8 +45,11 @@ public class Profile {
       Date logDate = new Date();
       logDate.setYear(logDate.getYear()+1900);
       logDate.setMonth(logDate.getMonth());
-      history = new LinkedList<Log>();
-      history.add(new DataLog(this.height, this.weight, logDate, this.userId));
+      String date = String.format("%s/%s/%s", logDate.getYear(), logDate.getMonth() + 1, logDate.getDate());
+      dataHistory = new LinkedList<Log>();
+      exerciseHistory = new LinkedList<Exercise>();
+      mealHistory = new LinkedList<Meal>();
+      dataHistory.add(new Log(this.height, this.weight, date, this.userId));
 
       //Settings
       userId = nextId++;
@@ -94,7 +103,7 @@ public class Profile {
       else {
          this.height = (height / 3.281) / 100.0; //Convert feet to centimeters
       }
-      history.add(new DataLog(this.height, this.weight, logDate, this.userId));
+      dataHistory.add(new Log(this.height, this.weight, String.format("%s/%s/%s", logDate.getYear(), logDate.getMonth() + 1, logDate.getDate()), this.userId));
       } catch (Exception e) {
          e.printStackTrace();
       }
@@ -111,7 +120,7 @@ public class Profile {
          this.weight = weight;
       else
          this.weight = weight / 2.204; // Convert pounds input to centimeters
-      history.add(new DataLog(this.height, this.weight, logDate, this.userId));
+      dataHistory.add(new Log(this.height, this.weight, String.format("%s/%s/%s", logDate.getYear(), logDate.getMonth() + 1, logDate.getDate()), this.userId));
       } catch (Exception e) {
          e.printStackTrace();
       }
@@ -140,8 +149,16 @@ public class Profile {
    }
 
    // Sets the history log of a profile to a pre-generated history
-   public void setHistory(List<Log> history) {
-      this.history = history;
+   public void setDataHistory(List<Log> history) {
+      this.dataHistory = history;
+   }
+
+   public void setExerciseHistory(List<Exercise> history) {
+      this.exerciseHistory = history;
+   }
+
+   public void setMealHistory(List<Meal> history) {
+      this.mealHistory = history;
    }
 
    //Getters
@@ -159,51 +176,56 @@ public class Profile {
    //Not sure if calc method should just return the name or the value
    public int getCalcMethod() {return bmrSetting;}
 
-   public List<Log> getHistory() {return history;}
-   public String getHistoryString() {
-      String out = "";
-      for (int i = 0; i < history.size(); i++)
-         out += history.get(i).toString()+"\n";
-      return out;
-   }
+   public List<Log> getDataHistory() {return dataHistory;}
+   public List<Exercise> getExerciseHistory() {return exerciseHistory;}
+   public List<Meal> getMealHistory() {return mealHistory;}
+
 
    //Log creation and management
    /**
     * Overloaded method for adding a new log to the profile.
     */
    public void addLog(double height, double weight, Date logDate) {
-      history.add(new DataLog(height, weight, logDate, this.userId));
+      dataHistory.add(new Log(height, weight, String.format("%s/%s/%s", logDate.getYear()+1900, logDate.getMonth() + 1, logDate.getDate()), this.userId));
    }
-   public void addLog(String mealName, Ingredient[] ingredients, String mealType, Date logDate) {
-      MealLog meal = new MealLog(mealName, mealType, logDate, this.userId);
+   public void addLog(Log data) {dataHistory.add(data);}
+
+   public void addLog(Ingredient[] ingredients, String mealType, String logDate) {
+      Meal meal = new Meal();
+      meal.setType(mealType);
+      meal.setDate(logDate);
       for (Ingredient i : ingredients) {
          if (i != null)
             meal.addIngredient(i);
       }
-      history.add(meal);
+      mealHistory.add(meal);
    }
-   public void addLog(String exerciseName, int caloBurnt, double time, Date logDate) {
-      history.add(new ExerciseLog(exerciseName, caloBurnt, time, logDate, this.userId));
-   }
+   public void addLog(Meal meal) {mealHistory.add(meal);}
 
-   /**
+   public void addLog(String date, String time, String intensity, String type, int duration, Date logDate) {
+      exerciseHistory.add(new Exercise(date, time, type, duration, intensity));
+   }
+   public void addLog(Exercise exercise) {exerciseHistory.add(exercise);}
+
+   /*
     * Remove the first log that matched (based on specified date and type) from history and returns it. Returns null if none matches.
     * @param type 0 for any log, 1 for DataLog, 2 for MealLog, 3 for ExerciseLog
     */
-   public Log removeLog(Date logDate, int type) {
-      //TODO: Implement better search algorithm (Quicksearch)
-      Log removedLog = null;
+   // public Log removeLog(Date logDate, int type) {
+   //    //TODO: Implement better search algorithm (Quicksearch)
+   //    Log removedLog = null;
 
-      //type: 0 = all, 1 = data, 2 = meals, 3 = exercise, default: do nothing
-      for (int i = 0; i < history.size(); i++) {
-         if (history.get(i).getLogType() == type) {
-            removedLog = history.remove(i);
-            break;
-         }
-      }
+   //    //type: 1 = data, 2 = meals, 3 = exercise, default: do nothing
 
-      return removedLog;
-   }
+   //    for (int i = 0; i < history.size(); i++) {
+   //       if (history.get(i).getLogType() == type) {
+   //          removedLog = history.remove(i);
+   //          break;
+   //       }
+   //    }
+
+   //    return removedLog;
+   // }
 
    // //Temp test method
    // public static void main(String args[]) {
