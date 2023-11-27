@@ -83,8 +83,7 @@ create table DataLog (
  UserID INT(8) NOT NULL,
  LogWeight FLOAT(9, 2),
  LogHeight FLOAT(9, 2),
- constraint Log_PK PRIMARY KEY (LogDate, UserID),
- constraint User_FK FOREIGN KEY (UserID) references UserProfile(UserID));
+ constraint Log_PK PRIMARY KEY (LogDate, UserID));
 
 create table Meal (
  LogDate VARCHAR(200) NOT NULL,
@@ -96,8 +95,7 @@ create table Meal (
  ProtVal INT(10),
  OthersVal INT(10),
  Serving INT(3), -- Number of servings of the ingredient in the meal
- constraint MealLog_PK PRIMARY KEY (LogDate, UserID, MealType),
- constraint User_FK FOREIGN KEY (UserID) references UserProfile(UserID));
+ constraint MealLog_PK PRIMARY KEY (LogDate, UserID, MealType));
 
  create table Exercise (
   LogDate VARCHAR(200) NOT NULL,
