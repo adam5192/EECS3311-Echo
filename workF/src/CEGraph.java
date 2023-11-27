@@ -54,7 +54,7 @@ public class CEGraph extends JFrame implements ActionListener {
 	public CEGraph(GraphingGUI previous, Profile profile) {
 		// Set window title
 		super("Daily Calory Intake & Daily Exercise");
-		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("YYYY-MM-DD");
+		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy/MM/dd");
 		Profile user = profile;
 		// Set charts region
 		JPanel panel = new JPanel();
@@ -63,7 +63,7 @@ public class CEGraph extends JFrame implements ActionListener {
 		start = new JTextField(10);
 		to = new JLabel("To");
 		end = new JTextField(10);
-		example = new JLabel("dd/mm/yyyy");
+		example = new JLabel("yyyy/mm/dd");
 		graph = new JButton("Graph");
 		back = new JButton("Back");
 		back.addActionListener(new ActionListener() {
@@ -117,7 +117,7 @@ public class CEGraph extends JFrame implements ActionListener {
 		panel.repaint();
 		TimeSeries caloryIntake = new TimeSeries("Daily Calory Intake");
 		TimeSeries amountOfExercise = new TimeSeries("Daily Amount of Exercise");
-		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("YYYY-MM-DD");
+		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy/MM/dd");
 		// turns date inputed from the user into a format
 		// that allows comparison of dates
 		// will receive the user BMR from profile
@@ -181,7 +181,7 @@ public class CEGraph extends JFrame implements ActionListener {
 			DateAxis domainAxis = new DateAxis("Days");
 			domainAxis.setAutoTickUnitSelection(false);
 			plot.setDomainAxis(domainAxis);
-			domainAxis.setDateFormatOverride(new SimpleDateFormat("dd/MM/yy"));
+			domainAxis.setDateFormatOverride(new SimpleDateFormat("yy/MM/dd"));
 			plot.setRangeAxis(new NumberAxis("Calories(cal)"));
 
 			plot.setDataset(1, dataset2);
