@@ -126,7 +126,7 @@ public class DBQuery {
       try (Connection query = DriverManager.getConnection("jdbc:mysql://localhost:3306", "root", "EECS3311_Project")) {
          PreparedStatement statement = query.prepareStatement(
             "select * from UserProfile inner join ProfileLog " + 
-            "on UserProfile.UserID = ProfileLog.UserID" +
+            "on UserProfile.UserID = ProfileLog.UserID " +
             "where UserID = ? order by ProfileLog.LogDate",
             ResultSet.TYPE_SCROLL_INSENSITIVE, // Allow for first(), last(), etc. operations on ResultSet instance
             ResultSet.CONCUR_UPDATABLE
@@ -235,8 +235,8 @@ public class DBQuery {
          // Storing profile-specific values
          PreparedStatement statement = query.prepareStatement(
             "insert into UserProfile (UserID, Sex, Birth, CurrHeight, CurrWeight, FatLvl, IsMetric, BMRSetting)" +
-            "values (?, ?, ?, ?, ?, ?, ?, ?)" +
-            "on duplicate key update" +
+            "values (?, ?, ?, ?, ?, ?, ?, ?) " +
+            "on duplicate key update " +
             "Sex = ?, Birth = ?, CurrHeight = ?, CurrWeight = ?, FatLvl = ?, IsMetric = ?, BMRSetting = ?"
             );
          // In values
@@ -257,6 +257,7 @@ public class DBQuery {
          statement.setDouble(13, user.getFatLvl());
          statement.setBoolean(14, user.isMetric);
          statement.setInt(15, user.getCalcMethod());
+
          statement.executeUpdate();
 
          for(Log i : user.getDataHistory()) {storeLog(i);}
@@ -273,7 +274,7 @@ public class DBQuery {
          // Updating DataLog
          PreparedStatement statement = query.prepareStatement(
             "insert into DataLog (LogDate, UserID, LogHeight, LogWeight)" +
-            "values (?, ?, ?, ?)" +
+            "values (?, ?, ?, ?) " +
             "on duplicate key update LogWeight = ?, LogHeight = ?"
          );
          statement.setString(1, log.getDate());
@@ -290,9 +291,9 @@ public class DBQuery {
       try (Connection query = DriverManager.getConnection("jdbc:mysql://localhost:3306", "root", "EECS3311_Project")) {
          // Updating MealLog
          PreparedStatement statement = query.prepareStatement(
-            "insert into MealLog (LogDate, UserID, MealType, CaloVal, CarbVal, FatVal, ProtVal, OthersVal)" +
-            "values (?, ?, ?, ?, ?, ?, ?, ?, ?)" +
-            "on duplicate key update" +
+            "insert into MealLog (LogDate, UserID, MealType, CaloVal, CarbVal, FatVal, ProtVal, OthersVal) " +
+            "values (?, ?, ?, ?, ?, ?, ?, ?, ?) " +
+            "on duplicate key update " +
             "CaloVal = ?, CarbVal = ?, FatVal = ?, ProtVal = ?, OthersVal = ?, Serving =?"
          );
          // Common attributes among ingredients of a meal
@@ -323,8 +324,8 @@ public class DBQuery {
       try (Connection query = DriverManager.getConnection("jdbc:mysql://localhost:3306", "root", "EECS3311_Project")) {
          // Updating ExerciseLog
          PreparedStatement statement = query.prepareStatement(
-            "insert into DataLog (LogDate, LogTime, UserID, CaloBurnt, ExerciseTime, Intensity, ExerciseType)" +
-            "values (?, ?, ?, ?, ?, ?, ?)" +
+            "insert into DataLog (LogDate, LogTime, UserID, CaloBurnt, ExerciseTime, Intensity, ExerciseType) " +
+            "values (?, ?, ?, ?, ?, ?, ?) " +
             "on duplicate key update CaloBurnt = ?, ExerciseTime = ?, Intensity = ?, ExerciseType = ?"
          );
          statement.setString(1, log.getDate());
