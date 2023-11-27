@@ -54,7 +54,7 @@ public class DNGraph extends JFrame implements ActionListener {
 		start = new JTextField(10);
 		to = new JLabel("To");
 		end = new JTextField(10);
-		example = new JLabel("dd/mm/yyyy");
+		example = new JLabel(""YYYY-MM-DD"");
 		// graphTen = new JButton("Graph Top 10");
 		graphFive = new JButton("Graph Top 5");
 		back = new JButton("Back");
