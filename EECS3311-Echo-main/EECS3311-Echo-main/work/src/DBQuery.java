@@ -127,13 +127,12 @@ public class DBQuery {
    public static Profile getProfile(int userID) {
       try (Connection query = DriverManager.getConnection("jdbc:mysql://localhost:3306", "root", "EECS3311_Project")) {
          PreparedStatement statement = query.prepareStatement(
-            "select * from UserProfile inner join ProfileLog " + 
-            "on UserProfile.UserID = ProfileLog.UserID " +
-            "where UserID = ? order by ProfileLog.LogDate",
+            "select * from UserProfile " + 
+            "where UserID = ? order by LogDate",
             ResultSet.TYPE_SCROLL_INSENSITIVE, // Allow for first(), last(), etc. operations on ResultSet instance
             ResultSet.CONCUR_UPDATABLE
             );
-         statement.setInt(2, userID);
+         statement.setInt(1, userID);
          ResultSet rs = statement.executeQuery(); // A set of rows representing logs of the profile being recovered.
 
          if (rs.wasNull()) return null; // Returns null if no Profile matching userID is found
