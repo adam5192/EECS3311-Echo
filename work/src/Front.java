@@ -21,8 +21,6 @@ public class Front implements ActionListener {
     JButton Graphing = new JButton("Graphing");
     JButton Profile = new JButton("Profile");
 
-    ArrayList<Integer> list = new ArrayList<Integer>();
-    JPanel panel = new JPanel();
 
     MealGUI mealGUIInstance;
     exerciseGUI exGUIInstance;
@@ -73,14 +71,9 @@ public class Front implements ActionListener {
 
         // Create instances of each gui component, they will default to invisible, and
         // then become visibile when corresponding button is pressed
+        profileGUIInstance = new ProfileGui(this);
         mealGUIInstance = new MealGUI(this);
         exGUIInstance = new exerciseGUI(this);
-        graphingGUIInstance = new GraphingGUI(this);
-
-        // TODO: implement above logic for ProfileGUI
-        profileGUIInstance = new ProfileGui(this);
-
-        System.out.println(DBQuery.getUsers());
     }
 
     // ActionListener method for button clicks.
@@ -99,20 +92,30 @@ public class Front implements ActionListener {
 
         } else if (e.getSource() == Exercise) {
             // Open a new window for Exercise log GUI.
-            main.setVisible(false);
-            exGUIInstance.setVisible(true);
-
+            if(profileGUIInstance.currProfile != null) {
+                main.setVisible(false);
+                exGUIInstance.setVisible(true);
+            } else {
+                JOptionPane.showMessageDialog(main, "Must create/select profile first");
+            }
         } else if (e.getSource() == Graphing) {
             // Open a new window for Graphing GUI.
-            main.setVisible(false);
-            graphingGUIInstance.setVisible(true);
-
+            if(profileGUIInstance.currProfile != null) {
+                main.setVisible(false);
+                graphingGUIInstance = new GraphingGUI(this);
+                graphingGUIInstance.setVisible(true);
+            } else {
+                JOptionPane.showMessageDialog(main, "Must create/select profile first");
+            }
         } else if (e.getSource() == Profile) {
             //TODO: implement same logic from Meal and Exercise for profile
 
             if (DBQuery.getUsers() != null) {
+                ArrayList<Integer> list = new ArrayList<Integer>();
                 list.addAll(DBQuery.getUsers());
+                System.out.println(list);
                 JComboBox<Integer> users = new JComboBox<>(list.toArray(new Integer[0]));
+                JPanel panel = new JPanel();
                 panel.add(users);
                 JOptionPane.showConfirmDialog(main, panel, "Select a Number", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
                 Integer selectedNumber = (Integer) ((JComboBox<?>) panel.getComponent(0)).getSelectedItem();
