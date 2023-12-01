@@ -49,9 +49,10 @@ public class ProfileGui implements ActionListener, FocusListener {
 	Date birth;
 	String Birth;
 
-
+Front temp;
 
 	public ProfileGui(Front front) {
+
 
 		this.front = front;
 
@@ -128,6 +129,7 @@ public class ProfileGui implements ActionListener, FocusListener {
 	public ProfileGui(Front front, int user) {
 
 		this.front = front;
+		this.temp=front;
 
 		back.setBounds(350, 20, 70, 30);
 
@@ -140,8 +142,20 @@ public class ProfileGui implements ActionListener, FocusListener {
 		JLabel HeightTitle = new JLabel("Height:  "+ currProfile.getHeight() +"m");
 		JLabel WeightTitle = new JLabel("Weight:  "+ currProfile.getWeight()+"kg");
 		JLabel BodyFatTitle = new JLabel("BodyFat%:  " + currProfile.getFatLvl());
-		JLabel GenderTitle = new JLabel("Gender:  " + currProfile.getSex());
-		JLabel dateTitle = new JLabel("Birth day:  " + currProfile.getBirth());
+		System.out.println(currProfile.getFatLvl());
+
+		if(currProfile.getSex()==true)
+		{
+			JLabel GenderTitle = new JLabel("Gender: Male");
+			GenderTitle.setBounds(120, 230, 100, 30);
+			frame.add(GenderTitle);
+		}else{
+			JLabel GenderTitle = new JLabel("Gender: Female");
+			GenderTitle.setBounds(120, 230, 100, 30);
+			frame.add(GenderTitle);
+		}
+
+		JLabel dateTitle = new JLabel("Birth day:  " + currProfile.getBirth().getYear()+"/"+ currProfile.getBirth().getMonth()+"/"+ currProfile.getBirth().getDate());
 		JLabel BMRTitle = new JLabel("BMR:  " + currProfile.getBMR());
 
 
@@ -149,8 +163,7 @@ public class ProfileGui implements ActionListener, FocusListener {
 		HeightTitle.setBounds(120, 110, 100, 30);
 		WeightTitle.setBounds(120, 150, 100, 30);
 		BodyFatTitle.setBounds(120, 190, 100, 30);
-		GenderTitle.setBounds(120, 230, 100, 30);
-		dateTitle.setBounds(120, 270, 100, 30);
+		dateTitle.setBounds(120, 270, 200, 30);
 		BMRTitle.setBounds(120, 310, 100, 30);
 
 
@@ -160,10 +173,10 @@ public class ProfileGui implements ActionListener, FocusListener {
 		frame.add(HeightTitle);
 		frame.add(WeightTitle);
 		frame.add(BodyFatTitle);
-		frame.add(GenderTitle);
 		frame.add(dateTitle);
 		frame.add(BMRTitle);
 		frame.add(back);
+		frame.add(NewProfile);
 
 		back.addActionListener(this);
 		frame.setLayout(null);
@@ -233,6 +246,13 @@ public class ProfileGui implements ActionListener, FocusListener {
 			} catch (NullPointerException exception) {
 				JOptionPane.showMessageDialog(frame, "Please fill in all fields correctly");
 			}
+			//front.list.add(currProfile.getUserID());
+		}
+		else if(e.getSource()==NewProfile)
+		{
+			frame.setVisible(false);
+			ProfileGui profileGUIInstance = new ProfileGui(temp);
+			profileGUIInstance.frame.setVisible(true);
 		}
 
 	}
