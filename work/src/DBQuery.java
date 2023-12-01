@@ -93,22 +93,21 @@ public class DBQuery {
       }
    }
 
-   /**
+     /**
     * Find all the existing profile in the database and output the name of the users
     * @return an array of integer representing the users in the current database. If no profile exists, return null.
     */
    public static List<Integer> getUsers() {
-      try (Connection query = DriverManager.getConnection("jdbc:mysql://localhost:3306/Project_Database", "root", "EECS3311_Project")) {
+      try (Connection query = DriverManager.getConnection("jdbc:mysql://localhost:3306/Project_Database", "root", "omer")) {
          PreparedStatement statement = query.prepareStatement("select count(*) as ProfileCount from UserProfile");
          ResultSet rs = statement.executeQuery();
          rs.next();
-         int size = rs.getInt("ProfileCount");
-         if (size <= 0) throw new SQLException();
+         if (rs.getInt("ProfileCount") < 0) throw new SQLException();
          statement = query.prepareStatement("select UserId from UserProfile");
          rs = statement.executeQuery();
          List<Integer> out = new ArrayList<Integer>();
 
-         for (int i = 0; rs.next() && i < size; i++) {
+         while (rs.next()) {
             out.add(rs.getInt("UserID"));
          }
 
