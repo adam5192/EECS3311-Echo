@@ -119,6 +119,14 @@ public class ProfileGui implements ActionListener, FocusListener {
 		Height.addFocusListener(this);
 		BodyFat.addFocusListener(this);
 		date.addFocusListener(this);
+		Male.addActionListener(this);
+		Female.addActionListener(this);
+		setting1.addActionListener(this);
+		setting2.addActionListener(this);
+		setting3.addActionListener(this);
+		Metric.addActionListener(this);
+		Imperial.addActionListener(this);
+
 
 		back.addActionListener(this);
 		Create.addActionListener(this);
