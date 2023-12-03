@@ -93,19 +93,19 @@ public class DBQuery {
       }
    }
 
-     /**
+   /**
     * Find all the existing profile in the database and output the name of the users
     * @return an array of integer representing the users in the current database. If no profile exists, return null.
     */
-   public static List<Integer> getUsers() {
-      try (Connection query = DriverManager.getConnection("jdbc:mysql://localhost:3306/Project_Database", "root", "omer")) {
+   public static ArrayList<Integer> getUsers() {
+      try (Connection query = DriverManager.getConnection("jdbc:mysql://localhost:3306/Project_Database", "root", "EECS3311_Project")) {
          PreparedStatement statement = query.prepareStatement("select count(*) as ProfileCount from UserProfile");
          ResultSet rs = statement.executeQuery();
          rs.next();
          if (rs.getInt("ProfileCount") < 0) throw new SQLException();
          statement = query.prepareStatement("select UserId from UserProfile");
          rs = statement.executeQuery();
-         List<Integer> out = new ArrayList<Integer>();
+         ArrayList<Integer> out = new ArrayList<Integer>();
 
          while (rs.next()) {
             out.add(rs.getInt("UserID"));
@@ -160,7 +160,7 @@ public class DBQuery {
          }
 
          statement = query.prepareStatement(
-                 "select * from Meal " +
+                 "select * from MealLog " +
                          "where UserID = ? group by LogDate, MealType",
                  ResultSet.TYPE_SCROLL_INSENSITIVE, // Allow for first(), last(), etc. operations on ResultSet instance
                  ResultSet.CONCUR_UPDATABLE
@@ -278,9 +278,9 @@ public class DBQuery {
          // Updating MealLog
          PreparedStatement statement = query.prepareStatement(
                  "insert into MealLog (LogDate, UserID, MealType, CaloVal, CarbVal, FatVal, ProtVal, OthersVal) " +
-                         "values (?, ?, ?, ?, ?, ?, ?, ?, ?) " +
+                         "values (?, ?, ?, ?, ?, ?, ?, ?) " +
                          "on duplicate key update " +
-                         "CaloVal = ?, CarbVal = ?, FatVal = ?, ProtVal = ?, OthersVal = ?, Serving =?"
+                         "CaloVal = ?, CarbVal = ?, FatVal = ?, ProtVal = ?, OthersVal = ?"
          );
          // Common attributes among ingredients of a meal
          statement.setString(1, log.getDate());
@@ -293,11 +293,11 @@ public class DBQuery {
          statement.setInt(7, log.calculateProtein());
          statement.setInt(8, log.calculateOthers());
          // If already existed, update
-         statement.setInt(10, log.calculateCalories());
-         statement.setInt(11, log.calculateCarbs());
-         statement.setInt(12, log.calculateFat());
-         statement.setInt(13, log.calculateProtein());
-         statement.setInt(14, log.calculateOthers());
+         statement.setInt(9, log.calculateCalories());
+         statement.setInt(10, log.calculateCarbs());
+         statement.setInt(11, log.calculateFat());
+         statement.setInt(12, log.calculateProtein());
+         statement.setInt(13, log.calculateOthers());
 
          statement.executeUpdate();
       } catch (SQLException e) {e.printStackTrace();}
@@ -310,7 +310,7 @@ public class DBQuery {
       try (Connection query = DriverManager.getConnection("jdbc:mysql://localhost:3306/Project_Database", "root", "EECS3311_Project")) {
          // Updating ExerciseLog
          PreparedStatement statement = query.prepareStatement(
-                 "insert into DataLog (LogDate, LogTime, UserID, CaloBurnt, ExerciseTime, Intensity, ExerciseType) " +
+                 "insert into ExerciseLog (LogDate, LogTime, UserID, CaloBurnt, ExerciseTime, Intensity, ExerciseType) " +
                          "values (?, ?, ?, ?, ?, ?, ?) " +
                          "on duplicate key update CaloBurnt = ?, ExerciseTime = ?, Intensity = ?, ExerciseType = ?"
          );
@@ -330,4 +330,12 @@ public class DBQuery {
       } catch (SQLException e) {e.printStackTrace();}
    }
 
+
+   /**
+    *
+    */
+   //Stub method, implement if needed
+   public static void editProfile(Profile user) {
+
+   }
 }
