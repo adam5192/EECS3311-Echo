@@ -13,6 +13,7 @@ public class ProfileGui implements ActionListener, FocusListener {
 
 	MyFrame frame = new MyFrame();
 	JButton Create = new JButton("Create profile");
+	JButton New_profile = new JButton("New profile");
 	JButton back = new JButton("Back");
 	JTextField Height = new JTextField("Height");
 	JTextField Weight = new JTextField("Weight");
@@ -132,6 +133,7 @@ public class ProfileGui implements ActionListener, FocusListener {
 		this.temp=front;
 
 		back.setBounds(350, 20, 70, 30);
+		New_profile.setBounds(220, 370, 120, 30);
 
 		title.setBounds(230, 20, 100, 70);
 		title.setForeground(Color.BLACK);
@@ -176,8 +178,10 @@ public class ProfileGui implements ActionListener, FocusListener {
 		frame.add(dateTitle);
 		frame.add(BMRTitle);
 		frame.add(back);
+		frame.add(New_profile);
 
 		back.addActionListener(this);
+		New_profile.addActionListener(this);
 		frame.setLayout(null);
 		frame.setLocationRelativeTo(null);
 	}
@@ -246,6 +250,12 @@ public class ProfileGui implements ActionListener, FocusListener {
 				JOptionPane.showMessageDialog(frame, "Please fill in all fields correctly");
 			}
 			//front.list.add(currProfile.getUserID());
+		}
+		else if(e.getSource()==New_profile)
+		{
+			frame.setVisible(false);
+			ProfileGui profileGUIInstance = new ProfileGui(front);
+			profileGUIInstance.frame.setVisible(true);
 		}
 
 	}
