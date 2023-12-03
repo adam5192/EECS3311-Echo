@@ -49,7 +49,7 @@ public class ProfileGui implements ActionListener, FocusListener {
 	Date birth;
 	String Birth;
 
-Front temp;
+	Front temp;
 
 	public ProfileGui(Front front) {
 
@@ -144,7 +144,7 @@ Front temp;
 		JLabel BodyFatTitle = new JLabel("BodyFat%:  " + currProfile.getFatLvl());
 		System.out.println(currProfile.getFatLvl());
 
-		if(currProfile.getSex()==true)
+		if(currProfile.getSex())
 		{
 			JLabel GenderTitle = new JLabel("Gender: Male");
 			GenderTitle.setBounds(120, 230, 100, 30);
@@ -176,7 +176,6 @@ Front temp;
 		frame.add(dateTitle);
 		frame.add(BMRTitle);
 		frame.add(back);
-		frame.add(NewProfile);
 
 		back.addActionListener(this);
 		frame.setLayout(null);
@@ -231,7 +230,7 @@ Front temp;
 			}
 			Birth = date.getText();
 			try {
-				birth = new Date(Integer.parseInt(Birth.substring(0,4)),Integer.parseInt(Birth.substring(5,7))-1,Integer.parseInt(Birth.substring(8,10)));
+				birth = new Date(Integer.parseInt(Birth.substring(0,4)),Integer.parseInt(Birth.substring(5,7)),Integer.parseInt(Birth.substring(8,10)));
 			} catch (StringIndexOutOfBoundsException ex) {
 				JOptionPane.showMessageDialog(frame, "Incorrect date format");
 			} catch (NumberFormatException exc) {
@@ -247,12 +246,6 @@ Front temp;
 				JOptionPane.showMessageDialog(frame, "Please fill in all fields correctly");
 			}
 			//front.list.add(currProfile.getUserID());
-		}
-		else if(e.getSource()==NewProfile)
-		{
-			frame.setVisible(false);
-			ProfileGui profileGUIInstance = new ProfileGui(temp);
-			profileGUIInstance.frame.setVisible(true);
 		}
 
 	}
@@ -284,5 +277,4 @@ Front temp;
 				textField.setText("yyyy/mm/dd");
 			}
 		}
-	}
-}
+	}}
