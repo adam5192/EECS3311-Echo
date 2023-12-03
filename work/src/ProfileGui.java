@@ -157,7 +157,7 @@ public class ProfileGui implements ActionListener, FocusListener {
 			frame.add(GenderTitle);
 		}
 
-		JLabel dateTitle = new JLabel("Birth day:  " + currProfile.getBirth().getYear()+"/"+ currProfile.getBirth().getMonth()+"/"+ currProfile.getBirth().getDate());
+		JLabel dateTitle = new JLabel("Birth day:  " + currProfile.getBirth().getYear()+"/"+ (currProfile.getBirth().getMonth()+1)+"/"+ currProfile.getBirth().getDate());
 		JLabel BMRTitle = new JLabel("BMR:  " + currProfile.getBMR());
 
 
@@ -234,7 +234,7 @@ public class ProfileGui implements ActionListener, FocusListener {
 			}
 			Birth = date.getText();
 			try {
-				birth = new Date(Integer.parseInt(Birth.substring(0,4)),Integer.parseInt(Birth.substring(5,7)),Integer.parseInt(Birth.substring(8,10)));
+				birth = new Date(Integer.parseInt(Birth.substring(0,4)),Integer.parseInt(Birth.substring(5,7))-1,Integer.parseInt(Birth.substring(8,10)));
 			} catch (StringIndexOutOfBoundsException ex) {
 				JOptionPane.showMessageDialog(frame, "Incorrect date format");
 			} catch (NumberFormatException exc) {
@@ -243,6 +243,7 @@ public class ProfileGui implements ActionListener, FocusListener {
 
 			try {
 				currProfile = new Profile(gender, birth, height, weight, bmrSetting);
+				currProfile.setFatLvl(fatlevel);
 				JOptionPane.showMessageDialog(frame, "Profile Created");
 				DBQuery.storeProfile(currProfile);
 				System.out.println(DBQuery.getUsers());
