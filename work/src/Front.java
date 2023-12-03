@@ -109,12 +109,11 @@ public class Front implements ActionListener {
             }
         } else if (e.getSource() == Profile) {
             //TODO: implement same logic from Meal and Exercise for profile
-
-            if (DBQuery.getUsers() != null) {
-                ArrayList<Integer> list = new ArrayList<Integer>();
-                list.addAll(DBQuery.getUsers());
+            ArrayList<Integer> list = DBQuery.getUsers();
+            if (list != null && !list.isEmpty()) {
+                int i = list.size();
                 System.out.println(list);
-                JComboBox<Integer> users = new JComboBox<>(list.toArray(new Integer[0]));
+                JComboBox<Integer> users = new JComboBox<>(list.toArray(new Integer[i]));
                 JPanel panel = new JPanel();
                 panel.add(users);
                 JOptionPane.showConfirmDialog(main, panel, "Select a Number", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
