@@ -2,6 +2,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.sql.SQLException;
+import java.text.ParseException;
 import java.util.*;
 import java.util.List;
 
@@ -15,7 +16,7 @@ public class MealGUI extends JFrame {
     private JButton viewMealLogButton;
     private JComboBox ingredientComboBox;
     private JLabel servingLabel;
-    private MealLogger mealLogger = new MealLogger();
+    MealLogger mealLogger = new MealLogger();
     private ArrayList<Ingredient> ingredientList = new ArrayList<>();
     JButton back = new JButton("Back");
 
@@ -65,42 +66,16 @@ public class MealGUI extends JFrame {
             }
         });
 
-        // Year JComboBox
+        // Year, month, day JComboBox
         JComboBox<Integer> yearComboBox = new JComboBox<>();
-        for (int year = 2020; year <= 2025; year++) {
-            yearComboBox.addItem(year);
-        }
-
-        //Array of ingredients
+        JComboBox<String> monthComboBox = new JComboBox<>();
+        JComboBox<Integer> dayComboBox = new JComboBox<>();
         String[] ops = DBQuery.getIngredientNames();
-        
         // Add ingredients to combo box
         for (int i = 0; i < ops.length; i++) {
             ingredientComboBox.addItem(ops[i]);
         }
-
-        // Month JComboBox setup
-        String[] months = {
-                "January",
-                "February",
-                "March",
-                "April",
-                "May",
-                "June",
-                "July",
-                "August",
-                "September",
-                "October",
-                "November",
-                "December"
-        };
-        JComboBox<String> monthComboBox = new JComboBox<>(months);
-
-        // Day combo box setup
-        JComboBox<Integer> dayComboBox = new JComboBox<>();
-        for (int day = 1; day <= 31; day++) {
-            dayComboBox.addItem(day);
-        }
+        DateGUI.setupComboDateBoxes(yearComboBox, dayComboBox, monthComboBox);
 
         // Key listener for ingredientField to implement suggestions as user types ingredient
         ingredientField.addKeyListener(new KeyAdapter() {
@@ -176,85 +151,13 @@ public class MealGUI extends JFrame {
                 Meal meal = new Meal();
                 // List of meal types
                 List<String> optionsList = new ArrayList<>(Arrays.asList("Breakfast", "Lunch", "Dinner", "Snacks"));
-
-                boolean validDateSelected = false;
-                while (!validDateSelected) {
-                    // Add elements to panel for date selection
-                    JPanel panel = new JPanel();
-                    panel.add(new JLabel("Year:"));
-                    panel.add(yearComboBox);
-                    panel.add(Box.createHorizontalStrut(15)); // Spacer
-                    panel.add(new JLabel("Month:"));
-                    panel.add(monthComboBox);
-                    panel.add(Box.createHorizontalStrut(15)); // Spacer
-                    panel.add(new JLabel("Day:"));
-                    panel.add(dayComboBox);
-                    // Show the dialog for date selection
-
-                    int result = JOptionPane.showOptionDialog(
-                            null,
-                            panel,
-                            "Enter the Date",
-                            JOptionPane.DEFAULT_OPTION,
-                            JOptionPane.PLAIN_MESSAGE,
-                            null,
-                            new Object[]{
-                                    "OK"
-                            }, // Array of options. Only "OK" button here
-                            null // Default button, null for no default
-                    );
-
-                    // Process the result
-                    if (result == JOptionPane.OK_OPTION) {
-                        int year = (int) yearComboBox.getSelectedItem();
-                        String monthName = (String) monthComboBox.getSelectedItem();
-                        int day = (int) dayComboBox.getSelectedItem(); // validate this input
-
-                        // Convert month name to month number (1-12)
-                        String[] months = {
-                                "January",
-                                "February",
-                                "March",
-                                "April",
-                                "May",
-                                "June",
-                                "July",
-                                "August",
-                                "September",
-                                "October",
-                                "November",
-                                "December"
-                        };
-                        int month = Arrays.asList(months).indexOf(monthName) + 1;
-
-                        // Check if the date is valid
-                        if (isValidDate(year, month, day)) {
-                            String formattedDate = year + "/" + String.format("%02d", month) + "/" + String.format("%02d", day);
-                            System.out.println("Selected Date: " + formattedDate);
-                            meal.setDate(formattedDate);
-                            validDateSelected = true;
-
-                            // Remove all logged meal types except snacks
-                            mealLogger.getMeals().stream()
-                                    .filter(m -> m.getDate().equals(formattedDate))
-                                    .map(Meal::getMealType)
-                                    .distinct()
-                                    .forEach(mealType -> {
-                                        if (!"Snacks".equals(mealType)) {
-                                            optionsList.remove(mealType);
-                                        }
-                                    });
-
-                        } else {
-                            System.out.println("Invalid Date");
-                            JOptionPane.showMessageDialog(MainPanel, "Please enter valid date");
-                        }
-                    }
+                try {
+                    DateGUI.logThis(yearComboBox, dayComboBox, monthComboBox, "Meal", front, meal, new Exercise(), optionsList);
+                } catch (ParseException ex) {
+                    ex.printStackTrace();
                 }
-
-                 // Convert list to array for option pane
+                // Convert list to array for option pane
                 String[] options = optionsList.toArray(new String[0]);
-
                 // If at least one ingredient is selected, show message dialog to select meal type
                 if (!ingredientList.isEmpty() && options.length > 0) {
                     int choice = JOptionPane.showOptionDialog(MainPanel,
@@ -334,16 +237,7 @@ public class MealGUI extends JFrame {
 
     }
 
-    // This method checks if the inputted date by the user is a real date
-    public boolean isValidDate(int year, int month, int day) {
-        Calendar cal = Calendar.getInstance();
-        cal.set(Calendar.YEAR, year);
-        cal.set(Calendar.MONTH, month - 1); // Calendar month is 0-based
-        cal.set(Calendar.DAY_OF_MONTH, 1);
 
-        int maxDay = cal.getActualMaximum(Calendar.DAY_OF_MONTH);
-        return day >= 1 && day <= maxDay;
-    }
 
     public static void main(String[] args) {
         new MealGUI(new Front());
