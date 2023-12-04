@@ -6,7 +6,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.util.Date;
-import java.util.Objects;
 
 import javax.swing.*;
 
@@ -15,7 +14,9 @@ public class ProfileGui implements ActionListener, FocusListener {
 	MyFrame frame = new MyFrame();
 	JButton Create = new JButton("Create profile");
 	JButton New_profile = new JButton("New profile");
+	JButton Edit_Profile = new JButton("Edit profile");
 	JButton back = new JButton("Back");
+	JButton confirm = new JButton("Confirm");
 	JTextField Height = new JTextField("Height");
 	JTextField Weight = new JTextField("Weight");
 	JTextField BodyFat = new JTextField("BodyFat%");
@@ -53,6 +54,7 @@ public class ProfileGui implements ActionListener, FocusListener {
 
 	Front temp;
 
+	// Profile Creation window
 	public ProfileGui(Front front) {
 
 
@@ -136,13 +138,100 @@ public class ProfileGui implements ActionListener, FocusListener {
 		frame.setLocationRelativeTo(null);
 	}
 
+	// Loaded Profile edit window
+	public ProfileGui(Front front, Profile user) {
+
+
+		this.front = front;
+
+		frame.setTitle("Profile");
+
+		// frame.setLayout(new FlowLayout(FlowLayout.CENTER, 100, 20));
+		back.setBounds(350, 20, 70, 30);
+
+		frame.setVisible(false);
+
+		title.setBounds(230, 0, 100, 70);
+		title.setForeground(Color.BLACK);
+
+		Height.setBounds(200, 50, 100, 30);
+		Weight.setBounds(200, 85, 100, 30);
+		BodyFat.setBounds(200, 120, 100, 30);
+		date.setBounds(200, 155, 100, 30);
+
+		GenderButtonsLabel.setBounds(65, 175, 100, 70);
+		Male.setBounds(20, 220, 65, 30);
+		Female.setBounds(85, 220, 75, 30);
+
+		BMRSettingLabel.setBounds(200, 250, 100, 70);
+		setting1.setBounds(100, 300, 100, 30);
+		setting2.setBounds(250, 300, 200, 30);
+		setting3.setBounds(180, 340, 200, 30);
+
+		UnitButtonsLabel.setBounds(350, 175, 100, 70);
+		Metric.setBounds(280, 225, 100, 30);
+		Imperial.setBounds(380, 225, 100, 30);
+
+		confirm.setBounds(180, 400, 120, 40);
+
+		group.add(Male);
+		group.add(Female);
+
+		groupSettings.add(setting1);
+		groupSettings.add(setting2);
+		groupSettings.add(setting3);
+
+		UnitGroups.add(Metric);
+		UnitGroups.add(Imperial);
+
+		frame.add(back);
+		frame.add(title);
+		frame.add(Height);
+		frame.add(Weight);
+		frame.add(BodyFat);
+		frame.add(Male);
+		frame.add(Female);
+		frame.add(date);
+		frame.add(setting1);
+		frame.add(setting2);
+		frame.add(setting3);
+		frame.add(Metric);
+		frame.add(Imperial);
+		frame.add(GenderButtonsLabel);
+		frame.add(UnitButtonsLabel);
+		frame.add(BMRSettingLabel);
+		frame.add(confirm);
+
+		Weight.addFocusListener(this);
+		Height.addFocusListener(this);
+		BodyFat.addFocusListener(this);
+		date.addFocusListener(this);
+		Male.addActionListener(this);
+		Female.addActionListener(this);
+		setting1.addActionListener(this);
+		setting2.addActionListener(this);
+		setting3.addActionListener(this);
+		Metric.addActionListener(this);
+		Imperial.addActionListener(this);
+
+
+		back.addActionListener(this);
+		confirm.addActionListener(this);
+
+		frame.setLayout(null);
+		frame.setLocationRelativeTo(null);
+	}
+
+
+	// Loaded Profile display
 	public ProfileGui(Front front, int user) {
 
 		this.front = front;
 		this.temp=front;
 
 		back.setBounds(350, 20, 70, 30);
-		New_profile.setBounds(220, 370, 120, 30);
+		New_profile.setBounds(280, 370, 120, 30);
+		Edit_Profile.setBounds(100, 370, 120, 30);
 
 		title.setBounds(230, 20, 100, 70);
 		title.setForeground(Color.BLACK);
@@ -188,9 +277,11 @@ public class ProfileGui implements ActionListener, FocusListener {
 		frame.add(BMRTitle);
 		frame.add(back);
 		frame.add(New_profile);
+		frame.add(Edit_Profile);
 
 		back.addActionListener(this);
 		New_profile.addActionListener(this);
+		Edit_Profile.addActionListener(this);
 		frame.setLayout(null);
 		frame.setLocationRelativeTo(null);
 	}
@@ -259,6 +350,7 @@ public class ProfileGui implements ActionListener, FocusListener {
 				else {
 					currProfile = new Profile(gender, birth, height, weight, bmrSetting);
 					currProfile.setFatLvl(fatlevel);
+					currProfile.setUnit(unitSetting);
 					JOptionPane.showMessageDialog(frame, "Profile Created");
 					DBQuery.storeProfile(currProfile);
 					System.out.println(DBQuery.getUsers());
@@ -274,7 +366,51 @@ public class ProfileGui implements ActionListener, FocusListener {
 			ProfileGui profileGUIInstance = new ProfileGui(front);
 			profileGUIInstance.frame.setVisible(true);
 		}
+		else if(e.getSource()==Edit_Profile)
+		{
+			frame.setVisible(false);
+			ProfileGui profileGUIInstance = new ProfileGui(front, currProfile);
+			profileGUIInstance.frame.setVisible(true);
+		}
+		else if (e.getSource()==confirm) {
+			try {
+				height =  Double.parseDouble(Height.getText());
+				weight =  Double.parseDouble(Weight.getText());
+				fatlevel =  Double.parseDouble(BodyFat.getText());
+			} catch (NumberFormatException ex) {
+				JOptionPane.showMessageDialog(frame, "Please enter valid numbers");
+			}
+			Birth = date.getText();
+			try {
+				birth = new Date(Integer.parseInt(Birth.substring(0,4)),Integer.parseInt(Birth.substring(5,7))-1,Integer.parseInt(Birth.substring(8,10)));
+			} catch (StringIndexOutOfBoundsException ex) {
+				JOptionPane.showMessageDialog(frame, "Incorrect date format");
+			} catch (NumberFormatException exc) {
+				JOptionPane.showMessageDialog(frame, "Please enter valid date");
+			}
 
+			try {
+				if (height <= 0 || weight <= 0 || fatlevel <= 0) {
+					JOptionPane.showMessageDialog(frame, "Please enter valid numbers");
+				} else if (bmrSetting < 0) {
+					JOptionPane.showMessageDialog(frame, "Please select a bmr setting");
+				}
+				else {
+					currProfile.setSex(gender);
+					currProfile.setBirth(birth);
+					currProfile.setHeight(height);
+					currProfile.setWeight(weight);
+					currProfile.setCalcMethod(bmrSetting);
+					currProfile.setFatLvl(fatlevel);
+					currProfile.setUnit(unitSetting);
+					JOptionPane.showMessageDialog(frame, "Profile Changed");
+					DBQuery.storeProfile(currProfile);
+					System.out.println(DBQuery.getUsers());
+				}
+			} catch (NullPointerException exception) {
+				JOptionPane.showMessageDialog(frame, "Please fill in all fields correctly");
+			}
+		}
 	}
 
 	@Override
