@@ -10,6 +10,7 @@ class Exercise  {
     private String intensity; // low, medium, high, very high
     private int caloriesBurned;
 
+
     // constructor to initialize exercise data
     public Exercise(String date, String time, String type, int duration, String intensity) {
         this.date = date;
@@ -17,6 +18,10 @@ class Exercise  {
         this.type = type;
         this.duration = duration;
         this.intensity = intensity;
+    }
+
+    public Exercise() {
+
     }
 
     public String getDate() {
