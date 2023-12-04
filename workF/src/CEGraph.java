@@ -4,6 +4,7 @@
  * Use case 4 that visualizes the daily calorie intakes
  * and daily exercise within an inputed time period
  */
+package src;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -54,7 +55,7 @@ public class CEGraph extends JFrame implements ActionListener {
 	public CEGraph(GraphingGUI previous, Profile profile) {
 		// Set window title
 		super("Daily Calory Intake & Daily Exercise");
-		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("YYYY-MM-DD");
+		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy/MM/dd");
 		Profile user = profile;
 		// Set charts region
 		JPanel panel = new JPanel();
@@ -63,7 +64,7 @@ public class CEGraph extends JFrame implements ActionListener {
 		start = new JTextField(10);
 		to = new JLabel("To");
 		end = new JTextField(10);
-		example = new JLabel("dd/mm/yyyy");
+		example = new JLabel("yyyy/mm/dd");
 		graph = new JButton("Graph");
 		back = new JButton("Back");
 		back.addActionListener(new ActionListener() {
@@ -115,62 +116,24 @@ public class CEGraph extends JFrame implements ActionListener {
 		panel.removeAll();// removes previous chart that was made
 		panel.revalidate();
 		panel.repaint();
-		TimeSeries caloryIntake = new TimeSeries("Daily Calory Intake");
-		TimeSeries amountOfExercise = new TimeSeries("Daily Amount of Exercise");
-		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("YYYY-MM-DD");
+		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy/MM/dd");
 		// turns date inputed from the user into a format
 		// that allows comparison of dates
-		// will receive the user BMR from profile
-		// will receive myMealLogger, log of the users meals, from mealLog
-		// will receive myExerciseLogger, log of the users
-		// exercise info, from exerciseLog
+		// receives the users mealLog and exerciseLog from user
+
 		// catch when the user inputs an end date that is
 		// earlier than the start date
 		if (startDate.after(endDate)) {
 			JOptionPane.showMessageDialog(null, "Incorrect Date Info");
 			System.out.println("test");
 		} else {
-			// for loop that adds info to the chart that fits
-			// into the inputed time period
-			Map<Date, Double> amountOfCalsPerDate = new HashMap<>();
-			for (int i = 0; i < user.getMealHistory().size(); i++) {
-				Double calories = amountOfCalsPerDate
-						.get(simpleDateFormat.parse(user.getMealHistory().get(i).getDate()));
-				Double amountOfCals = calories == null ? 0 : calories;
-				amountOfCalsPerDate.put(simpleDateFormat.parse(user.getMealHistory().get(i).getDate()),
-						amountOfCals + (user.getMealHistory().get(i)).calculateCalories());
-			} // end for loop
-
-			for (Entry<Date, Double> e : amountOfCalsPerDate.entrySet()) {
-				if (e.getKey().after(startDate) && e.getKey().before(endDate) || e.getKey().equals(startDate)
-						|| e.getKey().equals(endDate)) {
-					caloryIntake.add(new Day(e.getKey()), e.getValue());
-				} // end if statement
-			} // end for loop
-
-			Map<Date, Double> amountOfExPerDate = new HashMap<>();
-			for (int i = 0; i < user.getExerciseHistory().size(); i++) {
-				Double exercise = amountOfExPerDate
-						.get(simpleDateFormat.parse(user.getExerciseHistory().get(i).getDate()));
-				Double amountOfEx = exercise == null ? 0 : exercise;
-				amountOfExPerDate.put(simpleDateFormat.parse(user.getExerciseHistory().get(i).getDate()),
-						amountOfEx + (user.getExerciseHistory().get(i)).getCaloriesBurned());
-			} // end for loop
-
-			for (Entry<Date, Double> e : amountOfExPerDate.entrySet()) {
-				if (e.getKey().after(startDate) && e.getKey().before(endDate) || e.getKey().equals(startDate)
-						|| e.getKey().equals(endDate)) {
-					amountOfExercise.add(new Day(e.getKey()), e.getValue());
-				} // end if statement
-			} // end for loop
-
 			// creates the chart and adds the data
 			// adds the different axis'
 			TimeSeriesCollection dataset = new TimeSeriesCollection();
-			dataset.addSeries(caloryIntake);
+			dataset.addSeries(calculateCalories(user, startDate, endDate, simpleDateFormat));
 
 			TimeSeriesCollection dataset2 = new TimeSeriesCollection();
-			dataset2.addSeries(amountOfExercise);
+			dataset2.addSeries(calculateExercise(user, startDate, endDate, simpleDateFormat));
 
 			XYPlot plot = new XYPlot();
 			XYSplineRenderer splinerenderer1 = new XYSplineRenderer();
@@ -181,7 +144,7 @@ public class CEGraph extends JFrame implements ActionListener {
 			DateAxis domainAxis = new DateAxis("Days");
 			domainAxis.setAutoTickUnitSelection(false);
 			plot.setDomainAxis(domainAxis);
-			domainAxis.setDateFormatOverride(new SimpleDateFormat("dd/MM/yy"));
+			domainAxis.setDateFormatOverride(new SimpleDateFormat("yy/MM/dd"));
 			plot.setRangeAxis(new NumberAxis("Calories(cal)"));
 
 			plot.setDataset(1, dataset2);
@@ -203,6 +166,48 @@ public class CEGraph extends JFrame implements ActionListener {
 			panel.repaint();
 		} // end if statement
 	}// end createTimeSeries
+
+	public TimeSeries calculateCalories(Profile user, Date startDate, Date endDate, SimpleDateFormat simpleDateFormat)
+			throws ParseException {
+		TimeSeries data = new TimeSeries("Daily Calory Intake");
+		Map<Date, Double> amountOfCalsPerDate = new HashMap<>();
+		for (int i = 0; i < user.getMealHistory().size(); i++) {
+			Double calories = amountOfCalsPerDate.get(simpleDateFormat.parse((user.getMealHistory().get(i).getDate())));
+			Double amountOfCals = calories == null ? 0 : calories;
+			amountOfCalsPerDate.put(simpleDateFormat.parse((user.getMealHistory().get(i).getDate())),
+					amountOfCals + (user.getMealHistory().get(i)).calculateCalories());
+		} // end for loop
+
+		for (Entry<Date, Double> e : amountOfCalsPerDate.entrySet()) {
+			if (e.getKey().after(startDate) && e.getKey().before(endDate) || e.getKey().equals(startDate)
+					|| e.getKey().equals(endDate)) {
+				data.add(new Day(e.getKey()), e.getValue());
+			} // end if statement
+		} // end for loop
+		return data;
+	}// end calculateCalories
+
+	public TimeSeries calculateExercise(Profile user, Date startDate, Date endDate, SimpleDateFormat simpleDateFormat)
+			throws ParseException {
+		TimeSeries data = new TimeSeries("Daily amount of exercise");
+		Map<Date, Double> amountOfExPerDate = new HashMap<>();
+		for (int i = 0; i < user.getExerciseHistory().size(); i++) {
+			Double exercise = amountOfExPerDate
+					.get(simpleDateFormat.parse((user.getExerciseHistory().get(i).getDate())));
+			Double amountOfEx = exercise == null ? 0 : exercise;
+			amountOfExPerDate.put(simpleDateFormat.parse((user.getExerciseHistory().get(i).getDate())),
+					amountOfEx + (user.getExerciseHistory().get(i)).getCaloriesBurned());
+		} // end for loop
+
+		for (Entry<Date, Double> e : amountOfExPerDate.entrySet()) {
+			if (e.getKey().after(startDate) && e.getKey().before(endDate) || e.getKey().equals(startDate)
+					|| e.getKey().equals(endDate)) {
+				data.add(new Day(e.getKey()), e.getValue());
+			} // end if statement
+		} // end for loop
+		return data;
+
+	}// end calculateExercise
 
 	public static void main(String[] args) throws SQLException {
 		GraphingGUI back = new GraphingGUI(new Front());

@@ -4,6 +4,7 @@
  * Use case 5 that visualizes the daily
  * nutrient intakes
  */
+package src;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -47,12 +48,12 @@ public class DNGraph extends JFrame implements ActionListener {
 		// Set window title
 		super("Daily Nutrients Intake");
 		Profile user = profile;
-		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("YYYY-MM-DD");
+		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy/MM/dd");
 		inputDate = new JLabel("Input Date");
 		start = new JTextField(10);
 		to = new JLabel("To");
 		end = new JTextField(10);
-		example = new JLabel("dd/mm/yyyy");
+		example = new JLabel("yyyy/mm/dd");
 		// graphTen = new JButton("Graph Top 10");
 		graphFive = new JButton("Graph Top 5");
 		back = new JButton("Back");
@@ -107,9 +108,27 @@ public class DNGraph extends JFrame implements ActionListener {
 		panel.removeAll();// removes any previous charts that where made
 		panel.revalidate();
 		panel.repaint();
-		// data set
+		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy/MM/dd");
+		// catch when the user inputs a end date that is earlier than the start
+		if (startDate.after(endDate)) {
+			JOptionPane.showMessageDialog(null, "Incorrect Date Info");
+		} else {
+			JFreeChart chart = ChartFactory.createPieChart("Daily Nutrient Intake",
+					calculateNutrients(user, startDate, endDate, simpleDateFormat), true, true, false);
+
+			ChartPanel chartPanel = new ChartPanel(chart);
+			chartPanel.setPreferredSize(new Dimension(900, 600));
+			chartPanel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
+			chartPanel.setBackground(Color.white);
+			panel.add(chartPanel);
+			panel.revalidate();
+			panel.repaint();
+		} // end if statement
+	}// end createChartTopFive
+
+	public DefaultPieDataset calculateNutrients(Profile user, Date startDate, Date endDate,
+			SimpleDateFormat simpleDateFormat) throws ParseException {
 		DefaultPieDataset result = new DefaultPieDataset();
-		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("YYYY-MM-DD");
 		int totalCalories = 0;
 		int totalFat = 0;
 		int totalProtein = 0;
@@ -117,10 +136,8 @@ public class DNGraph extends JFrame implements ActionListener {
 		int other = 0;
 
 		for (int i = 0; i < user.getMealHistory().size(); i++) {
-			if (simpleDateFormat.parse(user.getMealHistory().get(i).getDate()).after(startDate)
-					&& simpleDateFormat.parse(user.getMealHistory().get(i).getDate()).before(endDate)
-					|| simpleDateFormat.parse(user.getMealHistory().get(i).getDate()).equals(startDate)
-					|| simpleDateFormat.parse(user.getMealHistory().get(i).getDate()).equals(endDate)) {
+			Date today = simpleDateFormat.parse(user.getMealHistory().get(i).getDate());
+			if (today.after(startDate) && today.before(endDate) || today.equals(startDate) || today.equals(endDate)) {
 				totalCalories += (user.getMealHistory().get(i)).calculateCalories();
 				totalFat += (user.getMealHistory().get(i)).calculateFat();
 				totalProtein += (user.getMealHistory().get(i)).calculateProtein();
@@ -134,21 +151,8 @@ public class DNGraph extends JFrame implements ActionListener {
 		result.setValue("Fat", totalFat);
 		result.setValue("Calories", totalCalories);
 		result.setValue("Other", other);
-		// catch when the user inputs a end date that is earlier than the start
-		if (startDate.after(endDate)) {
-			JOptionPane.showMessageDialog(null, "Incorrect Date Info");
-		} else {
-			JFreeChart chart = ChartFactory.createPieChart("Daily Nutrient Intake", result, true, true, false);
-
-			ChartPanel chartPanel = new ChartPanel(chart);
-			chartPanel.setPreferredSize(new Dimension(900, 600));
-			chartPanel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
-			chartPanel.setBackground(Color.white);
-			panel.add(chartPanel);
-			panel.revalidate();
-			panel.repaint();
-		} // end if statement
-	}// end createChartTopFive
+		return result;
+	}// end calculateNutrients
 
 	public static void main(String[] args) throws SQLException {
 		GraphingGUI back = new GraphingGUI(new Front());
