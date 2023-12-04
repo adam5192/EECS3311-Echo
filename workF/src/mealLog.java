@@ -78,6 +78,10 @@ class MealLogger {
         meals.add(meal);
     }
 
+    public void removeMeal(Meal meal) {
+        meals.remove(meal);
+    }
+
     //return logged meals
     public List<Meal> getMeals() {
         return meals;
