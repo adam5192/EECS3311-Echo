@@ -121,14 +121,16 @@ public class exerciseGUI extends JFrame {
 
                                 // Check if the date is valid
                                 if (isValidDate(year, month, day)) {
-                                    String formattedDate = year + "-" + String.format("%02d", month) + "-" + String.format("%02d", day);
+                                    String formattedDate = year + "/" + String.format("%02d", month) + "/" + String.format("%02d", day);
                                     System.out.println("Selected Date: " + formattedDate);
                                     Exercise exercise = new Exercise(formattedDate, time, type, duration, intensity);
                                     exerciseLogger.logExercise(exercise);
                                     timeField.setText("");
                                     validDateSelected = true;
                                     // add current exercise to profile log
+                                    exercise.setTime(time);
                                     front.profileGUIInstance.currProfile.addLog(exercise);
+                                    DBQuery.storeLog(exercise, front.profileGUIInstance.currProfile.getUserID());
                                 } else {
                                     System.out.println("Invalid Date");
                                     JOptionPane.showMessageDialog(MainPanel, "Please enter valid date");
@@ -148,28 +150,43 @@ public class exerciseGUI extends JFrame {
         viewLogButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                StringBuilder exerciseLogInfo = new StringBuilder();
-                int totalCaloriesBurned = 0;
+                // panel for displaying exercise log
+                JPanel exerciseLogPanel = new JPanel();
+                exerciseLogPanel.setLayout(new BoxLayout(exerciseLogPanel, BoxLayout.Y_AXIS));
+                // get bmr from current user info
                 double userBMR = front.profileGUIInstance.currProfile.getBMR();
+                // loop through exercise log
                 for (Exercise exercise : exerciseLogger.getExercises()) {
                     exercise.setCaloriesBurned(exercise.calculateCaloriesBurnt(userBMR));
 
-                    totalCaloriesBurned += exercise.getCaloriesBurned();
+                    JPanel exercisePanel = new JPanel();
+                    exercisePanel.setLayout(new FlowLayout(FlowLayout.LEFT));
+                    // button to remove an exercise
+                    JButton removeButton = new JButton("Remove");
+                    removeButton.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            // remove from log and gui
+                            exerciseLogger.removeExercise(exercise);
+                            exerciseLogPanel.remove(exercisePanel);
+                            exerciseLogPanel.revalidate();
+                            exerciseLogPanel.repaint();
+                        }
+                    });
+                    // display exercise info
+                    JLabel exerciseLabel = new JLabel(exercise.getDate() + " : " + exercise.getType() +
+                            " for " + exercise.getDuration() + " minutes, Calories Burned: " +
+                            exercise.getCaloriesBurned());
 
-                    // Display all corresponding info for each exercise in log
-                    exerciseLogInfo.append(exercise.getDate())
-                            .append(" : ")
-                            .append(exercise.getType())
-                            .append(" for ")
-                            .append(exercise.getDuration())
-                            .append(" minutes,")
-                            .append(" Calories Burned: ")
-                            .append(exercise.getCaloriesBurned())
-                            .append("\n");
+                    exercisePanel.add(exerciseLabel);
+                    exercisePanel.add(removeButton);
+                    exerciseLogPanel.add(exercisePanel);
                 }
-                JOptionPane.showMessageDialog(MainPanel, exerciseLogInfo.toString(), "Daily Exercise Log", JOptionPane.INFORMATION_MESSAGE);
+
+                JOptionPane.showMessageDialog(MainPanel, exerciseLogPanel, "Daily Exercise Log", JOptionPane.INFORMATION_MESSAGE);
             }
         });
+
     }
 
     // This method checks if the inputted date by the user is a real date
