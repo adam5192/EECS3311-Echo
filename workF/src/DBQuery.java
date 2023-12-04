@@ -97,18 +97,17 @@ public class DBQuery {
     * Find all the existing profile in the database and output the name of the users
     * @return an array of integer representing the users in the current database. If no profile exists, return null.
     */
-   public static List<Integer> getUsers() {
+   public static ArrayList<Integer> getUsers() {
       try (Connection query = DriverManager.getConnection("jdbc:mysql://localhost:3306/Project_Database", "root", "EECS3311_Project")) {
          PreparedStatement statement = query.prepareStatement("select count(*) as ProfileCount from UserProfile");
          ResultSet rs = statement.executeQuery();
          rs.next();
-         int size = rs.getInt("ProfileCount");
-         if (size <= 0) throw new SQLException();
+         if (rs.getInt("ProfileCount") < 0) throw new SQLException();
          statement = query.prepareStatement("select UserId from UserProfile");
          rs = statement.executeQuery();
-         List<Integer> out = new ArrayList<Integer>();
+         ArrayList<Integer> out = new ArrayList<Integer>();
 
-         for (int i = 0; rs.next() && i < size; i++) {
+         while (rs.next()) {
             out.add(rs.getInt("UserID"));
          }
 
@@ -144,34 +143,129 @@ public class DBQuery {
          userProfile.setFatLvl(rs.getInt("FatLvl"));
 
          // Log history regeneration
-         List<Log> dataHistory = new LinkedList<Log>(); // Better for add and deletion operations
-         List<Exercise> exerciseHistory = new LinkedList<Exercise>();
-         List<Meal> mealHistory = new LinkedList<Meal>();
-         rs.beforeFirst();
-         statement = query.prepareStatement(
+         List<Log> dataHistory = DBQuery.getDataLog(query, userID);
+         List<Exercise> exerciseHistory = DBQuery.getExerciseLog(query, userID);
+         List<Meal> mealHistory = DBQuery.getMealLog(query, userID);
+
+         if (dataHistory == null || exerciseHistory == null || mealHistory == null) throw new SQLException();
+
+//         rs.beforeFirst();
+//         statement = query.prepareStatement(
+//                 "select * from DataLog " +
+//                         "where UserID = ? group by LogDate"
+//         );
+//         statement.setInt(1, userID);
+//
+//         rs = statement.executeQuery();
+//         while(rs.next()) { // In case there is multiple logs with the same date of the same type from the same user
+//            dataHistory.add(new Log(rs.getDouble("LogHeight"), rs.getDouble("LogWeight"),
+//                    rs.getString("LogDate"), rs.getInt("UserID")));
+//         }
+//
+//         statement = query.prepareStatement(
+//                 "select * from MealLog " +
+//                         "where UserID = ? group by LogDate, MealType",
+//                 ResultSet.TYPE_SCROLL_INSENSITIVE, // Allow for first(), last(), etc. operations on ResultSet instance
+//                 ResultSet.CONCUR_UPDATABLE
+//         );
+//         statement.setInt(1, userID);
+//         rs = statement.executeQuery();
+//         Meal meal = new Meal();
+//         String lastIn = null;
+//         for(int i = 0; rs.next() && i < 100;) { // In case there is multiple logs with the same date of the same type
+//            if (lastIn.equals(null) || lastIn.equals(rs.getString("IngredientName"))) {// If first iteration or current ingredient and previous is part of the same meal, add to list as normal
+//               Ingredient e = new Ingredient(rs.getString("IngredientName"), rs.getInt("CaloVal"), rs.getInt("FatVal"),
+//                       rs.getInt("ProtVal"), rs.getInt("CarbVal"), rs.getInt("Others"), rs.getInt("Serving"));
+//               meal.addIngredient(e);
+//
+//               lastIn = rs.getString("IngredientName");
+//            }
+//            else { // Current ingredient is for a different meal
+//               rs.previous(); // info required is from the previous index
+//               java.util.Date date = new java.util.Date(rs.getDate("LogDate").getTime());
+//               date.setYear(date.getYear() + 1970);
+//
+//               meal.setType(rs.getString("MealType"));
+//               mealHistory.add(meal);
+//
+//               // Restart the process for the next meal
+//               meal = new Meal();
+//               lastIn = null;
+//               i = 0;
+//            }
+//         }
+//
+//         statement = query.prepareStatement(
+//                 "select * from Exercise " +
+//                         "where UserID = ? group by LogDate, LogTime, CaloBurnt, ExerciseTime, Intensity, ExerciseType"
+//         );
+//
+//         statement.setInt(1, userID);
+//         rs = statement.executeQuery();
+//         while(rs.next()) { // In case there is multiple logs with the same date of the same type from the same user
+//            exerciseHistory.add(new Exercise(rs.getString("LogDate"), rs.getString("LogTime"),
+//                    rs.getString("ExerciseType"), rs.getInt("Duration"), rs.getString("Intensity")));
+//         }
+
+         userProfile.setDataHistory(dataHistory);
+         userProfile.setExerciseHistory(exerciseHistory);
+         userProfile.setMealHistory(mealHistory);
+         return userProfile;
+      } catch (SQLException e) {
+         e.printStackTrace();
+         return null;
+      }
+   }
+
+   /*
+    * Find all rows in the DataLog table of the database and output a list of Meal objects
+    * @param query required as a parameter to ensure singleton trait of the Connection instance
+    * @param userID the integer value associating Log objects with a Profile instance
+    * @return a List of Log objects associated with the input userID
+    */
+   public static List<Log> getDataLog(Connection query, int userID) {
+      try {
+         List<Log> output = new LinkedList<Log>();
+         PreparedStatement statement = query.prepareStatement(
                  "select * from DataLog " +
                          "where UserID = ? group by LogDate"
          );
          statement.setInt(1, userID);
 
-         rs = statement.executeQuery();
+         ResultSet rs = statement.executeQuery();
          while(rs.next()) { // In case there is multiple logs with the same date of the same type from the same user
-            dataHistory.add(new Log(rs.getDouble("LogHeight"), rs.getDouble("LogWeight"),
+            output.add(new Log(rs.getDouble("LogHeight"), rs.getDouble("LogWeight"),
                     rs.getString("LogDate"), rs.getInt("UserID")));
          }
+         return output;
+      } catch(SQLException e) {
+         e.printStackTrace();
+         return null;
+      }
+   }
 
-         statement = query.prepareStatement(
-                 "select * from Meal " +
+   /*
+    * Find all rows in the MealLog table of the database and output a list of Meal objects
+    * @param query required as a parameter to ensure singleton trait of the Connection instance
+    * @param userID the integer value associating Meal objects with a Profile instance
+    * @return a List of Meal objects associated with the input userID
+    */
+   private static List<Meal> getMealLog(Connection query, int userID) {
+      try {
+         List<Meal> output = new LinkedList<Meal>();
+
+         PreparedStatement statement = query.prepareStatement(
+                 "select * from MealLog " +
                          "where UserID = ? group by LogDate, MealType",
                  ResultSet.TYPE_SCROLL_INSENSITIVE, // Allow for first(), last(), etc. operations on ResultSet instance
                  ResultSet.CONCUR_UPDATABLE
          );
          statement.setInt(1, userID);
-         rs = statement.executeQuery();
+         ResultSet rs = statement.executeQuery();
          Meal meal = new Meal();
          String lastIn = null;
-         for(int i = 0; rs.next() && i < 100;) { // In case there is multiple logs with the same date of the same type
-            if (lastIn.equals(null) || lastIn.equals(rs.getString("IngredientName"))) {// If first iteration or current ingredient and previous is part of the same meal, add to list as normal
+         while(rs.next()) {
+            if (lastIn == null || lastIn.equals(rs.getString("IngredientName"))) {// If first iteration or current ingredient and previous is part of the same meal, add to list as normal
                Ingredient e = new Ingredient(rs.getString("IngredientName"), rs.getInt("CaloVal"), rs.getInt("FatVal"),
                        rs.getInt("ProtVal"), rs.getInt("CarbVal"), rs.getInt("Others"), rs.getInt("Serving"));
                meal.addIngredient(e);
@@ -184,30 +278,43 @@ public class DBQuery {
                date.setYear(date.getYear() + 1970);
 
                meal.setType(rs.getString("MealType"));
-               mealHistory.add(meal);
+               output.add(meal);
 
                // Restart the process for the next meal
                meal = new Meal();
                lastIn = null;
-               i = 0;
             }
          }
-         statement = query.prepareStatement(
+
+         return output;
+      } catch (SQLException e) {
+         e.printStackTrace();
+         return null;
+      }
+   }
+
+   /*
+    * Find all rows in the Exercise table of the database and output a list of Exercise objects
+    * @param query required as a parameter to ensure singleton trait of the Connection instance
+    * @param userID the integer value associating Exercise objects with a Profile instance
+    * @return a List of Exercise objects associated with the input userID
+    */
+   private static List<Exercise> getExerciseLog(Connection query, int userID) {
+      try {
+         List<Exercise> output = new LinkedList<Exercise>();
+         PreparedStatement statement = query.prepareStatement(
                  "select * from Exercise " +
                          "where UserID = ? group by LogDate, LogTime, CaloBurnt, ExerciseTime, Intensity, ExerciseType"
          );
 
          statement.setInt(1, userID);
-         rs = statement.executeQuery();
+         ResultSet rs = statement.executeQuery();
          while(rs.next()) { // In case there is multiple logs with the same date of the same type from the same user
-            exerciseHistory.add(new Exercise(rs.getString("LogDate"), rs.getString("LogTime"),
+            output.add(new Exercise(rs.getString("LogDate"), rs.getString("LogTime"),
                     rs.getString("ExerciseType"), rs.getInt("Duration"), rs.getString("Intensity")));
          }
 
-         userProfile.setDataHistory(dataHistory);
-         userProfile.setExerciseHistory(exerciseHistory);
-         userProfile.setMealHistory(mealHistory);
-         return userProfile;
+         return output;
       } catch (SQLException e) {
          e.printStackTrace();
          return null;
@@ -331,4 +438,12 @@ public class DBQuery {
       } catch (SQLException e) {e.printStackTrace();}
    }
 
+
+   /*
+    *
+    */
+   //Stub method, implement if needed
+   public static void editProfile(Profile user) {
+
+   }
 }
