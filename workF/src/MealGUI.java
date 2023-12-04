@@ -54,6 +54,7 @@ public class MealGUI extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 setVisible(false);
                 front.main.setVisible(true);
+                front.profileGUIInstance.currProfile.setMealHistory(mealLogger.getMeals());
             }
         });
 
@@ -228,13 +229,10 @@ public class MealGUI extends JFrame {
 
                         // Check if the date is valid
                         if (isValidDate(year, month, day)) {
-                            String formattedDate = year + "-" + String.format("%02d", month) + "-" + String.format("%02d", day);
+                            String formattedDate = year + "/" + String.format("%02d", month) + "/" + String.format("%02d", day);
                             System.out.println("Selected Date: " + formattedDate);
                             meal.setDate(formattedDate);
                             validDateSelected = true;
-
-                            // add current meal to profile log
-                            front.profileGUIInstance.currProfile.addLog(meal);
 
                             // Remove all logged meal types except snacks
                             mealLogger.getMeals().stream()
@@ -268,6 +266,10 @@ public class MealGUI extends JFrame {
                         String selectedMeal = options[choice];
                         meal.setType(selectedMeal);
 
+                        // add current meal to profile log
+                        front.profileGUIInstance.currProfile.addLog(meal);
+                        DBQuery.storeLog(meal, front.profileGUIInstance.currProfile.getUserID());
+
                         // Add all ingredients to meal
                         for (Ingredient ingredient : ingredientList) {
                             meal.addIngredient(ingredient);
@@ -296,37 +298,40 @@ public class MealGUI extends JFrame {
         viewMealLogButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                StringBuilder mealLogInfo = new StringBuilder();
-                int totalCalories = 0, totalFat = 0, totalProtein = 0, totalCarbs = 0;
-                // Calculate nutritional information for all meals in meal log
+                // new panel for displaying meal log
+                JPanel mealLogPanel = new JPanel();
+                mealLogPanel.setLayout(new BoxLayout(mealLogPanel, BoxLayout.Y_AXIS));
+
                 for (Meal meal : mealLogger.getMeals()) {
-                    int calories = meal.calculateCalories();
-                    int fat = meal.calculateFat();
-                    int protein = meal.calculateProtein();
-                    int carbs = meal.calculateCarbs();
+                    JPanel mealPanel = new JPanel();
+                    mealPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
+                    // button to remove meal
+                    JButton removeButton = new JButton("Remove");
+                    removeButton.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            mealLogger.removeMeal(meal);
+                            mealLogPanel.remove(mealPanel);
+                            mealLogPanel.revalidate();
+                            mealLogPanel.repaint();
+                        }
+                    });
+                    // display meals info
+                    JLabel mealLabel = new JLabel(meal.getMealType() + " " + meal.getDate() +
+                            " Calories " + meal.calculateCalories() +
+                            ", Fat " + meal.calculateFat() + "g, Protein " +
+                            meal.calculateProtein() + "g, Carbs " +
+                            meal.calculateCarbs() + "g");
 
-                    totalCalories += calories;
-                    totalFat += fat;
-                    totalProtein += protein;
-                    totalCarbs += carbs;
-
-                    // Display each meal and its nutrients
-                    mealLogInfo.append(meal.getMealType())
-                            .append(" ")
-                            .append(meal.getDate())
-                            .append(" Calories ")
-                            .append(calories)
-                            .append(", Fat ")
-                            .append(fat)
-                            .append("g, Protein ")
-                            .append(protein)
-                            .append("g, Carbs ")
-                            .append(carbs)
-                            .append("g\n");
+                    mealPanel.add(mealLabel);
+                    mealPanel.add(removeButton);
+                    mealLogPanel.add(mealPanel);
                 }
-                JOptionPane.showMessageDialog(MainPanel, mealLogInfo.toString(), "Daily Meal Log", JOptionPane.INFORMATION_MESSAGE);
+
+                JOptionPane.showMessageDialog(MainPanel, mealLogPanel, "Daily Meal Log", JOptionPane.INFORMATION_MESSAGE);
             }
         });
+
     }
 
     // This method checks if the inputted date by the user is a real date
