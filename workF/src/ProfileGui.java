@@ -6,6 +6,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.util.Date;
+import java.util.Objects;
 
 import javax.swing.*;
 
@@ -13,6 +14,7 @@ public class ProfileGui implements ActionListener, FocusListener {
 
 	MyFrame frame = new MyFrame();
 	JButton Create = new JButton("Create profile");
+	JButton New_profile = new JButton("New profile");
 	JButton back = new JButton("Back");
 	JTextField Height = new JTextField("Height");
 	JTextField Weight = new JTextField("Weight");
@@ -40,10 +42,10 @@ public class ProfileGui implements ActionListener, FocusListener {
 	Front front;
 
 	public static Profile currProfile;
-	double height;
-	double weight;
-	double fatlevel;
-	int bmrSetting;
+	double height = -1;
+	double weight = -1;
+	double fatlevel = -1;
+	int bmrSetting = -1;
 	boolean unitSetting;
 	boolean gender;
 	Date birth;
@@ -118,6 +120,14 @@ public class ProfileGui implements ActionListener, FocusListener {
 		Height.addFocusListener(this);
 		BodyFat.addFocusListener(this);
 		date.addFocusListener(this);
+		Male.addActionListener(this);
+		Female.addActionListener(this);
+		setting1.addActionListener(this);
+		setting2.addActionListener(this);
+		setting3.addActionListener(this);
+		Metric.addActionListener(this);
+		Imperial.addActionListener(this);
+
 
 		back.addActionListener(this);
 		Create.addActionListener(this);
@@ -132,6 +142,7 @@ public class ProfileGui implements ActionListener, FocusListener {
 		this.temp=front;
 
 		back.setBounds(350, 20, 70, 30);
+		New_profile.setBounds(220, 370, 120, 30);
 
 		title.setBounds(230, 20, 100, 70);
 		title.setForeground(Color.BLACK);
@@ -144,7 +155,7 @@ public class ProfileGui implements ActionListener, FocusListener {
 		JLabel BodyFatTitle = new JLabel("BodyFat%:  " + currProfile.getFatLvl());
 		System.out.println(currProfile.getFatLvl());
 
-		if(currProfile.getSex()==true)
+		if(currProfile.getSex())
 		{
 			JLabel GenderTitle = new JLabel("Gender: Male");
 			GenderTitle.setBounds(120, 230, 100, 30);
@@ -155,7 +166,7 @@ public class ProfileGui implements ActionListener, FocusListener {
 			frame.add(GenderTitle);
 		}
 
-		JLabel dateTitle = new JLabel("Birth day:  " + currProfile.getBirth().getYear()+"/"+ currProfile.getBirth().getMonth()+"/"+ currProfile.getBirth().getDate());
+		JLabel dateTitle = new JLabel("Birth day:  " + currProfile.getBirth().getYear()+"/"+ (currProfile.getBirth().getMonth()+1)+"/"+ currProfile.getBirth().getDate());
 		JLabel BMRTitle = new JLabel("BMR:  " + currProfile.getBMR());
 
 
@@ -176,8 +187,10 @@ public class ProfileGui implements ActionListener, FocusListener {
 		frame.add(dateTitle);
 		frame.add(BMRTitle);
 		frame.add(back);
+		frame.add(New_profile);
 
 		back.addActionListener(this);
+		New_profile.addActionListener(this);
 		frame.setLayout(null);
 		frame.setLocationRelativeTo(null);
 	}
@@ -238,14 +251,28 @@ public class ProfileGui implements ActionListener, FocusListener {
 			}
 
 			try {
-				currProfile = new Profile(gender, birth, height, weight, bmrSetting);
-				JOptionPane.showMessageDialog(frame, "Profile Created");
-				DBQuery.storeProfile(currProfile);
-				System.out.println(DBQuery.getUsers());
+				if (height <= 0 || weight <= 0 || fatlevel <= 0) {
+					JOptionPane.showMessageDialog(frame, "Please enter valid numbers");
+				} else if (bmrSetting < 0) {
+					JOptionPane.showMessageDialog(frame, "Please select a bmr setting");
+				}
+				else {
+					currProfile = new Profile(gender, birth, height, weight, bmrSetting);
+					currProfile.setFatLvl(fatlevel);
+					JOptionPane.showMessageDialog(frame, "Profile Created");
+					DBQuery.storeProfile(currProfile);
+					System.out.println(DBQuery.getUsers());
+				}
 			} catch (NullPointerException exception) {
 				JOptionPane.showMessageDialog(frame, "Please fill in all fields correctly");
 			}
 			//front.list.add(currProfile.getUserID());
+		}
+		else if(e.getSource()==New_profile)
+		{
+			frame.setVisible(false);
+			ProfileGui profileGUIInstance = new ProfileGui(front);
+			profileGUIInstance.frame.setVisible(true);
 		}
 
 	}
