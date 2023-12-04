@@ -40,6 +40,12 @@ public class Profile {
       this.weight = weight;
       this.fatLvl = 0;
 
+      //Settings
+      userId = nextId;
+      nextId += 1;
+      isMetric = true; //Default in Metric
+      this.bmrSetting = bmrSetting;
+
       //Log Update
       Date logDate = new Date();
       logDate.setYear(logDate.getYear()+1900);
@@ -49,11 +55,6 @@ public class Profile {
       exerciseHistory = new LinkedList<Exercise>();
       mealHistory = new LinkedList<Meal>();
       dataHistory.add(new Log(this.height, this.weight, date, this.userId));
-
-      //Settings
-      userId = nextId++;
-      isMetric = true; //Default in Metric
-      this.bmrSetting = bmrSetting;
 
       //Calculate BMR value
       bmrVal = CalculateBMR.calculateBMR(birth, weight, height, sex, bmrSetting, fatLvl);
