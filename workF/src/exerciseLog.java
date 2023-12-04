@@ -99,6 +99,11 @@ class ExerciseLogger {
         exercises.add(exercise);
     }
 
+    // remove exercise from list
+    public void removeExercise(Exercise exercise) {
+        exercises.remove(exercise);
+    }
+
     // get list of all exercises
     public List<Exercise> getExercises() {
         return exercises;
