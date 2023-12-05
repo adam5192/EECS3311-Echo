@@ -149,64 +149,6 @@ public class DBQuery {
 
          if (dataHistory == null || exerciseHistory == null || mealHistory == null) throw new SQLException();
 
-//         rs.beforeFirst();
-//         statement = query.prepareStatement(
-//                 "select * from DataLog " +
-//                         "where UserID = ? group by LogDate"
-//         );
-//         statement.setInt(1, userID);
-//
-//         rs = statement.executeQuery();
-//         while(rs.next()) { // In case there is multiple logs with the same date of the same type from the same user
-//            dataHistory.add(new Log(rs.getDouble("LogHeight"), rs.getDouble("LogWeight"),
-//                    rs.getString("LogDate"), rs.getInt("UserID")));
-//         }
-//
-//         statement = query.prepareStatement(
-//                 "select * from MealLog " +
-//                         "where UserID = ? group by LogDate, MealType",
-//                 ResultSet.TYPE_SCROLL_INSENSITIVE, // Allow for first(), last(), etc. operations on ResultSet instance
-//                 ResultSet.CONCUR_UPDATABLE
-//         );
-//         statement.setInt(1, userID);
-//         rs = statement.executeQuery();
-//         Meal meal = new Meal();
-//         String lastIn = null;
-//         for(int i = 0; rs.next() && i < 100;) { // In case there is multiple logs with the same date of the same type
-//            if (lastIn.equals(null) || lastIn.equals(rs.getString("IngredientName"))) {// If first iteration or current ingredient and previous is part of the same meal, add to list as normal
-//               Ingredient e = new Ingredient(rs.getString("IngredientName"), rs.getInt("CaloVal"), rs.getInt("FatVal"),
-//                       rs.getInt("ProtVal"), rs.getInt("CarbVal"), rs.getInt("Others"), rs.getInt("Serving"));
-//               meal.addIngredient(e);
-//
-//               lastIn = rs.getString("IngredientName");
-//            }
-//            else { // Current ingredient is for a different meal
-//               rs.previous(); // info required is from the previous index
-//               java.util.Date date = new java.util.Date(rs.getDate("LogDate").getTime());
-//               date.setYear(date.getYear() + 1970);
-//
-//               meal.setType(rs.getString("MealType"));
-//               mealHistory.add(meal);
-//
-//               // Restart the process for the next meal
-//               meal = new Meal();
-//               lastIn = null;
-//               i = 0;
-//            }
-//         }
-//
-//         statement = query.prepareStatement(
-//                 "select * from Exercise " +
-//                         "where UserID = ? group by LogDate, LogTime, CaloBurnt, ExerciseTime, Intensity, ExerciseType"
-//         );
-//
-//         statement.setInt(1, userID);
-//         rs = statement.executeQuery();
-//         while(rs.next()) { // In case there is multiple logs with the same date of the same type from the same user
-//            exerciseHistory.add(new Exercise(rs.getString("LogDate"), rs.getString("LogTime"),
-//                    rs.getString("ExerciseType"), rs.getInt("Duration"), rs.getString("Intensity")));
-//         }
-
          userProfile.setDataHistory(dataHistory);
          userProfile.setExerciseHistory(exerciseHistory);
          userProfile.setMealHistory(mealHistory);
