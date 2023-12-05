@@ -32,20 +32,26 @@ public class DateGUI {
                 "November",
                 "December"
         };
+        int currentYear = Calendar.getInstance().get(Calendar.YEAR);
+        int currentDay = Calendar.getInstance().get(Calendar.DAY_OF_MONTH);
+        int currentMonth = Calendar.getInstance().get(Calendar.MONTH);
         // Year JComboBox
-        for (int year = 2020; year <= 2025; year++) {
+        for (int year = currentYear-2; year <= currentYear; year++) {
             yearComboBox.addItem(year);
         }
+        yearComboBox.setSelectedItem(currentYear);
 
         // Month JComboBox setup
         for (int i = 0; i < months.length; i++) {
             monthComboBox.addItem(months[i]);
         }
+        monthComboBox.setSelectedIndex(currentMonth);
 
         // Day combo box setup
         for (int day = 1; day <= 31; day++) {
             dayComboBox.addItem(day);
         }
+        dayComboBox.setSelectedItem(currentDay);
     }
 
     public static void logThis(JComboBox yearComboBox, JComboBox dayComboBox, JComboBox monthComboBox, String objType, Front front, Meal meal, Exercise exercise, List<String> optionsList) throws ParseException {
