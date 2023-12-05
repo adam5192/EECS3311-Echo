@@ -54,12 +54,7 @@ public class ProfileGui implements ActionListener, FocusListener {
 
 	Front temp;
 
-	// Profile Creation window
-	public ProfileGui(Front front) {
-
-
-		this.front = front;
-
+	public ProfileGui() {
 		frame.setTitle("Profile");
 
 		// frame.setLayout(new FlowLayout(FlowLayout.CENTER, 100, 20));
@@ -88,8 +83,6 @@ public class ProfileGui implements ActionListener, FocusListener {
 		Metric.setBounds(280, 225, 100, 30);
 		Imperial.setBounds(380, 225, 100, 30);
 
-		Create.setBounds(180, 400, 120, 40);
-
 		group.add(Male);
 		group.add(Female);
 
@@ -116,7 +109,6 @@ public class ProfileGui implements ActionListener, FocusListener {
 		frame.add(GenderButtonsLabel);
 		frame.add(UnitButtonsLabel);
 		frame.add(BMRSettingLabel);
-		frame.add(Create);
 
 		Weight.addFocusListener(this);
 		Height.addFocusListener(this);
@@ -130,96 +122,38 @@ public class ProfileGui implements ActionListener, FocusListener {
 		Metric.addActionListener(this);
 		Imperial.addActionListener(this);
 
-
 		back.addActionListener(this);
-		Create.addActionListener(this);
 
 		frame.setLayout(null);
 		frame.setLocationRelativeTo(null);
 	}
 
-	// Loaded Profile edit window
-	public ProfileGui(Front front, Profile user) {
-
+	// Profile Creation window
+	public ProfileGui(Front front) {
+		this();
 
 		this.front = front;
 
-		frame.setTitle("Profile");
+		Create.setBounds(180, 400, 120, 40);
+		frame.add(Create);
+		Create.addActionListener(this);
 
-		// frame.setLayout(new FlowLayout(FlowLayout.CENTER, 100, 20));
-		back.setBounds(350, 20, 70, 30);
+//		frame.setLayout(null);
+//		frame.setLocationRelativeTo(null);
+	}
 
-		frame.setVisible(false);
+	// Loaded Profile edit window
+	public ProfileGui(Front front, Profile user) {
+		this();
 
-		title.setBounds(230, 0, 100, 70);
-		title.setForeground(Color.BLACK);
-
-		Height.setBounds(200, 50, 100, 30);
-		Weight.setBounds(200, 85, 100, 30);
-		BodyFat.setBounds(200, 120, 100, 30);
-		date.setBounds(200, 155, 100, 30);
-
-		GenderButtonsLabel.setBounds(65, 175, 100, 70);
-		Male.setBounds(20, 220, 65, 30);
-		Female.setBounds(85, 220, 75, 30);
-
-		BMRSettingLabel.setBounds(200, 250, 100, 70);
-		setting1.setBounds(100, 300, 100, 30);
-		setting2.setBounds(250, 300, 200, 30);
-		setting3.setBounds(180, 340, 200, 30);
-
-		UnitButtonsLabel.setBounds(350, 175, 100, 70);
-		Metric.setBounds(280, 225, 100, 30);
-		Imperial.setBounds(380, 225, 100, 30);
+		this.front = front;
 
 		confirm.setBounds(180, 400, 120, 40);
-
-		group.add(Male);
-		group.add(Female);
-
-		groupSettings.add(setting1);
-		groupSettings.add(setting2);
-		groupSettings.add(setting3);
-
-		UnitGroups.add(Metric);
-		UnitGroups.add(Imperial);
-
-		frame.add(back);
-		frame.add(title);
-		frame.add(Height);
-		frame.add(Weight);
-		frame.add(BodyFat);
-		frame.add(Male);
-		frame.add(Female);
-		frame.add(date);
-		frame.add(setting1);
-		frame.add(setting2);
-		frame.add(setting3);
-		frame.add(Metric);
-		frame.add(Imperial);
-		frame.add(GenderButtonsLabel);
-		frame.add(UnitButtonsLabel);
-		frame.add(BMRSettingLabel);
 		frame.add(confirm);
-
-		Weight.addFocusListener(this);
-		Height.addFocusListener(this);
-		BodyFat.addFocusListener(this);
-		date.addFocusListener(this);
-		Male.addActionListener(this);
-		Female.addActionListener(this);
-		setting1.addActionListener(this);
-		setting2.addActionListener(this);
-		setting3.addActionListener(this);
-		Metric.addActionListener(this);
-		Imperial.addActionListener(this);
-
-
-		back.addActionListener(this);
 		confirm.addActionListener(this);
 
-		frame.setLayout(null);
-		frame.setLocationRelativeTo(null);
+//		frame.setLayout(null);
+//		frame.setLocationRelativeTo(null);
 	}
 
 
@@ -323,7 +257,7 @@ public class ProfileGui implements ActionListener, FocusListener {
 		{
 			unitSetting=false;
 		}
-		else if(e.getSource()==Create)
+		else if(e.getSource()==Create || e.getSource()==confirm)
 		{
 			try {
 				height =  Double.parseDouble(Height.getText());
@@ -348,10 +282,22 @@ public class ProfileGui implements ActionListener, FocusListener {
 					JOptionPane.showMessageDialog(frame, "Please select a bmr setting");
 				}
 				else {
-					currProfile = new Profile(gender, birth, height, weight, bmrSetting);
-					currProfile.setFatLvl(fatlevel);
-					currProfile.setUnit(unitSetting);
-					JOptionPane.showMessageDialog(frame, "Profile Created");
+					if (e.getSource()==Create) {
+						currProfile = new Profile(gender, birth, height, weight, bmrSetting);
+						currProfile.setFatLvl(fatlevel);
+						currProfile.setUnit(unitSetting);
+						JOptionPane.showMessageDialog(frame, "Profile Created");
+					}
+					else {
+						currProfile.setSex(gender);
+						currProfile.setBirth(birth);
+						currProfile.setHeight(height);
+						currProfile.setWeight(weight);
+						currProfile.setCalcMethod(bmrSetting);
+						currProfile.setFatLvl(fatlevel);
+						currProfile.setUnit(unitSetting);
+						JOptionPane.showMessageDialog(frame, "Profile Changed");
+					}
 					DBQuery.storeProfile(currProfile);
 					System.out.println(DBQuery.getUsers());
 				}
@@ -371,45 +317,6 @@ public class ProfileGui implements ActionListener, FocusListener {
 			frame.setVisible(false);
 			ProfileGui profileGUIInstance = new ProfileGui(front, currProfile);
 			profileGUIInstance.frame.setVisible(true);
-		}
-		else if (e.getSource()==confirm) {
-			try {
-				height =  Double.parseDouble(Height.getText());
-				weight =  Double.parseDouble(Weight.getText());
-				fatlevel =  Double.parseDouble(BodyFat.getText());
-			} catch (NumberFormatException ex) {
-				JOptionPane.showMessageDialog(frame, "Please enter valid numbers");
-			}
-			Birth = date.getText();
-			try {
-				birth = new Date(Integer.parseInt(Birth.substring(0,4)),Integer.parseInt(Birth.substring(5,7))-1,Integer.parseInt(Birth.substring(8,10)));
-			} catch (StringIndexOutOfBoundsException ex) {
-				JOptionPane.showMessageDialog(frame, "Incorrect date format");
-			} catch (NumberFormatException exc) {
-				JOptionPane.showMessageDialog(frame, "Please enter valid date");
-			}
-
-			try {
-				if (height <= 0 || weight <= 0 || fatlevel <= 0) {
-					JOptionPane.showMessageDialog(frame, "Please enter valid numbers");
-				} else if (bmrSetting < 0) {
-					JOptionPane.showMessageDialog(frame, "Please select a bmr setting");
-				}
-				else {
-					currProfile.setSex(gender);
-					currProfile.setBirth(birth);
-					currProfile.setHeight(height);
-					currProfile.setWeight(weight);
-					currProfile.setCalcMethod(bmrSetting);
-					currProfile.setFatLvl(fatlevel);
-					currProfile.setUnit(unitSetting);
-					JOptionPane.showMessageDialog(frame, "Profile Changed");
-					DBQuery.storeProfile(currProfile);
-					System.out.println(DBQuery.getUsers());
-				}
-			} catch (NullPointerException exception) {
-				JOptionPane.showMessageDialog(frame, "Please fill in all fields correctly");
-			}
 		}
 	}
 
